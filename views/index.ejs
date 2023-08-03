@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>GuardianConnector map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script type="text/javascript">
+    mapboxgl.accessToken = "<%= mapboxAccessToken %>";
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "<%= mapboxStyle %>",
+      projection: "<%= mapboxProjection %>",
+      center: ["<%= mapboxCenterLatitude %>", "<%= mapboxCenterLongitude %>"],
+      zoom: "<%= mapboxZoom %>",
+      bearing: "<%= mapboxBearing %>",
+      pitch: "<%= mapboxPitch %>",
+    });
+
+    // Request db data
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/data");
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        return [];
+      }
+    };
+
+    // Split coordinates array into lat/long keys
+    const processGeolocation = (obj) => {
+      if (
+        obj &&
+        obj.g__coordinates &&
+        typeof obj.g__coordinates === "string"
+      ) {
+        try {
+          const coordinates = JSON.parse(obj.g__coordinates);
+          if (Array.isArray(coordinates) && coordinates.length === 2) {
+            const [longitude, latitude] = coordinates;
+            obj.latitude = latitude;
+            obj.longitude = longitude;
+            delete obj.g__coordinates;
+          }
+        } catch (error) {
+          console.error("Error parsing coordinates:", error);
+        }
+      }
+      return obj;
+    };
+
+    const addDataToMap = async () => {
+      const data = await fetchData();
+
+      data.forEach((point) => {
+        point = processGeolocation(point);
+
+        const popupHTML = Object.keys(point)
+          // Filter out any metadata fields and null values
+          .filter(
+            (key) =>
+              key !== "type" &&
+              !key.includes("g__") &&
+              !key.includes("meta") &&
+              !key.includes("formhub") &&
+              !key.includes("start") &&
+              !key.includes("end") &&
+              !key.includes("___") &&
+              !key.includes("location") &&
+              key !== "latitude" &&
+              key !== "longitude" &&
+              point[key] !== null
+          )
+          .map((key) => {
+            // Rewrite the keys to be more legible
+            let transformedKey = key.replace(/^p__/, "").replace(/_/g, " ");
+            transformedKey = transformedKey.replace(/\b\w/g, (c) =>
+              c.toUpperCase()
+            ); // Capitalize first letter of each word
+            if (transformedKey === "Today") {
+              transformedKey = "Data Collected On";
+            }
+
+            // Rewrite the values to be more legible
+            let transformedValue = point[key];
+            if (typeof transformedValue === "string") {
+              transformedValue = transformedValue.replace(/_/g, " ");
+              transformedValue =
+                transformedValue.charAt(0).toUpperCase() +
+                transformedValue.slice(1);
+            }
+
+            return `<strong>${transformedKey}:</strong> ${transformedValue}`;
+          })
+          .join("<br>");
+
+        const marker = new mapboxgl.Marker()
+          .setLngLat([point.longitude, point.latitude])
+          .setPopup(new mapboxgl.Popup().setHTML(popupHTML));
+
+        marker.getElement().style.cursor = "pointer"; // Change cursor to pointer
+
+        marker.addTo(map);
+      });
+    };
+
+    map.on("load", () => {
+      addDataToMap();
+    });
+  </script>
+</body>
+
+</html>

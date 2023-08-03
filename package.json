@@ -1,0 +1,22 @@
+{
+  "name": "guardianconnector-map",
+  "version": "1.0.0",
+  "description": "A map to visualize GuardianConnector data",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "browserify build.js -o ./dist/bundle.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mapbox-gl": "^2.15.0",
+    "pg": "^8.11.2",
+    "request-promise": "^4.2.6",
+    "sqlite3": "^5.1.6"
+  },
+  "author": "Rudo Kemper",
+  "license": "GPL-3.0"
+}
