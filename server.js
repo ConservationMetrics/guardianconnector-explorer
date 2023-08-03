@@ -66,7 +66,7 @@ app.use(express.static('.'));
 // Scrape data from db source
 app.get('/data', async (req, res) => {
   try {
-    query = `SELECT * FROM ${process.env.SQLITE_TABLE}`;
+    query = `SELECT * FROM ${process.env.TABLE}`;
 
     db.all(query, [], (err, rows) => {
       if (err) {
