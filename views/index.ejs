@@ -73,7 +73,9 @@
     const addDataToMap = async () => {
       const data = await fetchData();
 
-      data.forEach((point) => {
+      const filteredData = data.filter(point => point.hasOwnProperty('g__coordinates'));
+
+      filteredData.forEach((point) => {
         point = processGeolocation(point);
 
         const popupHTML = Object.keys(point)
