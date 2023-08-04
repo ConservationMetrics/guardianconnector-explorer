@@ -28,7 +28,8 @@ if (process.env.SQLITE === "YES") {
     user: process.env.USER,
     host: process.env.HOST,
     password: process.env.PASSWORD,
-    port: process.env.DB_PORT
+    port: process.env.DB_PORT,
+    ssl: process.env.SSL
   };
   db = new Client(db_connection);
 
@@ -37,7 +38,11 @@ if (process.env.SQLITE === "YES") {
       console.log('Connected to the PostgreSQL database');
     })
     .catch((error) => {
-      console.error('Error connecting to the PostgreSQL database:', error);
+      if (error.message.includes('self signed certificate')) {
+        console.error('Error connecting to the PostgreSQL database: Self-signed certificate issue.');
+      } else {
+        console.error('Error connecting to the PostgreSQL database:', error);
+      }
     });
 }
 
@@ -66,16 +71,32 @@ app.use(express.static('.'));
 // Scrape data from db source
 app.get('/data', async (req, res) => {
   try {
-    query = `SELECT * FROM ${process.env.TABLE}`;
+    let query;
+    let queryArgs = []; // Query arguments (if needed)
 
-    db.all(query, [], (err, rows) => {
-      if (err) {
-        console.error('Error fetching data:', err.message);
-        res.status(500).json({ error: 'Error fetching data' });
-        return;
-      }
-      res.json(rows);
-    });
+    if (process.env.SQLITE === "yes") {
+      // SQLite configuration
+      query = `SELECT * FROM ${process.env.TABLE}`;
+      db.all(query, queryArgs, (err, rows) => {
+        if (err) {
+          console.error('Error fetching data:', err.message);
+          res.status(500).json({ error: 'Error fetching data' });
+          return;
+        }
+        res.json(rows);
+      });
+    } else {
+      // PostgreSQL configuration
+      query = `SELECT * FROM ${process.env.TABLE}`;
+      db.query(query, queryArgs, (err, result) => {
+        if (err) {
+          console.error('Error fetching data:', err);
+          res.status(500).json({ error: 'Error fetching data' });
+          return;
+        }
+        res.json(result.rows);
+      });
+    }
   } catch (error) {
     console.error('Error fetching data:', error);
     res.status(500).json({ error: 'Error fetching data' });
