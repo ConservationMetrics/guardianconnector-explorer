@@ -23,7 +23,7 @@ The tool will render the feature on a map in accordance to what kind of `type` i
 The tool can work with any GeoJSON data stored in the expected tabular format, but the main purpose is to show field data collected using data collection applications such as Mapeo, OpenDataKit (ODK), and KoboToolbox. 
 
 * Mapeo data from Mapeo Desktop is already exported as GeoJSON file.
-* ODK / KoboToolbox API survey data with a geospatial field may be transformed into such a format (as CMI does using [Frizzle]([Frizzle](https://github.com/ConservationMetrics/frizzle)) components).
+* ODK / KoboToolbox API survey data with a geospatial field may be transformed into such a format (as CMI does using [Frizzle](https://github.com/ConservationMetrics/frizzle) components).
 * In the future, we can do a similar transformation for Mapeo Cloud API data, if needed.
 
 ![GuardianConnector map with KoboToolbox data](public/GuardianConnector-map-1.jpg)

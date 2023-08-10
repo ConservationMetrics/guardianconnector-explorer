@@ -121,7 +121,8 @@
                 key !== "latitude" &&
                 key !== "longitude" &&
                 key !== "coordinates" &&
-                feature[key] !== (null || "")
+                feature[key] !== null &&
+                feature[key] !== ""
             )
             .map((key) => {
               // Rewrite the keys to be more legible
@@ -141,6 +142,11 @@
                 transformedValue = transformedValue
                   .replace(/_/g, " ")
                   .replace(/;/g, ", ");
+                
+                if (key === "p__categoryId") {
+                  transformedValue = transformedValue.replace(/-/g, " ");
+                }
+                
                 transformedValue =
                   transformedValue.charAt(0).toUpperCase() +
                   transformedValue.slice(1);
