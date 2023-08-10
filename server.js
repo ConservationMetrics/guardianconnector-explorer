@@ -74,7 +74,7 @@ app.get('/data', async (req, res) => {
     let query;
     let queryArgs = []; // Query arguments (if needed)
 
-    if (process.env.SQLITE === "yes") {
+    if (process.env.SQLITE === "YES") {
       // SQLite configuration
       query = `SELECT * FROM ${process.env.TABLE}`;
       db.all(query, queryArgs, (err, rows) => {
