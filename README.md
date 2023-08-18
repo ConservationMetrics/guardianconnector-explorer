@@ -4,7 +4,7 @@ This is a Mapbox tool for GuardianConnector which connects to a SQLite or Postgr
 
 To get started, copy `.env.example` to `.env` and add your database and table information, and a Mapbox access token.
 
-**Database:** use SQLite instead of Postgres, set  `SQLITE` to `YES`.
+**Database:** to use SQLite instead of Postgres, set  `SQLITE` to `YES`.
 
 **Media attachments:** your GeoJSON data is storing filenames for media attachments, you can embed them by setting `EMBED_MEDIA` to `YES` and providing the path to the directory where media attachments are stored in `MEDIA_PATH`.
 
@@ -22,7 +22,7 @@ At this time, media attachments are handled in a somewhat brittle way by renderi
 
 The tool will render the feature on a map in accordance to what kind of `type` it is (Point, LineString, Polygon). The properties fields are shown in a popup opened by clicking on the feature. Currently, we are hiding any metadata fields (prefixed by `$` in the GeoJSON properties).
 
-**GeoJSON formats**: this tool can work with any GeoJSON data stored in the expected tabular format, but the main purpose is to show field data collected using data collection applications such as Mapeo, OpenDataKit (ODK), and KoboToolbox. 
+**GeoJSON export formats**: this tool can work with any GeoJSON data stored in the expected tabular format, but the main purpose is to show field data collected using data collection applications such as Mapeo, OpenDataKit (ODK), and KoboToolbox. 
 
 * Mapeo data from Mapeo Desktop is already exported as GeoJSON file. This tool can work with both Territory and Observations data.
 * ODK / KoboToolbox API survey data with a geospatial field may be transformed into such a format (as CMI does using [Frizzle](https://github.com/ConservationMetrics/frizzle) components).
