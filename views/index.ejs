@@ -21,6 +21,12 @@
         bottom: 0;
         width: 100%;
       }
+
+      .popup-media {
+        width: 100%;
+        display: block;
+        margin-top: 5px;
+      }
     </style>
   </head>
 
@@ -142,14 +148,48 @@
                 transformedValue = transformedValue
                   .replace(/_/g, " ")
                   .replace(/;/g, ", ");
-                
+
                 if (key === "p__categoryId") {
                   transformedValue = transformedValue.replace(/-/g, " ");
                 }
-                
+
                 transformedValue =
                   transformedValue.charAt(0).toUpperCase() +
                   transformedValue.slice(1);
+              }
+
+              // Handle lists enclosed in square brackets
+              if (transformedValue.match(/^\[.*\]$/)) {
+                transformedValue = transformedValue
+                  .replace(/^\[|\]$/g, "")
+                  .split(", ")
+                  .map((item) => item.replace(/'/g, ""))
+                  .join(", ");
+              }
+
+              // Render images if the value is a path to an image (ends in .jpg, .jpeg, .png, or .webp)
+              if (transformedValue.match(/\.(jpg|jpeg|png|webp)$/i)) {
+                transformedValue = `<a href="<%= mediaPath %>/${transformedValue}" target="_blank"><img class="popup-media" src="<%= mediaPath %>/${transformedValue}" alt="${transformedKey}" /></a>`;
+              }
+
+              // Render audio if the value is a path to an audio file (ends in .mp3, .ogg, or .wav)
+              if (transformedValue.match(/\.(mp3|ogg|wav)$/i)) {
+                transformedValue = `<audio class="popup-media" controls>
+                               <source src="<%= mediaPath %>/${transformedValue}" type="audio/${transformedValue
+                  .split(".")
+                  .pop()}">
+                             Your browser does not support the audio element.
+                           </audio>`;
+              }
+
+              // Render video if the value is a path to a video file (ends in .mov, .mp4, .avi, .mkv, or .m4a)
+              if (transformedValue.match(/\.(mov|mp4|avi|mkv|m4a)$/i)) {
+                transformedValue = `<video class="popup-media" controls>
+                               <source src="<%= mediaPath %>/${transformedValue}" type="video/${transformedValue
+                  .split(".")
+                  .pop()}">
+                             Your browser does not support the video element.
+                           </video>`;
               }
 
               return `<strong>${transformedKey}:</strong> ${transformedValue}`;

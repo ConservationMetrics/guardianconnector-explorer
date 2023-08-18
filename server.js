@@ -62,8 +62,9 @@ app.get('/', (req, res) => {
   const mapboxZoom = process.env.MAPBOX_ZOOM;
   const mapboxPitch = process.env.MAPBOX_PITCH;
   const mapboxBearing = process.env.MAPBOX_BEARING;
+  const mediaPath = process.env.MEDIA_PATH;
 
-  res.render('index', { mapboxAccessToken, mapboxStyle, mapboxProjection, mapboxCenterLatitude, mapboxCenterLongitude, mapboxZoom, mapboxPitch, mapboxBearing });
+  res.render('index', { mapboxAccessToken, mapboxStyle, mapboxProjection, mapboxCenterLatitude, mapboxCenterLongitude, mapboxZoom, mapboxPitch, mapboxBearing, mediaPath });
 });
 
 app.use(express.static('.'));
