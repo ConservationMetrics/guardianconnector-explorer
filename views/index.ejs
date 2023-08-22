@@ -122,7 +122,7 @@
                 !key.includes("formhub") &&
                 !key.includes("start") &&
                 !key.includes("end") &&
-                !key.includes("___") &&
+                (!key.includes("___") || key.includes("photos")) &&
                 !key.includes("location") &&
                 key !== "latitude" &&
                 key !== "longitude" &&
@@ -167,31 +167,58 @@
                   .join(", ");
               }
 
-              // Render images if the value is a path to an image (ends in .jpg, .jpeg, .png, or .webp)
-              if (transformedValue.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                transformedValue = `<a href="<%= mediaPath %>/${transformedValue}" target="_blank"><img class="popup-media" src="<%= mediaPath %>/${transformedValue}" alt="${transformedKey}" /></a>`;
+              if ("<%= embedMedia %>" === "YES") {
+                // Check if the value is a list of files delimited by ' and a space
+                if (transformedValue.includes(",")) {
+                  const fileList = transformedValue.split(", ");
+                  transformedValue = fileList
+                    .map((file) => {
+                      // Process each file individually based on its extension
+                      if (file.match(/\.(jpg|jpeg|png|webp)$/i)) {
+                        return `<a href="<%= mediaPath %>/${file}" target="_blank"><img class="popup-media" src="<%= mediaPath %>/${file}" alt="${transformedKey}" /></a>`;
+                      } else if (file.match(/\.(mp3|ogg|wav)$/i)) {
+                        return `<audio class="popup-media" controls>
+                                      <source src="<%= mediaPath %>/${file}" type="audio/${file
+                          .split(".")
+                          .pop()}">
+                                    Your browser does not support the audio element.
+                                  </audio>`;
+                      } else if (file.match(/\.(mov|mp4|avi|mkv|m4a)$/i)) {
+                        return `<video class="popup-media" controls>
+                                      <source src="<%= mediaPath %>/${file}" type="video/${file
+                          .split(".")
+                          .pop()}">
+                                    Your browser does not support the video element.
+                                  </video>`;
+                      } else {
+                        return null; // Skip unsupported files
+                      }
+                    })
+                    .filter((html) => html !== null) // Remove null values
+                    .join("<br>");
+                } else {
+                  // Process a single file based on its extension
+                  if (transformedValue.match(/\.(jpg|jpeg|png|webp)$/i)) {
+                    transformedValue = `<a href="<%= mediaPath %>/${transformedValue}" target="_blank"><img class="popup-media" src="<%= mediaPath %>/${transformedValue}" alt="${transformedKey}" /></a>`;
+                  } else if (transformedValue.match(/\.(mp3|ogg|wav)$/i)) {
+                    transformedValue = `<audio class="popup-media" controls>
+                                                <source src="<%= mediaPath %>/${transformedValue}" type="audio/${transformedValue
+                      .split(".")
+                      .pop()}">
+                                              Your browser does not support the audio element.
+                                            </audio>`;
+                  } else if (
+                    transformedValue.match(/\.(mov|mp4|avi|mkv|m4a)$/i)
+                  ) {
+                    transformedValue = `<video class="popup-media" controls>
+                                                <source src="<%= mediaPath %>/${transformedValue}" type="video/${transformedValue
+                      .split(".")
+                      .pop()}">
+                                              Your browser does not support the video element.
+                                            </video>`;
+                  }
+                }
               }
-
-              // Render audio if the value is a path to an audio file (ends in .mp3, .ogg, or .wav)
-              if (transformedValue.match(/\.(mp3|ogg|wav)$/i)) {
-                transformedValue = `<audio class="popup-media" controls>
-                               <source src="<%= mediaPath %>/${transformedValue}" type="audio/${transformedValue
-                  .split(".")
-                  .pop()}">
-                             Your browser does not support the audio element.
-                           </audio>`;
-              }
-
-              // Render video if the value is a path to a video file (ends in .mov, .mp4, .avi, .mkv, or .m4a)
-              if (transformedValue.match(/\.(mov|mp4|avi|mkv|m4a)$/i)) {
-                transformedValue = `<video class="popup-media" controls>
-                               <source src="<%= mediaPath %>/${transformedValue}" type="video/${transformedValue
-                  .split(".")
-                  .pop()}">
-                             Your browser does not support the video element.
-                           </video>`;
-              }
-
               return `<strong>${transformedKey}:</strong> ${transformedValue}`;
             })
             .join("<br>");

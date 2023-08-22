@@ -62,9 +62,10 @@ app.get('/', (req, res) => {
   const mapboxZoom = process.env.MAPBOX_ZOOM;
   const mapboxPitch = process.env.MAPBOX_PITCH;
   const mapboxBearing = process.env.MAPBOX_BEARING;
+  const embedMedia = process.env.EMBED_MEDIA;
   const mediaPath = process.env.MEDIA_PATH;
 
-  res.render('index', { mapboxAccessToken, mapboxStyle, mapboxProjection, mapboxCenterLatitude, mapboxCenterLongitude, mapboxZoom, mapboxPitch, mapboxBearing, mediaPath });
+  res.render('index', { mapboxAccessToken, mapboxStyle, mapboxProjection, mapboxCenterLatitude, mapboxCenterLongitude, mapboxZoom, mapboxPitch, mapboxBearing, embedMedia, mediaPath });
 });
 
 app.use(express.static('.'));
@@ -84,6 +85,12 @@ app.get('/data', async (req, res) => {
           res.status(500).json({ error: 'Error fetching data' });
           return;
         }
+
+        // Remove the first row if it's considered headers
+        if (rows.length > 0 && Object.keys(rows[0]).some(key => isNaN(key))) {
+          rows.shift();
+        }
+
         res.json(rows);
       });
     } else {
