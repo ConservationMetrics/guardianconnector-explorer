@@ -9,6 +9,7 @@
       rel="stylesheet"
     />
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <link rel="stylesheet" href="dist/lightbox.min.css" />
     <style>
       body {
         margin: 0;
@@ -32,6 +33,7 @@
 
   <body>
     <div id="map"></div>
+    <script src="dist/lightbox-plus-jquery.js"></script>
     <script type="text/javascript">
       mapboxgl.accessToken = "<%= mapboxAccessToken %>";
       const map = new mapboxgl.Map({
@@ -169,13 +171,14 @@
 
               if ("<%= embedMedia %>" === "YES") {
                 // Check if the value is a list of files delimited by ' and a space
-                if (transformedValue.includes(",")) {
+                if (transformedValue.includes(", ")) {
                   const fileList = transformedValue.split(", ");
                   transformedValue = fileList
                     .map((file) => {
                       // Process each file individually based on its extension
                       if (file.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                        return `<a href="<%= mediaPath %>/${file}" target="_blank"><img class="popup-media" src="<%= mediaPath %>/${file}" alt="${transformedKey}" /></a>`;
+                        return `<a href="<%= mediaPath %>/${file}" data-lightbox="${transformedKey}" data-title="${transformedKey}">
+                                    <img class="popup-media" src="<%= mediaPath %>/${file}" alt="${transformedKey}" /></a>`;
                       } else if (file.match(/\.(mp3|ogg|wav)$/i)) {
                         return `<audio class="popup-media" controls>
                                       <source src="<%= mediaPath %>/${file}" type="audio/${file
@@ -199,7 +202,8 @@
                 } else {
                   // Process a single file based on its extension
                   if (transformedValue.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                    transformedValue = `<a href="<%= mediaPath %>/${transformedValue}" target="_blank"><img class="popup-media" src="<%= mediaPath %>/${transformedValue}" alt="${transformedKey}" /></a>`;
+                    transformedValue = `<a href="<%= mediaPath %>/${transformedValue}" data-lightbox="${transformedKey}" data-title="${transformedKey}">
+                                            <img class="popup-media" src="<%= mediaPath %>/${transformedValue}" alt="${transformedKey}" /></a>`;
                   } else if (transformedValue.match(/\.(mp3|ogg|wav)$/i)) {
                     transformedValue = `<audio class="popup-media" controls>
                                                 <source src="<%= mediaPath %>/${transformedValue}" type="audio/${transformedValue
