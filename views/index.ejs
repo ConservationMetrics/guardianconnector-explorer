@@ -54,10 +54,10 @@
       const fetchData = async () => {
         try {
           const response = await fetch("/data");
-          const data = await response.json();
-          return data;
+          const apiResponse = await response.json();
+          return apiResponse;
         } catch (error) {
-          console.error("Error fetching data:", error);
+          console.error("Error fetching API response:", error);
           return [];
         }
       };
@@ -108,33 +108,84 @@
         return [x / numPoints, y / numPoints];
       };
 
-      const addDataToMap = async () => {
-        const data = await fetchData();
+      // Filter columns with unwanted keys and substrings
+      const filterColumns = (
+        originalColumns,
+        unwantedKeys,
+        unwantedSubstrings
+      ) => {
+        return new Set(
+          [...originalColumns].filter((column) => {
+            if (unwantedKeys.includes(column)) return false;
+            if (unwantedSubstrings.some((sub) => column.includes(sub)))
+              return false;
+            return true;
+          })
+        );
+      };
 
-        const filteredData = data.filter((feature) =>
-          feature.hasOwnProperty("g__coordinates")
+      const addDataToMap = async () => {
+        const apiResponse = await fetchData();
+        const data = apiResponse.data;
+
+        // Filtering unwanted keys from the SQL columns. Add or remove as desired.
+        const unwantedColumns = "<%= unwantedColumns %>".split(','); 
+        const unwantedSubstrings = "<%= unwantedSubstrings %>".split(','); 
+
+        let filteredSqlColumns;
+
+        // If there is a __columns table, use that for SQL column mapping and filtering
+        if (apiResponse.columns) {
+          const columns = apiResponse.columns;
+
+          // Create an original-to-SQL column mapping for lookup
+          const columnMapping = {};
+          columns.forEach((column) => {
+            columnMapping[column.original_column] = column.sql_column;
+          });
+
+          const originalColumnsSet = new Set(
+            columns.map((column) => column.original_column)
+          );
+          const columnsToFilter = filterColumns(
+            originalColumnsSet,
+            unwantedColumns,
+            unwantedSubstrings
+          );
+
+          // Map the filtered original_column entries to sql_column entries
+          filteredSqlColumns = new Set(
+            [...columnsToFilter].map((column) => columnMapping[column])
+          );
+        } else {
+          // If there is no __columns table, then filter based on Object keys of one data entry
+          filteredSqlColumns = new Set(
+            Object.keys(data[0]) // assuming data has at least one item
+              .filter(
+                (key) =>
+                  !unwantedColumns.includes(key) &&
+                  !unwantedSubstrings.some((sub) => key.includes(sub))
+              )
+          );
+        }
+
+        // Ensure we are only rendering data with expected geo fields
+        const filteredData = data.filter(
+          (feature) =>
+            feature.hasOwnProperty("g__coordinates") &&
+            feature.hasOwnProperty("g__type")
         );
 
         filteredData.forEach((feature) => {
           feature = processGeolocation(feature);
 
           const popupHTML = Object.keys(feature)
-            // Filter out any metadata fields and null values
+            // Filter only the keys that exist in our filtered columns set
             .filter(
               (key) =>
-                key !== "type" &&
-                !key.includes("g__") &&
-                !key.includes("meta") &&
-                !key.includes("formhub") &&
-                !key.includes("start") &&
-                !key.includes("end") &&
-                (!key.includes("___") || key.includes("photos")) &&
-                !key.includes("location") &&
-                key !== "latitude" &&
-                key !== "longitude" &&
-                key !== "coordinates" &&
                 feature[key] !== null &&
-                feature[key] !== ""
+                feature[key] !== "" &&
+                filteredSqlColumns.has(key)
             )
             .map((key) => {
               // Rewrite the keys to be more legible
@@ -144,7 +195,7 @@
               ); // Capitalize first letter of each word
               if (transformedKey === "Today") {
                 transformedKey = "Data Collected On";
-              } else if (transformedKey === "CategoryId") {
+              } else if (transformedKey === "Categoryid") {
                 transformedKey = "Category";
               }
 
@@ -155,7 +206,7 @@
                   .replace(/_/g, " ")
                   .replace(/;/g, ", ");
 
-                if (key === "p__categoryId") {
+                if (key.includes("Category")) {
                   transformedValue = transformedValue.replace(/-/g, " ");
                 }
 
