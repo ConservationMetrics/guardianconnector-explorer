@@ -1,373 +1,313 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>GuardianConnector map</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css"
-      rel="stylesheet"
-    />
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    <link rel="stylesheet" href="dist/lightbox.min.css" />
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
 
-      #map {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 100%;
-      }
+<head>
+  <meta charset="utf-8" />
+  <title>GuardianConnector map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <link rel="stylesheet" href="dist/lightbox.min.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
 
-      .mapboxgl-popup-content {
-        word-wrap: break-word;
-      }
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+    }
 
-      .popup-media {
-        width: 100%;
-        display: block;
-        margin-top: 5px;
-      }
-    </style>
-  </head>
+    .mapboxgl-popup-content {
+      word-wrap: break-word;
+    }
 
-  <body>
-    <div id="map"></div>
-    <script src="dist/lightbox-plus-jquery.js"></script>
-    <script type="text/javascript">
-      mapboxgl.accessToken = "<%= mapboxAccessToken %>";
-      const map = new mapboxgl.Map({
-        container: "map",
-        style: "<%= mapboxStyle %>",
-        projection: "<%= mapboxProjection %>",
-        center: ["<%= mapboxCenterLatitude %>", "<%= mapboxCenterLongitude %>"],
-        zoom: "<%= mapboxZoom %>",
-        bearing: "<%= mapboxBearing %>",
-        pitch: "<%= mapboxPitch %>",
-      });
+    .popup-media {
+      width: 100%;
+      display: block;
+      margin-top: 5px;
+    }
+  </style>
+</head>
 
-      // Request db data
-      const fetchData = async () => {
+<body>
+  <div id="map"></div>
+  <script src="dist/lightbox-plus-jquery.js"></script>
+  <script type="text/javascript">
+    mapboxgl.accessToken = "<%= mapboxAccessToken %>";
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "<%= mapboxStyle %>",
+      projection: "<%= mapboxProjection %>",
+      center: ["<%= mapboxCenterLatitude %>", "<%= mapboxCenterLongitude %>"],
+      zoom: "<%= mapboxZoom %>",
+      bearing: "<%= mapboxBearing %>",
+      pitch: "<%= mapboxPitch %>",
+    });
+
+    // Process different geometry types and extract coordinates
+    const processGeolocation = (obj) => {
+      if (
+        obj &&
+        obj.g__type &&
+        obj.g__coordinates &&
+        typeof obj.g__coordinates === "string"
+      ) {
         try {
-          const response = await fetch("/data");
-          const apiResponse = await response.json();
-          return apiResponse;
-        } catch (error) {
-          console.error("Error fetching API response:", error);
-          return [];
-        }
-      };
+          const geometryType = obj.g__type;
+          const coordinates = JSON.parse(obj.g__coordinates);
 
-      // Process different geometry types and extract coordinates
-      const processGeolocation = (obj) => {
-        if (
-          obj &&
-          obj.g__type &&
-          obj.g__coordinates &&
-          typeof obj.g__coordinates === "string"
-        ) {
-          try {
-            const geometryType = obj.g__type;
-            const coordinates = JSON.parse(obj.g__coordinates);
-
-            if (
-              geometryType === "Point" &&
-              Array.isArray(coordinates) &&
-              coordinates.length === 2
-            ) {
-              const [longitude, latitude] = coordinates;
-              obj.latitude = latitude;
-              obj.longitude = longitude;
-            } else if (geometryType === "LineString") {
-              obj.coordinates = coordinates;
-            } else if (geometryType === "Polygon") {
-              obj.coordinates = [coordinates];
-            }
-          } catch (error) {
-            console.error("Error parsing coordinates:", error);
+          if (
+            geometryType === "Point" &&
+            Array.isArray(coordinates) &&
+            coordinates.length === 2
+          ) {
+            const [longitude, latitude] = coordinates;
+            obj.latitude = latitude;
+            obj.longitude = longitude;
+          } else if (geometryType === "LineString") {
+            obj.coordinates = coordinates;
+          } else if (geometryType === "Polygon") {
+            obj.coordinates = [coordinates];
           }
+        } catch (error) {
+          console.error("Error parsing coordinates:", error);
         }
-        return obj;
-      };
+      }
+      return obj;
+    };
 
-      // Calculate the centroid of the polygon's coordinates
-      const calculatePolygonCentroid = (coordinates) => {
-        const numPoints = coordinates.length;
-        let x = 0.0;
-        let y = 0.0;
+    // Calculate the centroid of the polygon's coordinates
+    const calculatePolygonCentroid = (coordinates) => {
+      const numPoints = coordinates.length;
+      let x = 0.0;
+      let y = 0.0;
 
-        for (const [lng, lat] of coordinates) {
-          x += lng;
-          y += lat;
-        }
+      for (const [lng, lat] of coordinates) {
+        x += lng;
+        y += lat;
+      }
 
-        return [x / numPoints, y / numPoints];
-      };
+      return [x / numPoints, y / numPoints];
+    };
 
-      // Filter columns with unwanted columns and substrings
-      const filterColumns = (
-        originalColumns,
-        unwantedColumns,
-        unwantedSubstrings
-      ) => {
-        return new Set(
-          [...originalColumns].filter((column) => {
-            if (unwantedColumns.includes(column)) return false;
-            if (unwantedSubstrings.some((sub) => column.includes(sub)))
-              return false;
-            return true;
-          })
-        );
-      };
+    const addDataToMap = async () => {
 
-      const addDataToMap = async () => {
-        const apiResponse = await fetchData();
-        const data = apiResponse.data;
+      // Parse strings from EJS template into objects
+      const dataString = `<%- JSON.stringify(data) %>`;
+      const filteredSqlColumnsString = `<%- JSON.stringify(filteredSqlColumns) %>`;
 
-        // Filtering unwanted keys from the SQL columns. Add or remove as desired.
-        const unwantedColumns = "<%= unwantedColumns %>".split(','); 
-        const unwantedSubstrings = "<%= unwantedSubstrings %>".split(','); 
 
-        let filteredSqlColumns;
+      data = JSON.parse(dataString.replace(/^"|"$/g, ''));
+      filteredSqlColumnsObj = JSON.parse(filteredSqlColumnsString.replace(/^"|"$/g, ''));
+      const filteredSqlColumns = new Set(filteredSqlColumnsObj);
 
-        // If there is a __columns table, use that for SQL column mapping and filtering
-        if (apiResponse.columns) {
-          const columns = apiResponse.columns;
+      console.log(data)
+      console.log(filteredSqlColumns)
 
-          // Create an original-to-SQL column mapping for lookup
-          const columnMapping = {};
-          columns.forEach((column) => {
-            columnMapping[column.original_column] = column.sql_column;
-          });
+      // Ensure we are only rendering data with expected geo fields
+      filteredData = data.filter(
+        (feature) =>
+          feature.hasOwnProperty("g__coordinates") &&
+          feature.hasOwnProperty("g__type")
+      );
+      
+      filteredData.forEach((feature) => {
+        feature = processGeolocation(feature);
 
-          const originalColumnsSet = new Set(
-            columns.map((column) => column.original_column)
-          );
-          const columnsToFilter = filterColumns(
-            originalColumnsSet,
-            unwantedColumns,
-            unwantedSubstrings
-          );
+        const popupHTML = Object.keys(feature)
+          // Filter only the keys that exist in our filtered columns set
+          .filter(
+            (key) =>
+              feature[key] !== null &&
+              feature[key] !== "" &&
+              filteredSqlColumns.has(key)
+          )
+          .map((key) => {
+            // Rewrite the keys to be more legible
+            let transformedKey = key.replace(/^p__/, "").replace(/_/g, " ");
+            transformedKey = transformedKey.replace(/\b\w/g, (c) =>
+              c.toUpperCase()
+            ); // Capitalize first letter of each word
+            if (transformedKey === "Today") {
+              transformedKey = "Data Collected On";
+            } else if (transformedKey === "Categoryid") {
+              transformedKey = "Category";
+            }
 
-          // Map the filtered original_column entries to sql_column entries
-          filteredSqlColumns = new Set(
-            [...columnsToFilter].map((column) => columnMapping[column])
-          );
-        } else {
-          // If there is no __columns table, then filter based on Object keys of one data entry
-          filteredSqlColumns = new Set(
-            Object.keys(data[0]) // assuming data has at least one item
-              .filter(
-                (key) =>
-                  !unwantedColumns.includes(key) &&
-                  !unwantedSubstrings.some((sub) => key.includes(sub))
-              )
-          );
-        }
+            // Rewrite the values to be more legible
+            let transformedValue = feature[key];
+            if (typeof transformedValue === "string") {
+              transformedValue = transformedValue
+                .replace(/_/g, " ")
+                .replace(/;/g, ", ");
 
-        // Ensure we are only rendering data with expected geo fields
-        const filteredData = data.filter(
-          (feature) =>
-            feature.hasOwnProperty("g__coordinates") &&
-            feature.hasOwnProperty("g__type")
-        );
-
-        filteredData.forEach((feature) => {
-          feature = processGeolocation(feature);
-
-          const popupHTML = Object.keys(feature)
-            // Filter only the keys that exist in our filtered columns set
-            .filter(
-              (key) =>
-                feature[key] !== null &&
-                feature[key] !== "" &&
-                filteredSqlColumns.has(key)
-            )
-            .map((key) => {
-              // Rewrite the keys to be more legible
-              let transformedKey = key.replace(/^p__/, "").replace(/_/g, " ");
-              transformedKey = transformedKey.replace(/\b\w/g, (c) =>
-                c.toUpperCase()
-              ); // Capitalize first letter of each word
-              if (transformedKey === "Today") {
-                transformedKey = "Data Collected On";
-              } else if (transformedKey === "Categoryid") {
-                transformedKey = "Category";
+              if (key.includes("Category")) {
+                transformedValue = transformedValue.replace(/-/g, " ");
               }
 
-              // Rewrite the values to be more legible
-              let transformedValue = feature[key];
-              if (typeof transformedValue === "string") {
-                transformedValue = transformedValue
-                  .replace(/_/g, " ")
-                  .replace(/;/g, ", ");
+              transformedValue =
+                transformedValue.charAt(0).toUpperCase() +
+                transformedValue.slice(1);
+            }
 
-                if (key.includes("Category")) {
-                  transformedValue = transformedValue.replace(/-/g, " ");
+            // Handle lists enclosed in square brackets
+            if (transformedValue.match(/^\[.*\]$/)) {
+              transformedValue = transformedValue
+                .replace(/^\[|\]$/g, "")
+                .split(", ")
+                .map((item) => item.replace(/'/g, ""))
+                .join(", ");
+            }
+
+            if ("<%= embedMedia %>" === "YES") {
+              // Store uuid key to use for media attachment paths if it exists
+              let uuid;
+              for (let key in feature) {
+                if (key.includes("uuid") && !key.includes("formhub")) {
+                  uuid = feature[key];
+                  break;
+                }
+              }
+
+              const imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+              const audioExtensions = ['mp3', 'ogg', 'wav', 'm4a'];
+              const videoExtensions = ['mov', 'mp4', 'avi', 'mkv'];
+              const allExtensions = [...imageExtensions, ...audioExtensions, ...videoExtensions];
+
+              // Render media content in accordance to the kind of file extension that it has
+              const processFile = (file) => {
+                file = file.replace(/ /g, '_');
+
+                // If uuid exists, prepend it to the filepath. This is necessary for KoboToolbox attachments
+                let filepath;
+                if (uuid !== undefined) {
+                  filepath = `${uuid}/${file}`
+                } else {
+                  filepath = `${file}`
                 }
 
-                transformedValue =
-                  transformedValue.charAt(0).toUpperCase() +
-                  transformedValue.slice(1);
-              }
+                const extensionMatch = file.match(new RegExp(`\\.(${allExtensions.join('|')})`, 'i'));
+                if (!extensionMatch) return null;
 
-              // Handle lists enclosed in square brackets
-              if (transformedValue.match(/^\[.*\]$/)) {
-                transformedValue = transformedValue
-                  .replace(/^\[|\]$/g, "")
-                  .split(", ")
-                  .map((item) => item.replace(/'/g, ""))
-                  .join(", ");
-              }
+                const extension = extensionMatch[1].toLowerCase();
 
-              if ("<%= embedMedia %>" === "YES") {
-                // Store uuid key to use for media attachment paths if it exists
-                let uuid;
-                for (let key in feature) {
-                  if (key.includes("uuid") && !key.includes("formhub")) {
-                    uuid = feature[key];
-                    break; 
-                  }
-                }
-  
-                const imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-                const audioExtensions = ['mp3', 'ogg', 'wav', 'm4a'];
-                const videoExtensions = ['mov', 'mp4', 'avi', 'mkv'];
-                const allExtensions = [...imageExtensions, ...audioExtensions, ...videoExtensions];
-  
-                // Render media content in accordance to the kind of file extension that it has
-                const processFile = (file) => {
-                  file = file.replace(/ /g, '_');
-
-                  // If uuid exists, prepend it to the filepath. This is necessary for KoboToolbox attachments
-                  let filepath;
-                  if (uuid !== undefined) {
-                    filepath = `${uuid}/${file}`
-                  } else {
-                    filepath = `${file}`
-                  }
-
-                  const extensionMatch = file.match(new RegExp(`\\.(${allExtensions.join('|')})`, 'i'));
-                  if (!extensionMatch) return null;
-  
-                  const extension = extensionMatch[1].toLowerCase();
-  
-                  if (imageExtensions.includes(extension)) {
-                    return `<a href="<%= mediaPath %>/${filepath}" data-lightbox="${transformedKey}" data-title="${transformedKey}">
+                if (imageExtensions.includes(extension)) {
+                  return `<a href="<%= mediaPath %>/${filepath}" data-lightbox="${transformedKey}" data-title="${transformedKey}">
                                             <img class="popup-media" src="<%= mediaPath %>/${filepath}" alt="${transformedKey}" /></a>`;
-                  } else if (audioExtensions.includes(extension)) {
-                    return `<audio class="popup-media" controls>
+                } else if (audioExtensions.includes(extension)) {
+                  return `<audio class="popup-media" controls>
                                             <source src="<%= mediaPath %>/${filepath}" type="audio/${extension}">
                                         Your browser does not support the audio element.
                                       </audio>`;
-                  } else if (videoExtensions.includes(extension)) {
-                    return `<video class="popup-media" controls>
+                } else if (videoExtensions.includes(extension)) {
+                  return `<video class="popup-media" controls>
                                             <source src="<%= mediaPath %>/${filepath}" type="video/${extension}">
                                         Your browser does not support the video element.
                                       </video>`;
-                  }
-                  return null;
                 }
-  
-                if (transformedValue.includes(", ")) {
-                  const fileList = transformedValue.split(", ");
-                  transformedValue = fileList.map(processFile)
-                    .filter(Boolean)
-                    .join("<br>");
-                } else {
-                  transformedValue = processFile(transformedValue) || transformedValue;
-                }
+                return null;
               }
-              return `<strong>${transformedKey}:</strong> ${transformedValue}`;
-            })
-            .join("<br>");
 
-          if (feature.latitude && feature.longitude) {
-            // Process and render Point geometry
-            const marker = new mapboxgl.Marker()
-              .setLngLat([feature.longitude, feature.latitude])
-              .setPopup(new mapboxgl.Popup().setHTML(popupHTML));
-            marker.getElement().style.cursor = "pointer"; // Change cursor to pointer
-            marker.addTo(map);
+              if (transformedValue.includes(", ")) {
+                const fileList = transformedValue.split(", ");
+                transformedValue = fileList.map(processFile)
+                  .filter(Boolean)
+                  .join("<br>");
+              } else {
+                transformedValue = processFile(transformedValue) || transformedValue;
+              }
+            }
+            return `<strong>${transformedKey}:</strong> ${transformedValue}`;
+          })
+          .join("<br>");
+
+        if (feature.latitude && feature.longitude) {
+          // Process and render Point geometry
+          const marker = new mapboxgl.Marker()
+            .setLngLat([feature.longitude, feature.latitude])
+            .setPopup(new mapboxgl.Popup().setHTML(popupHTML));
+          marker.getElement().style.cursor = "pointer"; // Change cursor to pointer
+          marker.addTo(map);
+        }
+
+        if (feature.coordinates) {
+          // Process and render LineString or Polygon geometry
+          const geoJsonFeature = {
+            type: "Feature",
+            geometry: {
+              type: feature.g__type,
+              coordinates: feature.coordinates,
+            },
+          };
+
+          const geometryType = geoJsonFeature.geometry.type;
+
+          const featureLayer = {
+            id: `${geometryType}-${feature.id}`, // Unique ID for the layer
+            type: geometryType === "Polygon" ? "fill" : "line",
+            source: {
+              type: "geojson",
+              data: geoJsonFeature,
+            },
+            paint: {
+              ...(geometryType === "Polygon" && {
+                "fill-color": "#3FB1CE",
+                "fill-opacity": 0.75,
+              }),
+              ...(geometryType === "LineString" && {
+                "line-color": "#3FB1CE",
+                "line-opacity": 0.75,
+                "line-width": 8,
+              }),
+            },
+          };
+
+          // Add cursor styling for polygons and linestrings
+          if (geometryType === "Polygon" || geometryType === "LineString") {
+            map.on("mouseenter", `${geometryType}-${feature.id}`, () => {
+              map.getCanvas().style.cursor = "pointer";
+            });
+            map.on("mouseleave", `${geometryType}-${feature.id}`, () => {
+              map.getCanvas().style.cursor = "";
+            });
           }
 
-          if (feature.coordinates) {
-            // Process and render LineString or Polygon geometry
-            const geoJsonFeature = {
-              type: "Feature",
-              geometry: {
-                type: feature.g__type,
-                coordinates: feature.coordinates,
-              },
-            };
+          // Add popup for polygons and linestrings triggered by click
+          map.on("click", `${geometryType}-${feature.id}`, (e) => {
+            let popupLocation;
 
-            const geometryType = geoJsonFeature.geometry.type;
-
-            const featureLayer = {
-              id: `${geometryType}-${feature.id}`, // Unique ID for the layer
-              type: geometryType === "Polygon" ? "fill" : "line",
-              source: {
-                type: "geojson",
-                data: geoJsonFeature,
-              },
-              paint: {
-                ...(geometryType === "Polygon" && {
-                  "fill-color": "#3FB1CE",
-                  "fill-opacity": 0.75,
-                }),
-                ...(geometryType === "LineString" && {
-                  "line-color": "#3FB1CE",
-                  "line-opacity": 0.75,
-                  "line-width": 8,
-                }),
-              },
-            };
-
-            // Add cursor styling for polygons and linestrings
-            if (geometryType === "Polygon" || geometryType === "LineString") {
-              map.on("mouseenter", `${geometryType}-${feature.id}`, () => {
-                map.getCanvas().style.cursor = "pointer";
-              });
-              map.on("mouseleave", `${geometryType}-${feature.id}`, () => {
-                map.getCanvas().style.cursor = "";
-              });
+            if (geometryType === "LineString") {
+              // For LineString, use the middle point of the coordinates array
+              popupLocation =
+                geoJsonFeature.geometry.coordinates[
+                Math.floor(geoJsonFeature.geometry.coordinates.length / 2)
+                ];
+            } else if (geometryType === "Polygon") {
+              // For Polygon, calculate the centroid of the coordinates
+              popupLocation = calculatePolygonCentroid(
+                geoJsonFeature.geometry.coordinates[0]
+              );
             }
 
-            // Add popup for polygons and linestrings triggered by click
-            map.on("click", `${geometryType}-${feature.id}`, (e) => {
-              let popupLocation;
+            new mapboxgl.Popup()
+              .setLngLat(popupLocation)
+              .setHTML(popupHTML)
+              .addTo(map);
+          });
 
-              if (geometryType === "LineString") {
-                // For LineString, use the middle point of the coordinates array
-                popupLocation =
-                  geoJsonFeature.geometry.coordinates[
-                    Math.floor(geoJsonFeature.geometry.coordinates.length / 2)
-                  ];
-              } else if (geometryType === "Polygon") {
-                // For Polygon, calculate the centroid of the coordinates
-                popupLocation = calculatePolygonCentroid(
-                  geoJsonFeature.geometry.coordinates[0]
-                );
-              }
-
-              new mapboxgl.Popup()
-                .setLngLat(popupLocation)
-                .setHTML(popupHTML)
-                .addTo(map);
-            });
-
-            map.addLayer(featureLayer);
-          }
-        });
-      };
-
-      map.on("load", () => {
-        addDataToMap();
+          map.addLayer(featureLayer);
+        }
       });
-    </script>
-  </body>
+    };
+
+    map.on("load", () => {
+      addDataToMap();
+    });
+  </script>
+</body>
+
 </html>
