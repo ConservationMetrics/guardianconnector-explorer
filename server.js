@@ -76,6 +76,17 @@ app.get('/', (req, res) => {
   res.render('index', { data: JSON.stringify(data), filteredSqlColumns: JSON.stringify(Array.from(filteredSqlColumns)), mapboxAccessToken, mapboxStyle, mapboxProjection, mapboxCenterLatitude, mapboxCenterLongitude, mapboxZoom, mapboxPitch, mapboxBearing, embedMedia, mediaPath });
 });
 
+// Set up gallery view
+app.get('/gallery', (req, res) => {
+  const embedMedia = process.env.EMBED_MEDIA;
+  const mediaPath = process.env.MEDIA_PATH;
+  
+  const { data, filteredSqlColumns } = req.filteredData;
+
+  // Render the gallery view and pass the environment variables
+  res.render('gallery', { data: JSON.stringify(data), filteredSqlColumns: JSON.stringify(Array.from(filteredSqlColumns)), embedMedia, mediaPath });
+});
+
 app.listen(PORT, () => {
-  console.log(`The GuardianConnector map is running on port ${PORT}`);
+  console.log(`GuardianConnector Views is running on port ${PORT}`);
 });

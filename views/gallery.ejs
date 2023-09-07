@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>GuardianConnector gallery</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="dist/lightbox.min.css" />
+    <style>
+      /* Gallery Grid Styles */
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 16px;
+        padding: 16px;
+      }
+      
+      .gallery-item {
+        border: 1px solid #ccc;
+        padding: 8px;
+        border-radius: 8px;
+        box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .popup-media {
+        max-width: 100%;
+        border-radius: 4px;
+      }
+
+      .media-metadata {
+        margin-top: 8px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="galleryContainer" class="gallery"></div>
+      <% if(embedMedia !== "YES") { %>
+        <h3>Gallery is not available: GuardianConnector Views is not embedding media.</h3>
+      <% } %>
+    </div>
+
+    <script src="dist/lightbox-plus-jquery.js"></script>
+    <script src="dist/dataTransform.js"></script>
+    <script type="text/javascript">
+      const embedMediaValue = "<%= embedMedia %>";
+
+      if(embedMediaValue === "YES") {
+        // Parse strings from EJS template into objects
+        const dataString = `<%- JSON.stringify(data) %>`;
+        const filteredSqlColumnsString = `<%- JSON.stringify(filteredSqlColumns) %>`;
+
+        data = JSON.parse(dataString.replace(/^"|"$/g, ''));
+        filteredSqlColumnsObj = JSON.parse(filteredSqlColumnsString.replace(/^"|"$/g, ''));
+        const filteredSqlColumns = new Set(filteredSqlColumnsObj);
+
+        const imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+        const audioExtensions = ['mp3', 'ogg', 'wav', 'm4a'];
+        const videoExtensions = ['mov', 'mp4', 'avi', 'mkv'];
+        const allExtensions = [...imageExtensions, ...audioExtensions, ...videoExtensions];
+
+        const galleryContainer = document.getElementById("galleryContainer");
+
+        data.forEach((feature) => {
+            let uuid;
+            for (let key in feature) {
+                if (key.includes("uuid") && !key.includes("formhub")) {
+                    uuid = feature[key];
+                    break;
+                }
+            }
+
+            for (let key in feature) {
+                if (typeof feature[key] !== 'string') continue;
+                if (feature[key].includes("attachment")) continue;
+
+                const file = feature[key].replace(/ /g, '_').replace(/^\['|'\]$/g, "");
+
+                // Check for acceptable file extensions
+                const extensionMatch = file.match(new RegExp(`\\.(${allExtensions.join('|')})`, 'i'));
+                if (!extensionMatch) continue;
+
+                const extension = extensionMatch[1].toLowerCase();
+                let filepath;
+
+                if (uuid !== undefined) {
+                    filepath = `${uuid}/${file}`;
+                } else {
+                    filepath = `${file}`;
+                }
+
+                // Prepare the data fields for display below the image
+                let mediaMetadataHTML = '<div class="media-metadata">';
+                for (let columnKey of filteredSqlColumns) {
+                    if (feature[columnKey]) {
+                      // Transform the key and value for display
+                      const displayKey = transformKey(columnKey);
+                      const displayValue = transformValue(columnKey, feature[columnKey]);
+
+                      mediaMetadataHTML += `<strong>${displayKey}</strong>: ${displayValue}<br>`;
+                    }
+                }
+                mediaMetadataHTML += '</div>';
+
+                let mediaHTML = '<div class="gallery-item">';
+
+                if (imageExtensions.includes(extension)) {
+                    mediaHTML += `<a href="<%= mediaPath %>/${filepath}" data-lightbox="${key}" data-title="${key}">
+                                        <img class="popup-media" src="<%= mediaPath %>/${filepath}" alt="${key}" /></a>
+                                        ${mediaMetadataHTML}`;
+                } else if (audioExtensions.includes(extension)) {
+                    mediaHTML += `<audio class="popup-media" controls>
+                                        <source src="<%= mediaPath %>/${filepath}" type="audio/${extension}">
+                                    Your browser does not support the audio element.
+                                  </audio>
+                                  ${mediaMetadataHTML}`;
+                } else if (videoExtensions.includes(extension)) {
+                    mediaHTML += `<video class="popup-media" controls>
+                                        <source src="<%= mediaPath %>/${filepath}" type="video/${extension}">
+                                    Your browser does not support the video element.
+                                  </video>
+                                  ${mediaMetadataHTML}`;
+                }
+
+                mediaHTML += '</div>';
+                galleryContainer.innerHTML += mediaHTML;
+            }
+        });      
+      }
+    </script>
+  </body>
+</html>
