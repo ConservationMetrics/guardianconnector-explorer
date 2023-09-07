@@ -12,6 +12,13 @@ const PORT = process.env.PORT || 3000;
 
 const db = setupDatabaseConnection();
 
+// Function to get the base URL dynamically based on the host
+const getBaseUrl = (req) => {
+  const protocol = req.protocol;
+  const host = req.get('host');
+  return `${protocol}://${host}`;
+};
+
 // Get data from db source
 app.get('/data', async (req, res) => {
   try {
@@ -43,6 +50,7 @@ app.get('/data', async (req, res) => {
 app.use(async (req, res, next) => {
   try {
       req.filteredData = await fetchDataAndFilter(
+        getBaseUrl(req),
         process.env.UNWANTED_COLUMNS, 
         process.env.UNWANTED_SUBSTRINGS
       );

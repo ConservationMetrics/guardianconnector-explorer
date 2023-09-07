@@ -1,13 +1,16 @@
 let fetch;
 
 // Request db data
-const fetchData = async () => {
+const fetchData = async (baseUrl) => {
     if (!fetch) {
         fetch = (await import('node-fetch')).default;
     }
     try {
-        // TODO: Fix this hardcoded URL
-        const response = await fetch("http://localhost:5000/data");
+        // Construct the URL for fetching data
+        const apiUrl = new URL("data", baseUrl);
+
+        const response = await fetch(apiUrl);
+
         if (!response.ok) { 
             console.error(`Failed with status: ${response.status}, statusText: ${response.statusText}`);
             throw new Error("Network response was not ok"); 
@@ -36,8 +39,8 @@ const filterColumns = (
     );
 };
 
-const fetchDataAndFilter = async (unwantedColumnsList, unwantedSubstringsList) => {
-    const apiResponse = await fetchData();
+const fetchDataAndFilter = async (baseUrl, unwantedColumnsList, unwantedSubstringsList) => {
+    const apiResponse = await fetchData(baseUrl);
     const data = apiResponse.data;
 
     if (!data.length) {
