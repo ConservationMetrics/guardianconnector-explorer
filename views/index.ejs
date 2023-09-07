@@ -35,7 +35,9 @@
 
 <body>
   <div id="map"></div>
+  
   <script src="dist/lightbox-plus-jquery.js"></script>
+  <script src="dist/dataTransform.js"></script>
   <script type="text/javascript">
     mapboxgl.accessToken = "<%= mapboxAccessToken %>";
     const map = new mapboxgl.Map({
@@ -105,9 +107,6 @@
       filteredSqlColumnsObj = JSON.parse(filteredSqlColumnsString.replace(/^"|"$/g, ''));
       const filteredSqlColumns = new Set(filteredSqlColumnsObj);
 
-      console.log(data)
-      console.log(filteredSqlColumns)
-
       // Ensure we are only rendering data with expected geo fields
       filteredData = data.filter(
         (feature) =>
@@ -127,41 +126,9 @@
               filteredSqlColumns.has(key)
           )
           .map((key) => {
-            // Rewrite the keys to be more legible
-            let transformedKey = key.replace(/^p__/, "").replace(/_/g, " ");
-            transformedKey = transformedKey.replace(/\b\w/g, (c) =>
-              c.toUpperCase()
-            ); // Capitalize first letter of each word
-            if (transformedKey === "Today") {
-              transformedKey = "Data Collected On";
-            } else if (transformedKey === "Categoryid") {
-              transformedKey = "Category";
-            }
-
-            // Rewrite the values to be more legible
-            let transformedValue = feature[key];
-            if (typeof transformedValue === "string") {
-              transformedValue = transformedValue
-                .replace(/_/g, " ")
-                .replace(/;/g, ", ");
-
-              if (key.includes("Category")) {
-                transformedValue = transformedValue.replace(/-/g, " ");
-              }
-
-              transformedValue =
-                transformedValue.charAt(0).toUpperCase() +
-                transformedValue.slice(1);
-            }
-
-            // Handle lists enclosed in square brackets
-            if (transformedValue.match(/^\[.*\]$/)) {
-              transformedValue = transformedValue
-                .replace(/^\[|\]$/g, "")
-                .split(", ")
-                .map((item) => item.replace(/'/g, ""))
-                .join(", ");
-            }
+            // Use the transform functions for key and value transformations
+            let transformedKey = transformKey(key);
+            let transformedValue = transformValue(key, feature[key]);
 
             if ("<%= embedMedia %>" === "YES") {
               // Store uuid key to use for media attachment paths if it exists
