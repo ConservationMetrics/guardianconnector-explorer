@@ -108,15 +108,15 @@
         return [x / numPoints, y / numPoints];
       };
 
-      // Filter columns with unwanted keys and substrings
+      // Filter columns with unwanted columns and substrings
       const filterColumns = (
         originalColumns,
-        unwantedKeys,
+        unwantedColumns,
         unwantedSubstrings
       ) => {
         return new Set(
           [...originalColumns].filter((column) => {
-            if (unwantedKeys.includes(column)) return false;
+            if (unwantedColumns.includes(column)) return false;
             if (unwantedSubstrings.some((sub) => column.includes(sub)))
               return false;
             return true;
