@@ -225,57 +225,61 @@
               }
 
               if ("<%= embedMedia %>" === "YES") {
-                // Check if the value is a list of files delimited by ' and a space
+                // Store uuid key to use for media attachment paths if it exists
+                let uuid;
+                for (let key in feature) {
+                  if (key.includes("uuid") && !key.includes("formhub")) {
+                    uuid = feature[key];
+                    break; 
+                  }
+                }
+  
+                const imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+                const audioExtensions = ['mp3', 'ogg', 'wav', 'm4a'];
+                const videoExtensions = ['mov', 'mp4', 'avi', 'mkv'];
+                const allExtensions = [...imageExtensions, ...audioExtensions, ...videoExtensions];
+  
+                // Render media content in accordance to the kind of file extension that it has
+                const processFile = (file) => {
+                  file = file.replace(/ /g, '_');
+
+                  // If uuid exists, prepend it to the filepath. This is necessary for KoboToolbox attachments
+                  let filepath;
+                  if (uuid !== null) {
+                    filepath = `${uuid}/${file}`
+                  } else {
+                    filepath = `${file}`
+                  }
+
+                  const extensionMatch = file.match(new RegExp(`\\.(${allExtensions.join('|')})`, 'i'));
+                  if (!extensionMatch) return null;
+  
+                  const extension = extensionMatch[1].toLowerCase();
+  
+                  if (imageExtensions.includes(extension)) {
+                    return `<a href="<%= mediaPath %>/${filepath}" data-lightbox="${transformedKey}" data-title="${transformedKey}">
+                                            <img class="popup-media" src="<%= mediaPath %>/${filepath}" alt="${transformedKey}" /></a>`;
+                  } else if (audioExtensions.includes(extension)) {
+                    return `<audio class="popup-media" controls>
+                                            <source src="<%= mediaPath %>/${filepath}" type="audio/${extension}">
+                                        Your browser does not support the audio element.
+                                      </audio>`;
+                  } else if (videoExtensions.includes(extension)) {
+                    return `<video class="popup-media" controls>
+                                            <source src="<%= mediaPath %>/${filepath}" type="video/${extension}">
+                                        Your browser does not support the video element.
+                                      </video>`;
+                  }
+                  return null;
+                }
+  
                 if (transformedValue.includes(", ")) {
                   const fileList = transformedValue.split(", ");
-                  transformedValue = fileList
-                    .map((file) => {
-                      // Process each file individually based on its extension
-                      if (file.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                        return `<a href="<%= mediaPath %>/${file}" data-lightbox="${transformedKey}" data-title="${transformedKey}">
-                                    <img class="popup-media" src="<%= mediaPath %>/${file}" alt="${transformedKey}" /></a>`;
-                      } else if (file.match(/\.(mp3|ogg|wav)$/i)) {
-                        return `<audio class="popup-media" controls>
-                                      <source src="<%= mediaPath %>/${file}" type="audio/${file
-                          .split(".")
-                          .pop()}">
-                                    Your browser does not support the audio element.
-                                  </audio>`;
-                      } else if (file.match(/\.(mov|mp4|avi|mkv|m4a)$/i)) {
-                        return `<video class="popup-media" controls>
-                                      <source src="<%= mediaPath %>/${file}" type="video/${file
-                          .split(".")
-                          .pop()}">
-                                    Your browser does not support the video element.
-                                  </video>`;
-                      } else {
-                        return null; // Skip unsupported files
-                      }
-                    })
-                    .filter((html) => html !== null) // Remove null values
+                  transformedValue = fileList.map(processFile)
+                    .filter(Boolean)
                     .join("<br>");
                 } else {
-                  // Process a single file based on its extension
-                  if (transformedValue.match(/\.(jpg|jpeg|png|webp)$/i)) {
-                    transformedValue = `<a href="<%= mediaPath %>/${transformedValue}" data-lightbox="${transformedKey}" data-title="${transformedKey}">
-                                            <img class="popup-media" src="<%= mediaPath %>/${transformedValue}" alt="${transformedKey}" /></a>`;
-                  } else if (transformedValue.match(/\.(mp3|ogg|wav)$/i)) {
-                    transformedValue = `<audio class="popup-media" controls>
-                                                <source src="<%= mediaPath %>/${transformedValue}" type="audio/${transformedValue
-                      .split(".")
-                      .pop()}">
-                                              Your browser does not support the audio element.
-                                            </audio>`;
-                  } else if (
-                    transformedValue.match(/\.(mov|mp4|avi|mkv|m4a)$/i)
-                  ) {
-                    transformedValue = `<video class="popup-media" controls>
-                                                <source src="<%= mediaPath %>/${transformedValue}" type="video/${transformedValue
-                      .split(".")
-                      .pop()}">
-                                              Your browser does not support the video element.
-                                            </video>`;
-                  }
+                  transformedValue = processFile(transformedValue) || transformedValue;
                 }
               }
               return `<strong>${transformedKey}:</strong> ${transformedValue}`;
