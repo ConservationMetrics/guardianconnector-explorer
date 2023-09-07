@@ -245,7 +245,7 @@
 
                   // If uuid exists, prepend it to the filepath. This is necessary for KoboToolbox attachments
                   let filepath;
-                  if (uuid !== null) {
+                  if (uuid !== undefined) {
                     filepath = `${uuid}/${file}`
                   } else {
                     filepath = `${file}`
