@@ -23,11 +23,17 @@
         "./*"
       ]
     },
+    "typeRoots": ["./node_modules/@types"],
     "types": [
       "@nuxt/types",
       "@types/node"
     ]
   },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "node_modules/@types/**/*.d.ts"
+  ],
   "exclude": [
     "node_modules",
     ".nuxt",
