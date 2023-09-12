@@ -29,6 +29,15 @@ $ yarn start
 $ yarn generate
 ```
 
+## Deployment
+
+For deployment (e.g.) on Azure, the following additional env vars are needed:
+
+```
+HOST: 0.0.0.0
+NODE_ENV: production
+```
+
 ## How it works
 
 ![GuardianConnector Map with KoboToolbox data](docs/GuardianConnector-Map.jpg)
