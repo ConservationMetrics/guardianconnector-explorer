@@ -61,12 +61,12 @@ type Column = {
 const filterData = (
   data: any[],
   columns: Column[] | null,
-  unwantedColumnsList: string,
-  unwantedSubstringsList: string
+  unwantedColumnsList: string | undefined,
+  unwantedSubstringsList: string | undefined
 ): any[] => {
   // Split the unwantedColumns and unwantedSubstrings from .env
-  const unwantedColumns = unwantedColumnsList.split(",");
-  const unwantedSubstrings = unwantedSubstringsList.split(",");
+  const unwantedColumns = unwantedColumnsList ? unwantedColumnsList.split(",") : [];
+  const unwantedSubstrings = unwantedSubstringsList ? unwantedSubstringsList.split(",") : [];  
 
   let filteredSqlColumns: Set<string>;
 

@@ -4,4 +4,4 @@ build/
 .nuxt/
 .git/
 *.db
-# .env
+.env

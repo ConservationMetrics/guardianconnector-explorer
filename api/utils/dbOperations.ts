@@ -1,4 +1,4 @@
-const checkTableExists = (db: any, table: string, isSQLite: string): Promise<boolean> => {
+const checkTableExists = (db: any, table: string | undefined, isSQLite: string | undefined): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     let query: string;
     if (isSQLite === "YES") {
@@ -17,7 +17,7 @@ const checkTableExists = (db: any, table: string, isSQLite: string): Promise<boo
   });
 };
 
-const fetchDataFromTable = async (db: any, table: string, isSQLite: string): Promise<any[]> => {
+const fetchDataFromTable = async (db: any, table: string | undefined, isSQLite: string | undefined): Promise<any[]> => {
   let query: string;
   if (isSQLite === "YES") {
     query = `SELECT * FROM ${table}`;
@@ -41,7 +41,7 @@ const fetchDataFromTable = async (db: any, table: string, isSQLite: string): Pro
   }
 };
 
-const fetchData = async (db: any, table: string, isSQLite: string): Promise<{ mainData: any[]; columnsData: any[] | null }> => {
+const fetchData = async (db: any, table: string | undefined, isSQLite: string | undefined): Promise<{ mainData: any[]; columnsData: any[] | null }> => {
   console.log("Fetching data from", table, "...");
   // Fetch data
   const mainDataExists = await checkTableExists(db, table, isSQLite);

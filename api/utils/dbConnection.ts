@@ -5,13 +5,25 @@ type DatabaseConnection = Client | Database | null;
 
 let db: DatabaseConnection = null;
 
-const setupDatabaseConnection = (): DatabaseConnection => {
+const setupDatabaseConnection = (
+  isSQLite: string,
+  sqliteDbPath: string | undefined,
+  database: string | undefined,
+  host: string | undefined,
+  user: string | undefined,
+  password: string | undefined,
+  port: string,
+  ssl: string | undefined
+): DatabaseConnection => {
   console.log("Setting up database connection...");
 
-  if (process.env.SQLITE === "YES") {
+  if (isSQLite === "YES") {
+    if (sqliteDbPath === undefined) {
+      throw new Error("sqliteDbPath is undefined");
+    }
     const sqlite = verbose();
     db = new sqlite.Database(
-      process.env.SQLITE_DB_PATH!,
+      sqliteDbPath,
       OPEN_READONLY,
       (err: Error | null) => {
         if (err) {
@@ -24,12 +36,12 @@ const setupDatabaseConnection = (): DatabaseConnection => {
     );
   } else {
     const dbConnection = {
-      database: process.env.DATABASE,
-      user: process.env.DB_USER,
-      host: process.env.DB_HOST,
-      password: process.env.DB_PASSWORD,
-      port: parseInt(process.env.DB_PORT!, 10),
-      ssl: process.env.DB_SSL === 'true',
+      database: database,
+      user: user,
+      host: host,
+      password: password,
+      port: parseInt(port, 10),
+      ssl: ssl === "true" ? { rejectUnauthorized: false } : false,
     };
     db = new Client(dbConnection);
 
