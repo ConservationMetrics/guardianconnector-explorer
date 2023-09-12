@@ -194,7 +194,6 @@ body {
   top: 0;
   bottom: 0;
   width: 100%;
-  padding-left: 400px; /* to account for the sidebar */
 }
 
 .mapboxgl-popup-content {
