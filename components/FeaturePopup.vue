@@ -2,6 +2,7 @@
   <div v-if="showSidebar" class="sidebar">
     <button class="close-btn" @click="$emit('close')">X</button>
     <Feature
+      :embed-media="embedMedia"
       :mediaBasePath="mediaBasePath"
       :filePaths="filePaths"
       :feature="filteredFeature"
@@ -18,6 +19,7 @@ import Feature from "@/components/Feature.vue";
 export default {
   components: { Feature },
   props: [
+    "embedMedia",
     "mediaBasePath",
     "filePaths",
     "feature",

@@ -4,6 +4,7 @@
     <Media
       v-for="filePath in filePaths"
       :key="filePath"
+      v-if="embedMedia === 'YES'"
       :mediaBasePath="mediaBasePath"
       :filePath="filePath"
       :image-extensions="imageExtensions"
@@ -46,6 +47,7 @@ export default {
     },
   },
   props: [
+    "embedMedia",
     "mediaBasePath",
     "filePaths",
     "feature",

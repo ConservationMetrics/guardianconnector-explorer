@@ -2,8 +2,9 @@
   <div id="map">
     <FeaturePopup
       :show-sidebar="showSidebar"
-      :mediaBasePath="mediaBasePath"
-      :filePaths="getFilePaths(selectedFeature, allExtensions)"
+      :embed-media="embedMedia"
+      :media-base-path="mediaBasePath"
+      :file-paths="getFilePaths(selectedFeature, allExtensions)"
       :feature="selectedFeature"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
@@ -20,10 +21,24 @@ import getFilePaths from "@/src/utils.ts";
 
 export default {
   components: { FeaturePopup },
-  props: ["data", "imageExtensions", "audioExtensions", "videoExtensions"],
+  props: [
+    "data", 
+    "imageExtensions", 
+    "audioExtensions", 
+    "videoExtensions",
+    "embedMedia",
+    "mediaBasePath",
+    "mapboxAccessToken",
+    "mapboxStyle",
+    "mapboxProjection",
+    "mapboxLatitude",
+    "mapboxLongitude",
+    "mapboxZoom",
+    "mapboxPitch",
+    "mapboxBearing"
+  ],
   data() {
     return {
-      mediaBasePath: process.env.MEDIA_BASE_PATH || "",
       showSidebar: false,
       selectedFeature: null,
     };
@@ -143,19 +158,19 @@ export default {
     },
   },
   mounted() {
-    mapboxgl.accessToken = process.env.MAPBOX_ACCESS_TOKEN;
+    mapboxgl.accessToken = this.mapboxAccessToken;
 
     this.map = new mapboxgl.Map({
       container: "map",
-      style: process.env.MAPBOX_STYLE || "mapbox://styles/mapbox/streets-v12",
-  projection: process.env.MAPBOX_PROJECTION || "globe",
-  center: [
-    process.env.MAPBOX_CENTER_LONGITUDE || 0,
-    process.env.MAPBOX_CENTER_LATITUDE || -15
-  ],
-  zoom: process.env.MAPBOX_ZOOM || 2.5,
-  pitch: process.env.MAPBOX_PITCH || 0,
-  bearing: process.env.MAPBOX_BEARING || 0,
+      style: this.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
+    projection: this.mapboxProjection || "globe",
+    center: [
+      this.mapboxLongitude || 0,
+      this.mapboxLatitude || -15
+    ],
+    zoom: this.mapboxZoom || 2.5,
+    pitch: this.mapboxPitch || 0,
+    bearing: this.mapboxBearing || 0,
 });
 
     this.map.on("load", this.addDataToMap);

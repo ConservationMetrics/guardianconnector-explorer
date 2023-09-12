@@ -6,8 +6,9 @@
     <Feature
       v-for="(feature, index) in data"
       :key="index"
-      :mediaBasePath="mediaBasePath"
-      :filePaths="getFilePaths(feature, allExtensions)"
+      :embed-media="embedMedia"
+      :media-base-path="mediaBasePath"
+      :file-paths="getFilePaths(feature, allExtensions)"
       :feature="feature"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
@@ -22,12 +23,7 @@ import getFilePaths from "@/src/utils.ts";
 
 export default {
   components: { Feature },
-  props: ["data", "imageExtensions", "audioExtensions", "videoExtensions"],
-  data() {
-    return {
-      mediaBasePath: process.env.MEDIA_BASE_PATH || "",
-    };
-  },
+  props: ["data", "imageExtensions", "audioExtensions", "videoExtensions", "embedMedia", "mediaBasePath"],
   computed: {
     allExtensions() {
       return [
