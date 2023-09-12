@@ -40,7 +40,7 @@ export default {
   ],
 
   serverMiddleware: [
-    '~/api/index',
+    '~/api/index.ts',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
