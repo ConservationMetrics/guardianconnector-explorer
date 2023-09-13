@@ -57,8 +57,8 @@ const config: NuxtConfig = {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: [({ isLegacy }) => isLegacy && 'axios']
-  },
+    transpile: [(context) => context.isLegacy ? 'axios' : undefined]
+    },
 
   server: {
   },
