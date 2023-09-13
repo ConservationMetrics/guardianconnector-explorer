@@ -1,4 +1,6 @@
-export default {
+import { NuxtConfig } from '@nuxt/types'
+
+const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'GuardianConnector Views',
@@ -41,6 +43,7 @@ export default {
 
   serverMiddleware: [
     '~/api/index.ts',
+    '~/api/middleware/cors'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -60,3 +63,5 @@ export default {
   server: {
   },
 }
+
+export default config
