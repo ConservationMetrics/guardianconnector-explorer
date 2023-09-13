@@ -21,13 +21,13 @@ RUN yarn run build
 
 RUN touch .env
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8080
+EXPOSE 8080
 
 # Set app serving to permissive / assigned
 ENV NUXT_HOST=0.0.0.0
 # Set app port
-ENV NUXT_PORT=80
+ENV NUXT_PORT=8080
 
 # Run the application
 CMD ["yarn", "start"]

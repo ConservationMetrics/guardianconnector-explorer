@@ -5,6 +5,7 @@ import fetchData from './utils/dbOperations';
 import { filterData, filterGeoData, filterDataByExtension, transformData } from './utils/dataProcessing';
 
 interface EnvVars {
+  VUE_APP_API_KEY: string;
   DATABASE: string;
   DB_HOST: string;
   DB_USER: string;
@@ -32,6 +33,7 @@ const env = process.env as unknown as EnvVars;
 
 // Remove quotations from all vars if they exist.
 // This is important as the presence of quotation marks can lead to issues when trying to connect to the database or any other operation requiring these variables.
+const API_KEY = env.VUE_APP_API_KEY ? env.VUE_APP_API_KEY.replace(/['"]+/g, '') : undefined;
 const DATABASE = env.DATABASE ? env.DATABASE.replace(/['"]+/g, '') : undefined;
 const DB_HOST= env.DB_HOST ? env.DB_HOST.replace(/['"]+/g, '') : undefined;
 const DB_USER = env.DB_USER ? env.DB_USER.replace(/['"]+/g, '') : undefined;
@@ -55,6 +57,16 @@ const MAPBOX_PITCH = env.MAPBOX_PITCH ? env.MAPBOX_PITCH.replace(/['"]+/g, '') :
 const MAPBOX_BEARING = env.MAPBOX_BEARING ? env.MAPBOX_BEARING.replace(/['"]+/g, '') : '0';
 
 const app = express();
+
+app.use((req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (apiKey !== API_KEY) {
+    res.status(403).send('Forbidden');
+    return;
+  }
+  next();
+});
+
 const db = setupDatabaseConnection(
   IS_SQLITE, 
   SQLITE_DB_PATH, 

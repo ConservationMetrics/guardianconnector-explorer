@@ -51,9 +51,9 @@ export default {
   },
   async created() {
     try {
-      // FIXME: this is throwing a "connect ECONNREFUSED" error on the server console 
-      // upon first load, but it does not seem to impact API requests on the client side.
-      const response = await this.$axios.$get('api/map');
+      let apiKey = this.$config.apiKey;
+      apiKey = apiKey.replace(/['"]+/g, '');
+      const response = await this.$axios.$get('api/map', { headers: { 'x-api-key': apiKey } });
       this.data = response.data;
       this.imageExtensions = response.imageExtensions;
       this.audioExtensions = response.audioExtensions;

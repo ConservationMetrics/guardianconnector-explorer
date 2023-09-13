@@ -38,16 +38,16 @@ export default {
   },
   async created() {
       try {
-      // FIXME: this is throwing a "connect ECONNREFUSED" error on the server console 
-      // upon first load, but it does not seem to impact API requests on the client side.
-      const response = await this.$axios.$get('api/gallery');
-      this.data = response.data;
-      this.imageExtensions = response.imageExtensions;
-      this.audioExtensions = response.audioExtensions;
-      this.videoExtensions = response.videoExtensions;
-      this.embedMedia = response.embedMedia;
-      this.mediaBasePath = response.mediaBasePath;
-      this.dataFetched = true;
+        let apiKey = this.$config.apiKey;
+        apiKey = apiKey.replace(/['"]+/g, '');
+        const response = await this.$axios.$get('api/gallery', { headers: { 'x-api-key': apiKey } });
+        this.data = response.data;
+        this.imageExtensions = response.imageExtensions;
+        this.audioExtensions = response.audioExtensions;
+        this.videoExtensions = response.videoExtensions;
+        this.embedMedia = response.embedMedia;
+        this.mediaBasePath = response.mediaBasePath;
+        this.dataFetched = true;
     } catch (error) {
       console.error('Error fetching data on client side:', error);
     }

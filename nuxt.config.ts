@@ -42,8 +42,7 @@ const config: NuxtConfig = {
   ],
 
   serverMiddleware: [
-    '~/api/index.ts',
-    '~/api/middleware/cors'
+    '~/api/index.ts'
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -52,7 +51,12 @@ const config: NuxtConfig = {
   ],
 
   axios: {
-    baseURL: '/',
+    baseURL: 'http://127.0.0.1:8080',
+    browserBaseURL: '/',  
+  },
+
+  publicRuntimeConfig: {
+    apiKey: process.env.VUE_APP_API_KEY,
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
