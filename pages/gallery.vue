@@ -3,6 +3,8 @@
     <Gallery 
       v-if="embedMedia === 'YES' && dataFetched"
       :data="data"
+      :filter-data="filterData"
+      :filter-field="filterField"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
@@ -29,10 +31,12 @@ export default {
     return {
       dataFetched: false,
       data: [],
+      filterData: false,
+      filterField: '',
       imageExtensions: [],
       audioExtensions: [],
       videoExtensions: [],
-      embedMedia: '',
+      embedMedia: false,
       mediaBasePath: ''
     };
   },
@@ -42,6 +46,8 @@ export default {
         apiKey = apiKey.replace(/['"]+/g, '');
         const response = await this.$axios.$get('api/gallery', { headers: { 'x-api-key': apiKey } });
         this.data = response.data;
+        this.filterData = response.filterData;
+        this.filterField = response.filterField;
         this.imageExtensions = response.imageExtensions;
         this.audioExtensions = response.audioExtensions;
         this.videoExtensions = response.videoExtensions;

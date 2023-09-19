@@ -3,6 +3,8 @@
     <Map
       v-if="dataFetched"
       :data="data"
+      :filter-data="filterData"
+      :filter-field="filterField"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
@@ -34,10 +36,12 @@ export default {
     return {
       dataFetched: false,
       data: [],
+      filterData: false,
+      filterField: '',
       imageExtensions: [],
       audioExtensions: [],
       videoExtensions: [],
-      embedMedia: '',
+      embedMedia: false,
       mediaBasePath: '',
       mapboxAccessToken: '',
       mapboxStyle: '',
@@ -55,6 +59,8 @@ export default {
       apiKey = apiKey.replace(/['"]+/g, '');
       const response = await this.$axios.$get('api/map', { headers: { 'x-api-key': apiKey } });
       this.data = response.data;
+      this.filterData = response.filterData;
+      this.filterField = response.filterField;
       this.imageExtensions = response.imageExtensions;
       this.audioExtensions = response.audioExtensions;
       this.videoExtensions = response.videoExtensions;

@@ -4,7 +4,7 @@
     <Media
       v-for="filePath in filePaths"
       :key="filePath"
-      v-if="embedMedia === 'YES'"
+      v-if="embedMedia === true"
       :mediaBasePath="mediaBasePath"
       :filePath="filePath"
       :image-extensions="imageExtensions"

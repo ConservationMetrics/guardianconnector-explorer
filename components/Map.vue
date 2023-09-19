@@ -23,6 +23,8 @@ export default {
   components: { FeaturePopup },
   props: [
     "data", 
+    "filterData",
+    "filterField",
     "imageExtensions", 
     "audioExtensions", 
     "videoExtensions",
