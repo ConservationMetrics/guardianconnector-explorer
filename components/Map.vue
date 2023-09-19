@@ -1,5 +1,11 @@
 <template>
   <div id="map">
+    <DataFilter
+      v-if="filterData === true"
+      :data="data"
+      :filter-field="filterField"
+      @filter="filter"
+    />
     <FeaturePopup
       :show-sidebar="showSidebar"
       :embed-media="embedMedia"
@@ -16,13 +22,16 @@
 
 <script>
 import mapboxgl from "mapbox-gl";
+import DataFilter from "@/components/DataFilter.vue";
 import FeaturePopup from "@/components/FeaturePopup.vue";
 import getFilePaths from "@/src/utils.ts";
 
 export default {
-  components: { FeaturePopup },
+  components: { DataFilter, FeaturePopup },
   props: [
     "data", 
+    "filterData",
+    "filterField",
     "imageExtensions", 
     "audioExtensions", 
     "videoExtensions",
@@ -41,6 +50,8 @@ export default {
     return {
       showSidebar: false,
       selectedFeature: null,
+      filteredData: [],
+      markers: []
     };
   },
   computed: {
@@ -53,6 +64,15 @@ export default {
     },
   },
   methods: {
+    filter(value) {
+      if (value === 'null') {
+        this.filteredData = this.data;
+      } else {
+        this.filteredData = this.data.filter(item => item[this.filterField] === value);
+      }
+      this.addDataToMap(); // Call this method to update the map data
+    },
+
     getFilePaths: getFilePaths,
 
     // Process different geometry types and extract coordinates
@@ -89,7 +109,20 @@ export default {
     },
 
     addDataToMap() {
-      this.data.forEach((feature) => {
+       // Remove existing data layers from the map
+      if (this.map) {
+        this.map.getStyle().layers.forEach(layer => {
+          if (layer.id.startsWith('Point-') || layer.id.startsWith('LineString-') || layer.id.startsWith('Polygon-')) {
+            this.map.removeLayer(layer.id);
+            this.map.removeSource(layer.id);
+          }
+        });
+
+        this.markers.forEach(marker => marker.remove());
+        this.markers = [];
+      }
+
+      this.filteredData.forEach((feature) => {
         feature = this.processGeolocation(feature);
         const geoJsonFeature = {
           type: "Feature",
@@ -107,6 +140,7 @@ export default {
           ]);
           marker.getElement().style.cursor = "pointer"; // Change cursor to pointer
           marker.addTo(this.map);
+          this.markers.push(marker);
           marker.getElement().addEventListener("click", () => {
             this.selectedFeature = feature;
             this.showSidebar = true;
@@ -173,7 +207,10 @@ export default {
     bearing: this.mapboxBearing || 0,
 });
 
-    this.map.on("load", this.addDataToMap);
+    this.filteredData = this.data; // Initialize filteredData with the original data
+    this.map.on("load", () => {
+      this.addDataToMap();
+    });
   },
   beforeDestroy() {
     if (this.map) {

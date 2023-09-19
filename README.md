@@ -6,9 +6,11 @@ This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an A
 
 To get started, copy `.env.example` to `.env` and add your database and table information, and a Mapbox access token.
 
-**Database:** to use SQLite instead of Postgres, set  `SQLITE` to `YES` and provide a path value for `SQLITE_DB_PATH`.
+**Database:** To use SQLite instead of Postgres, set  `SQLITE` to `YES` and provide a path value for `SQLITE_DB_PATH`.
 
-**Media attachments:** if your data is storing filenames for media attachments, you can embed them by setting `EMBED_MEDIA` to `YES`, and by providing the path to the exact location where media attachments are stored in `MEDIA_PATH`.
+**Media attachments:** If your data is storing filenames for media attachments, you can embed them by setting `EMBED_MEDIA` to `YES`, and by providing the path to the exact location where media attachments are stored in `MEDIA_PATH`.
+
+**Dropdown filter:** You can enable a dropdown that allows you to filter the data on your views. Set `FRONT_END_FILTERING` to `YES` and provide a value for `FRONT_END_FILTER_FIELD` (e.g. "Category" which could be a good choice for Mapeo data).
 
 **Unwanted columns and substrings:** Many outputs from data collection APIs have a lot of extraneous metadata fields that are not useful to the end user. See [docs/schema.md](docs/schema.md) for a list of these fields that are output by popular data collection APIs. You can determine which fields to filter out in `UNWANTED_COLUMNS` (exact column names will be filtered) and `UNWANTED_SUBSTRINGS` (all columns which include these substrings will be filtered).
 
@@ -28,6 +30,8 @@ $ yarn start
 # generate static project
 $ yarn generate
 ```
+
+Add `--hostname 0.0.0.0` if you want the app to be accessible across your local network.
 
 ## Deployment
 

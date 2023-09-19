@@ -27,6 +27,8 @@ interface EnvVars {
   MAPBOX_ZOOM: string;
   MAPBOX_PITCH: string;
   MAPBOX_BEARING: string;
+  FRONT_END_FILTERING: string;
+  FRONT_END_FILTER_FIELD: string;
 }
 
 const env = process.env as unknown as EnvVars;
@@ -45,6 +47,8 @@ const SQLITE_DB_PATH = env.SQLITE_DB_PATH ? env.SQLITE_DB_PATH.replace(/['"]+/g,
 const TABLE = env.TABLE ? env.TABLE.replace(/['"]+/g, '') : undefined;
 const UNWANTED_COLUMNS = env.UNWANTED_COLUMNS ? env.UNWANTED_COLUMNS.replace(/['"]+/g, '') : undefined;
 const UNWANTED_SUBSTRINGS = env.UNWANTED_SUBSTRINGS ? env.UNWANTED_SUBSTRINGS.replace(/['"]+/g, '') : undefined;
+const FRONT_END_FILTERING = env.FRONT_END_FILTERING ? env.FRONT_END_FILTERING.replace(/['"]+/g, '') : "NO";
+const FRONT_END_FILTER_FIELD = env.FRONT_END_FILTER_FIELD ? env.FRONT_END_FILTER_FIELD.replace(/['"]+/g, '') : undefined;
 const EMBED_MEDIA = env.EMBED_MEDIA.replace(/['"]+/g, '').toUpperCase() === 'YES' ? 'YES' : 'NO';
 const MEDIA_BASE_PATH = env.MEDIA_BASE_PATH ? env.MEDIA_BASE_PATH.replace(/['"]+/g, '') : undefined;
 const MAPBOX_ACCESS_TOKEN = env.MAPBOX_ACCESS_TOKEN ? env.MAPBOX_ACCESS_TOKEN.replace(/['"]+/g, '') : 'pk.ey';
@@ -108,8 +112,27 @@ app.get('/map', async (req: express.Request, res: express.Response) => {  try {
         // Transform data
     const transformedData = transformData(filteredGeoData)
 
-    res.json({ data: transformedData, imageExtensions: imageExtensions, audioExtensions: audioExtensions, videoExtensions: videoExtensions, embedMedia: EMBED_MEDIA, mediaBasePath: MEDIA_BASE_PATH, mapboxAccessToken: MAPBOX_ACCESS_TOKEN, mapboxStyle: MAPBOX_STYLE, mapboxProjection: MAPBOX_PROJECTION, mapboxLatitude: MAPBOX_CENTER_LATITUDE, mapboxLongitude: MAPBOX_CENTER_LONGITUDE, mapboxZoom: MAPBOX_ZOOM, mapboxPitch: MAPBOX_PITCH, mapboxBearing: MAPBOX_BEARING });
-    
+    const response = {
+      data: transformedData, 
+      filterData: FRONT_END_FILTERING === "YES",
+      filterField: FRONT_END_FILTER_FIELD,
+      imageExtensions: imageExtensions, 
+      audioExtensions: audioExtensions, 
+      videoExtensions: videoExtensions, 
+      embedMedia: EMBED_MEDIA === "YES",
+      mediaBasePath: MEDIA_BASE_PATH, 
+      mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
+      mapboxStyle: MAPBOX_STYLE, 
+      mapboxProjection: MAPBOX_PROJECTION, 
+      mapboxLatitude: MAPBOX_CENTER_LATITUDE, 
+      mapboxLongitude: MAPBOX_CENTER_LONGITUDE, 
+      mapboxZoom: MAPBOX_ZOOM, 
+      mapboxPitch: MAPBOX_PITCH, 
+      mapboxBearing: MAPBOX_BEARING
+    };
+
+    res.json(response);
+
   } catch (error:any) {
     console.error('Error fetching data on API side:', error.message);
     res.status(500).json({ error: error.message });
@@ -127,8 +150,19 @@ app.get('/gallery', async (req: express.Request, res: express.Response) => {  tr
     // Transform data
     const transformedData = transformData(dataWithFilesOnly)
 
-    res.json({ data: transformedData, imageExtensions: imageExtensions, audioExtensions: audioExtensions, videoExtensions: videoExtensions, embedMedia: EMBED_MEDIA, mediaBasePath: MEDIA_BASE_PATH });
+    const response = {
+      data: transformedData, 
+      filterData: FRONT_END_FILTERING === "YES",
+      filterField: FRONT_END_FILTER_FIELD,
+      imageExtensions: imageExtensions, 
+      audioExtensions: audioExtensions, 
+      videoExtensions: videoExtensions, 
+      embedMedia: EMBED_MEDIA === "YES",
+      mediaBasePath: MEDIA_BASE_PATH
+    };
 
+    res.json(response);
+    
   } catch (error:any) {
     console.error('Error fetching data on API side:', error.message);
     res.status(500).json({ error: error.message });

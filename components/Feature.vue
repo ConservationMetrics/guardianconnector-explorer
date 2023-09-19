@@ -2,9 +2,9 @@
   <div class="feature p-4 rounded-lg shadow-lg">
     <!-- Conditional rendering depending on file extension -->
     <Media
+      v-if="embedMedia === true"
       v-for="filePath in filePaths"
       :key="filePath"
-      v-if="embedMedia === 'YES'"
       :mediaBasePath="mediaBasePath"
       :filePath="filePath"
       :image-extensions="imageExtensions"
