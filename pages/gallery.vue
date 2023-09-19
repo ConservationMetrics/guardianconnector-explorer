@@ -1,7 +1,7 @@
 <template>
   <div>
     <Gallery 
-      v-if="embedMedia === 'YES' && dataFetched"
+      v-if="embedMedia === true && dataFetched"
       :data="data"
       :filter-data="filterData"
       :filter-field="filterField"
@@ -11,7 +11,7 @@
       :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
     />
-    <h3 v-if="embedMedia !== 'YES' && dataFetched">
+    <h3 v-if="embedMedia !== true && dataFetched">
       GuardianConnector Views Gallery is not available. Please activate media embedding.
     </h3>
 </div>
