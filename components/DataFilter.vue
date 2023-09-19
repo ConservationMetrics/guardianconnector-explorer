@@ -1,6 +1,6 @@
 <template>
     <div class="filter-modal">
-      <h4>Filter data:</h4>
+      <h4>Filter data by field: <strong>{{ filterField }}</strong> </h4>
       <select v-model="selectedValue" @change="emitFilter" v-if="uniqueValues.length > 0">
         <option disabled value="">Select field</option>
         <option value="null">Show all data</option>
@@ -8,7 +8,7 @@
           {{ value }}
         </option>
       </select>
-      <p class="no-data" v-else><i>No data found that matches your filter string.</i></p>
+      <p class="no-data" v-else><i>No data found that matches {{ filterField }}.</i></p>
     </div>
   </template>
   
