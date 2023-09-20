@@ -1,22 +1,10 @@
 <template>
   <div id="map">
-    <DataFilter
-      v-if="filterData === true"
-      :data="data"
-      :filter-field="filterField"
-      @filter="filter"
-    />
-    <FeaturePopup
-      :show-sidebar="showSidebar"
-      :embed-media="embedMedia"
-      :media-base-path="mediaBasePath"
-      :file-paths="getFilePaths(selectedFeature, allExtensions)"
-      :feature="selectedFeature"
-      :image-extensions="imageExtensions"
-      :audio-extensions="audioExtensions"
-      :video-extensions="videoExtensions"
-      @close="showSidebar = false"
-    />
+    <DataFilter v-if="filterData === true" :data="data" :filter-field="filterField" @filter="filter" />
+    <FeaturePopup :show-sidebar="showSidebar" :embed-media="embedMedia" :media-base-path="mediaBasePath"
+      :file-paths="getFilePaths(selectedFeature, allExtensions)" :feature="selectedFeature"
+      :image-extensions="imageExtensions" :audio-extensions="audioExtensions" :video-extensions="videoExtensions"
+      @close="showSidebar = false" />
   </div>
 </template>
 
@@ -29,11 +17,11 @@ import getFilePaths from "@/src/utils.ts";
 export default {
   components: { DataFilter, FeaturePopup },
   props: [
-    "data", 
+    "data",
     "filterData",
     "filterField",
-    "imageExtensions", 
-    "audioExtensions", 
+    "imageExtensions",
+    "audioExtensions",
     "videoExtensions",
     "embedMedia",
     "mediaBasePath",
@@ -44,7 +32,8 @@ export default {
     "mapboxLongitude",
     "mapboxZoom",
     "mapboxPitch",
-    "mapboxBearing"
+    "mapboxBearing",
+    "mapbox3d"
   ],
   data() {
     return {
@@ -129,7 +118,7 @@ export default {
     },
 
     addDataToMap() {
-       // Remove existing data layers from the map
+      // Remove existing data layers from the map
       if (this.map) {
         this.map.getStyle().layers.forEach(layer => {
           if (layer.id.startsWith('Point-') || layer.id.startsWith('LineString-') || layer.id.startsWith('Polygon-')) {
@@ -175,11 +164,11 @@ export default {
           this.map.addLayer(pointLayer);
 
           this.map.on("mouseenter", pointLayer.id, () => {
-              this.map.getCanvas().style.cursor = "pointer";
-            });
-            this.map.on("mouseleave", pointLayer.id, () => {
-              this.map.getCanvas().style.cursor = "";
-            });
+            this.map.getCanvas().style.cursor = "pointer";
+          });
+          this.map.on("mouseleave", pointLayer.id, () => {
+            this.map.getCanvas().style.cursor = "";
+          });
 
           this.map.on("click", pointLayer.id, () => {
             this.selectedFeature = feature;
@@ -238,18 +227,31 @@ export default {
     this.map = new mapboxgl.Map({
       container: "map",
       style: this.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
-    projection: this.mapboxProjection || "globe",
-    center: [
-      this.mapboxLongitude || 0,
-      this.mapboxLatitude || -15
-    ],
-    zoom: this.mapboxZoom || 2.5,
-    pitch: this.mapboxPitch || 0,
-    bearing: this.mapboxBearing || 0,
-});
+      projection: this.mapboxProjection || "globe",
+      center: [
+        this.mapboxLongitude || 0,
+        this.mapboxLatitude || -15
+      ],
+      zoom: this.mapboxZoom || 2.5,
+      pitch: this.mapboxPitch || 0,
+      bearing: this.mapboxBearing || 0,
+    });
 
     this.filteredData = this.data; // Initialize filteredData with the original data
     this.map.on("load", () => {
+
+      // Add 3D Terrain if set in env var
+      console.log(this.mapbox3d)
+      if (this.mapbox3d) {
+        this.map.addSource('mapbox-dem', {
+          'type': 'raster-dem',
+          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
+          'tileSize': 512,
+          'maxzoom': 14
+        });
+        this.map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+      }
+
       this.addDataToMap();
     });
   },

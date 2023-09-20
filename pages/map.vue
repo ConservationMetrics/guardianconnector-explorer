@@ -18,6 +18,7 @@
       :mapbox-zoom="mapboxZoom"
       :mapbox-pitch="mapboxPitch"
       :mapbox-bearing="mapboxBearing"
+      :mapbox3d="mapbox3d"
     />
   </div>
 </template>
@@ -50,7 +51,8 @@ export default {
       mapboxLongitude: '',
       mapboxZoom: '',
       mapboxPitch: '',
-      mapboxBearing: ''
+      mapboxBearing: '',
+      mapbox3d: false
     };
   },
   async created() {
@@ -74,6 +76,7 @@ export default {
       this.mapboxZoom = response.mapboxZoom;
       this.mapboxPitch = response.mapboxPitch;
       this.mapboxBearing = response.mapboxBearing;
+      this.mapbox3d = response.mapbox3d;
       this.dataFetched = true;
     } catch (error) {
       console.error('Error fetching data on client side:', error);

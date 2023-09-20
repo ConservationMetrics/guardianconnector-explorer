@@ -27,6 +27,7 @@ interface EnvVars {
   MAPBOX_ZOOM: string;
   MAPBOX_PITCH: string;
   MAPBOX_BEARING: string;
+  MAPBOX_3D: string;
   FRONT_END_FILTERING: string;
   FRONT_END_FILTER_FIELD: string;
 }
@@ -59,6 +60,7 @@ const MAPBOX_CENTER_LONGITUDE = env.MAPBOX_CENTER_LONGITUDE ? env.MAPBOX_CENTER_
 const MAPBOX_ZOOM = env.MAPBOX_ZOOM ? env.MAPBOX_ZOOM.replace(/['"]+/g, '') : '2.5';
 const MAPBOX_PITCH = env.MAPBOX_PITCH ? env.MAPBOX_PITCH.replace(/['"]+/g, '') : '0';
 const MAPBOX_BEARING = env.MAPBOX_BEARING ? env.MAPBOX_BEARING.replace(/['"]+/g, '') : '0';
+const MAPBOX_3D = env.MAPBOX_3D ? env.MAPBOX_3D.replace(/['"]+/g, '') : 'NO';
 
 const app = express();
 
@@ -128,7 +130,8 @@ app.get('/map', async (req: express.Request, res: express.Response) => {  try {
       mapboxLongitude: MAPBOX_CENTER_LONGITUDE, 
       mapboxZoom: MAPBOX_ZOOM, 
       mapboxPitch: MAPBOX_PITCH, 
-      mapboxBearing: MAPBOX_BEARING
+      mapboxBearing: MAPBOX_BEARING,
+      mapbox3d: MAPBOX_3D === "YES"
     };
 
     res.json(response);

@@ -6,6 +6,8 @@ This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an A
 
 To get started, copy `.env.example` to `.env` and add your database and table information, and a Mapbox access token.
 
+**Mapbox:** You can optionally provide a Mapbox style, projection, center lat/long, zoom level, pitch, bearing, and if you want the map to render with a 3D terrain layer.
+
 **Database:** To use SQLite instead of Postgres, set  `SQLITE` to `YES` and provide a path value for `SQLITE_DB_PATH`.
 
 **Media attachments:** If your data is storing filenames for media attachments, you can embed them by setting `EMBED_MEDIA` to `YES`, and by providing the path to the exact location where media attachments are stored in `MEDIA_PATH`.
