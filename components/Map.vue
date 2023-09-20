@@ -50,9 +50,18 @@ export default {
     return {
       showSidebar: false,
       selectedFeature: null,
+      processedData: [],
       filteredData: [],
-      markers: []
+      colorMap: new Map(),
     };
+  },
+  watch: {
+    data: {
+      immediate: true,
+      handler(newData) {
+        this.processedData = newData.map(this.processGeolocation);
+      },
+    },
   },
   computed: {
     allExtensions() {
@@ -66,14 +75,23 @@ export default {
   methods: {
     filter(value) {
       if (value === 'null') {
-        this.filteredData = this.data;
+        this.filteredData = this.processedData;
       } else {
-        this.filteredData = this.data.filter(item => item[this.filterField] === value);
+        this.filteredData = this.processedData.filter(item => item[this.filterField] === value);
       }
       this.addDataToMap(); // Call this method to update the map data
     },
 
     getFilePaths: getFilePaths,
+
+    getRandomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    },
 
     // Process different geometry types and extract coordinates
     processGeolocation(obj) {
@@ -82,16 +100,18 @@ export default {
         let coordinates;
 
         // Convert string to array
-        coordinates = JSON.parse(obj.Geocoordinates);
+        if (!Array.isArray(obj.Geocoordinates)) {
+          coordinates = JSON.parse(obj.Geocoordinates);
+        } else {
+          coordinates = obj.Geocoordinates;
+        }
 
         if (
           geometryType === "Point" &&
           Array.isArray(coordinates) &&
           coordinates.length === 2
         ) {
-          const [longitude, latitude] = coordinates;
-          obj.latitude = latitude;
-          obj.longitude = longitude;
+          obj.Geocoordinates = coordinates;
         } else if (geometryType === "LineString") {
           obj.Geocoordinates = coordinates;
         } else if (geometryType === "Polygon") {
@@ -117,9 +137,6 @@ export default {
             this.map.removeSource(layer.id);
           }
         });
-
-        this.markers.forEach(marker => marker.remove());
-        this.markers = [];
       }
 
       this.filteredData.forEach((feature) => {
@@ -132,22 +149,46 @@ export default {
           },
         };
 
+        let color = this.colorMap.get(feature[this.filterField]);
+        if (!color) {
+          color = this.getRandomColor();
+          this.colorMap.set(feature[this.filterField], color);
+        }
+
         // Process and render Point geometry
-        if (geoJsonFeature.geometry.type == "Point") {
-          const marker = new mapboxgl.Marker().setLngLat([
-            feature.longitude,
-            feature.latitude,
-          ]);
-          marker.getElement().style.cursor = "pointer"; // Change cursor to pointer
-          marker.addTo(this.map);
-          this.markers.push(marker);
-          marker.getElement().addEventListener("click", () => {
+        if (geoJsonFeature.geometry.type === "Point") {
+          const id = feature.Id;
+          const pointLayer = {
+            id: `Point-${id}`, // Unique ID for the layer
+            type: 'circle',
+            source: {
+              type: "geojson",
+              data: geoJsonFeature,
+            },
+            paint: {
+              'circle-radius': 6,
+              'circle-color': color,
+              'circle-stroke-width': 2,
+              'circle-stroke-color': '#fff'
+            },
+          };
+          this.map.addLayer(pointLayer);
+
+          this.map.on("mouseenter", pointLayer.id, () => {
+              this.map.getCanvas().style.cursor = "pointer";
+            });
+            this.map.on("mouseleave", pointLayer.id, () => {
+              this.map.getCanvas().style.cursor = "";
+            });
+
+          this.map.on("click", pointLayer.id, () => {
             this.selectedFeature = feature;
             this.showSidebar = true;
           });
         }
+
         // Process and render LineString or Polygon geometry
-        else if ( geoJsonFeature.geometry.type === "LineString" || geoJsonFeature.geometry.type === "Polygon") {
+        else if (geoJsonFeature.geometry.type === "LineString" || geoJsonFeature.geometry.type === "Polygon") {
           const geometryType = geoJsonFeature.geometry.type;
           const id = feature.Id;
 

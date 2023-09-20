@@ -25,7 +25,6 @@
         const values = this.data
           .map(item => item[this.filterField])
           .filter(value => value !== null && value !== '' && value !== undefined);
-        console.log(values)
         return [...new Set(values)];
       },
     },
