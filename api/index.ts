@@ -80,8 +80,7 @@ app.post('/login', (req: express.Request, res: express.Response) => {
 
   // If authentication is successful, generate and return a JWT
   const token = jwt.sign({}, 'your-secret-key');
-  // TODO: figure out a way to access this token and use it for embedding
-  console.log('Generated token:', token);
+  // TODO: figure out a way to access this token and use it for embedding (e.g. in Superset)
   res.status(200).json({ token: token });
 });
 
