@@ -30,6 +30,7 @@ interface EnvVars {
   MAPBOX_BEARING: string;
   MAPBOX_3D: string;
   PASSWORD: string;
+  SECRET_JWT_KEY: string;
   FRONT_END_FILTERING: string;
   FRONT_END_FILTER_FIELD: string;
 }
@@ -64,6 +65,7 @@ const MAPBOX_ZOOM = env.MAPBOX_ZOOM ? env.MAPBOX_ZOOM.replace(/['"]+/g, '') : '2
 const MAPBOX_PITCH = env.MAPBOX_PITCH ? env.MAPBOX_PITCH.replace(/['"]+/g, '') : '0';
 const MAPBOX_BEARING = env.MAPBOX_BEARING ? env.MAPBOX_BEARING.replace(/['"]+/g, '') : '0';
 const MAPBOX_3D = env.MAPBOX_3D ? env.MAPBOX_3D.replace(/['"]+/g, '') : 'NO';
+const SECRET_JWT_KEY= env.SECRET_JWT_KEY ? env.SECRET_JWT_KEY.replace(/['"]+/g, '') : 'secret-jwt-key';
 
 const app = express();
 
@@ -79,8 +81,7 @@ app.post('/login', (req: express.Request, res: express.Response) => {
   }
 
   // If authentication is successful, generate and return a JWT
-  const token = jwt.sign({}, 'your-secret-key');
-  // TODO: figure out a way to access this token and use it for embedding (e.g. in Superset)
+  const token = jwt.sign({}, SECRET_JWT_KEY);
   res.status(200).json({ token: token });
 });
 
@@ -95,12 +96,18 @@ app.use((req: express.Request, res: express.Response, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
+  // Check if the token matches the secret JWT
+  if (token === SECRET_JWT_KEY) {
+    next();
+    return;
+  }
+
   if (token == null) {
     res.status(401).send('Unauthorized');
     return;
   }
 
-  jwt.verify(token, 'your-secret-key', (err) => {
+  jwt.verify(token, SECRET_JWT_KEY, (err) => {
     if (err) {
       res.status(403).send('Forbidden');
       return;
