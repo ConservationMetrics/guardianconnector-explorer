@@ -1,4 +1,6 @@
 import express from 'express';
+import { NextFunction } from 'express';
+
 import jwt from 'jsonwebtoken';
 
 import setupDatabaseConnection from './utils/dbConnection';
@@ -71,22 +73,8 @@ const app = express();
 
 app.use(express.json());
 
-// Endpoint for login
-app.post('/login', (req: express.Request, res: express.Response) => {
-  const providedPassword = req.body.password;
-
-  if (providedPassword !== PASSWORD) {
-    res.status(403).send('Forbidden');
-    return;
-  }
-
-  // If authentication is successful, generate and return a JWT
-  const token = jwt.sign({}, SECRET_JWT_KEY);
-  res.status(200).json({ token: token });
-});
-
 // Middleware for checking the JWT in each request
-app.use((req: express.Request, res: express.Response, next) => {
+const jwtCheckMiddleware= (req: express.Request, res: express.Response, next: NextFunction) => {
   const apiKey = req.headers['x-api-key'];
   if (apiKey !== API_KEY) {
     res.status(403).send('Forbidden');
@@ -95,12 +83,6 @@ app.use((req: express.Request, res: express.Response, next) => {
   
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
-
-  // Check if the token matches the secret JWT
-  if (token === SECRET_JWT_KEY) {
-    next();
-    return;
-  }
 
   if (token == null) {
     res.status(401).send('Unauthorized');
@@ -115,7 +97,36 @@ app.use((req: express.Request, res: express.Response, next) => {
 
     next();
   });
+};
+
+// Endpoints for login
+app.get('/login', (req: express.Request, res: express.Response) => {
+  const secret_key = req.query.secret_key;
+
+  if (secret_key !== SECRET_JWT_KEY) {
+    res.status(403).send('Forbidden');
+    return;
+  }
+  // If authentication is successful, generate and return a JWT
+  const token = jwt.sign({}, SECRET_JWT_KEY);
+  res.status(200).json({ token: token });
 });
+
+app.post('/login', (req: express.Request, res: express.Response) => {
+  const providedPassword = req.body.password;
+
+  if (providedPassword !== PASSWORD) {
+    res.status(403).send('Forbidden');
+    return;
+  }
+  // If authentication is successful, generate and return a JWT
+  const token = jwt.sign({}, SECRET_JWT_KEY);
+  res.status(200).json({ token: token });
+});
+
+// Apply middleware to Views routes
+app.use('/gallery', jwtCheckMiddleware);
+app.use('/map', jwtCheckMiddleware);
 
 const db = setupDatabaseConnection(
   IS_SQLITE, 
