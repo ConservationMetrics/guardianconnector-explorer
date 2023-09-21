@@ -1,4 +1,5 @@
 import express from 'express';
+import jwt from 'jsonwebtoken';
 
 import setupDatabaseConnection from './utils/dbConnection';
 import fetchData from './utils/dbOperations';
@@ -28,6 +29,7 @@ interface EnvVars {
   MAPBOX_PITCH: string;
   MAPBOX_BEARING: string;
   MAPBOX_3D: string;
+  PASSWORD: string;
   FRONT_END_FILTERING: string;
   FRONT_END_FILTER_FIELD: string;
 }
@@ -51,6 +53,7 @@ const UNWANTED_SUBSTRINGS = env.UNWANTED_SUBSTRINGS ? env.UNWANTED_SUBSTRINGS.re
 const FRONT_END_FILTERING = env.FRONT_END_FILTERING ? env.FRONT_END_FILTERING.replace(/['"]+/g, '') : "NO";
 const FRONT_END_FILTER_FIELD = env.FRONT_END_FILTER_FIELD ? env.FRONT_END_FILTER_FIELD.replace(/['"]+/g, '') : undefined;
 const EMBED_MEDIA = env.EMBED_MEDIA.replace(/['"]+/g, '').toUpperCase() === 'YES' ? 'YES' : 'NO';
+const PASSWORD = env.PASSWORD ? env.PASSWORD.replace(/['"]+/g, '') : undefined;
 const MEDIA_BASE_PATH = env.MEDIA_BASE_PATH ? env.MEDIA_BASE_PATH.replace(/['"]+/g, '') : undefined;
 const MAPBOX_ACCESS_TOKEN = env.MAPBOX_ACCESS_TOKEN ? env.MAPBOX_ACCESS_TOKEN.replace(/['"]+/g, '') : 'pk.ey';
 const MAPBOX_STYLE = env.MAPBOX_STYLE ? env.MAPBOX_STYLE.replace(/['"]+/g, '') : 'mapbox://styles/mapbox/streets-v12';
@@ -64,13 +67,48 @@ const MAPBOX_3D = env.MAPBOX_3D ? env.MAPBOX_3D.replace(/['"]+/g, '') : 'NO';
 
 const app = express();
 
-app.use((req, res, next) => {
+app.use(express.json());
+
+// Endpoint for login
+app.post('/login', (req: express.Request, res: express.Response) => {
+  const providedPassword = req.body.password;
+
+  if (providedPassword !== PASSWORD) {
+    res.status(403).send('Forbidden');
+    return;
+  }
+
+  // If authentication is successful, generate and return a JWT
+  const token = jwt.sign({}, 'your-secret-key');
+  // TODO: figure out a way to access this token and use it for embedding
+  console.log('Generated token:', token);
+  res.status(200).json({ token: token });
+});
+
+// Middleware for checking the JWT in each request
+app.use((req: express.Request, res: express.Response, next) => {
   const apiKey = req.headers['x-api-key'];
   if (apiKey !== API_KEY) {
     res.status(403).send('Forbidden');
     return;
   }
-  next();
+  
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) {
+    res.status(401).send('Unauthorized');
+    return;
+  }
+
+  jwt.verify(token, 'your-secret-key', (err) => {
+    if (err) {
+      res.status(403).send('Forbidden');
+      return;
+    }
+
+    next();
+  });
 });
 
 const db = setupDatabaseConnection(

@@ -15,7 +15,7 @@
       "~/*": ["./*"],
       "@/*": ["./*"]
     },
-    "types": ["@types/node", "@nuxt/types"]
+    "types": ["@types/node", "@nuxt/types", "@nuxtjs/auth-next"]
   },
   "include": ["**/*.ts", "**/*.vue", "node_modules/@types/**/*.d.ts"],
   "exclude": ["node_modules", ".nuxt", "dist"]

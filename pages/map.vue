@@ -32,6 +32,7 @@ export default {
       title: 'GuardianConnector Views: Map'
     }
   },
+  middleware: 'auth',
   components: { Map },
   data() {
     return {
@@ -59,7 +60,13 @@ export default {
     try {
       let apiKey = this.$config.apiKey;
       apiKey = apiKey.replace(/['"]+/g, '');
-      const response = await this.$axios.$get('api/map', { headers: { 'x-api-key': apiKey } });
+      const token = this.$auth.strategy.token.get('local');
+      const response = await this.$axios.$get('api/map', { 
+        headers: { 
+          'x-api-key': apiKey,
+          'Authorization': `Bearer ${token}` // Include the token in the Authorization header
+        } 
+      });
       this.data = response.data;
       this.filterData = response.filterData;
       this.filterField = response.filterField;

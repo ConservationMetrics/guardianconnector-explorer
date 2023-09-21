@@ -38,17 +38,47 @@ const config: NuxtConfig = {
     // https://go.nuxtjs.dev/typescript
     '@nuxt/typescript-build',
     'nuxt-windicss',
-    ['@nuxtjs/dotenv', {path: './'}]
+    ['@nuxtjs/dotenv', {path: './'}],
+    '@nuxtjs/auth-next',
   ],
 
   serverMiddleware: [
     '~/api/index.ts'
   ],
 
+  router: {
+    middleware: ['auth']
+  },
+
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     '@nuxtjs/axios',
+    '@nuxtjs/auth-next'
   ],
+
+  auth: {
+    strategies: {
+      local: {
+        token: {
+          property: 'token',
+          required: true,
+          type: 'Bearer',
+          maxAge: 1800
+        },
+        endpoints: {
+          login: { url: '/api/login', method: 'post', propertyName: 'token' },
+          logout: false,
+          user: false
+        }
+      }
+    },
+    redirect: {
+      login: '/login',
+      logout: '/login',
+      callback: '/login',
+      home: '/map', // Redirect to /map after login
+    }
+  },
 
   axios: {
     baseURL: 'http://127.0.0.1:8080',
@@ -61,8 +91,8 @@ const config: NuxtConfig = {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: [(context) => context.isLegacy ? 'axios' : undefined]
-    },
+    transpile: [(context) => context.isLegacy ? 'axios' : undefined, 'defu'],
+  },
 
   server: {
   },
