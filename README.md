@@ -4,7 +4,9 @@ This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an A
 
 ## Configure
 
-To get started, copy `.env.example` to `.env` and add your database and table information, and a Mapbox access token.
+To get started, copy `.env.example` to `.env` and add your database and table information, password, and a Mapbox access token.
+
+**Password:** GuardianConnector Views is protected through password and a JavaScript Web Token. Please set the password in `PASSWORD`. You can also set a `SECRET_JWT_KEY` to authenticate using the browser, by appending `?secret_key=` to the end of your path.
 
 **Mapbox:** You can optionally provide a Mapbox style, projection, center lat/long, zoom level, pitch, bearing, and if you want the map to render with a 3D terrain layer.
 

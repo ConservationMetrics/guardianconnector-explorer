@@ -241,7 +241,6 @@ export default {
     this.map.on("load", () => {
 
       // Add 3D Terrain if set in env var
-      console.log(this.mapbox3d)
       if (this.mapbox3d) {
         this.map.addSource('mapbox-dem', {
           'type': 'raster-dem',
