@@ -1,5 +1,31 @@
 import { NuxtConfig } from '@nuxt/types'
 
+const getAuthConfig = () => {
+  return {
+    strategies: {
+      local: {
+        token: {
+          property: 'token',
+          required: true,
+          type: 'Bearer',
+          maxAge: 1800
+        },
+        endpoints: {
+          login: { url: '/api/login', method: 'post', propertyName: 'token' },
+          logout: false,
+          user: false
+        }
+      }
+    },
+    redirect: {
+      login: '/login',
+      logout: '/login',
+      callback: '/login',
+      home: '/map', // Redirect to /map after login
+    }
+  };
+};
+
 const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -47,7 +73,7 @@ const config: NuxtConfig = {
   ],
 
   router: {
-    middleware: ['auth']
+    middleware: ['authMiddleware']
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -55,29 +81,7 @@ const config: NuxtConfig = {
     '@nuxtjs/axios'
   ],
 
-  auth: {
-    strategies: {
-      local: {
-        token: {
-          property: 'token',
-          required: true,
-          type: 'Bearer',
-          maxAge: 1800
-        },
-        endpoints: {
-          login: { url: '/api/login', method: 'post', propertyName: 'token' },
-          logout: false,
-          user: false
-        }
-      }
-    },
-    redirect: {
-      login: '/login',
-      logout: '/login',
-      callback: '/login',
-      home: '/map', // Redirect to /map after login
-    }
-  },
+  auth: getAuthConfig(),
 
   axios: {
     baseURL: 'http://127.0.0.1:8080',

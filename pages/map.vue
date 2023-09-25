@@ -32,7 +32,6 @@ export default {
       title: 'GuardianConnector Views: Map'
     }
   },
-  middleware: 'auth',
   components: { Map },
   data() {
     return {

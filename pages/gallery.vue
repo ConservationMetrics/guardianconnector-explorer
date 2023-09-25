@@ -26,7 +26,6 @@ export default {
       title: 'GuardianConnector Views: Gallery'
     }
   },
-  middleware: 'auth',
   components: { Gallery },
   data() {
     return {
