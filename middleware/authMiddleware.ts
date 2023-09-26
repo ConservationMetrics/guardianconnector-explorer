@@ -11,7 +11,7 @@ const authMiddleware: Middleware = ({ app, $auth, redirect }) => {
   if (USE_PASSWORD === 'NO') {
     return;
   }
-  if (!$auth.loggedIn) {
+  if (!$auth.loggedIn || $auth.strategy.name !== 'auth0') {
     return redirect('/login')
   }
 }

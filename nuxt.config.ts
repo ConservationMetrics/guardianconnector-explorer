@@ -1,8 +1,15 @@
+require('dotenv').config();
+
 import { NuxtConfig } from '@nuxt/types'
 
 const getAuthConfig = () => {
   return {
     strategies: {
+      auth0: {
+        domain: process.env.AUTH0_DOMAIN,
+        clientId: process.env.AUTH0_CLIENT_ID,
+        ...(process.env.AUTH0_AUDIENCE ? { audience: process.env.AUTH0_AUDIENCE } : {})
+      },
       local: {
         token: {
           property: 'token',

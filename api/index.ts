@@ -98,22 +98,29 @@ const checkApiAndJwt = (req: express.Request, res: express.Response, next: NextF
     return;
   }
 
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authStrategy = req.headers['x-auth-strategy'];
 
-  if (token == null) {
-    res.status(401).send('Unauthorized');
-    return;
-  }
+  // Only check for the JWT token if the authentication strategy is 'local'
+  if (authStrategy === 'local') {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-  jwt.verify(token, SECRET_JWT_KEY, (err) => {
-    if (err) {
-      res.status(403).send('Forbidden');
+    if (token == null) {
+      res.status(401).send('Unauthorized');
       return;
     }
 
+    jwt.verify(token, SECRET_JWT_KEY, (err) => {
+      if (err) {
+        res.status(403).send('Forbidden');
+        return;
+      }
+
+      next();
+    });
+  } else {
     next();
-  });
+  }
 };
 
 // Endpoints for login

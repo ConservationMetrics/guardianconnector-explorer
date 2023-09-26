@@ -44,7 +44,18 @@ export default {
       try {
         let apiKey = this.$config.apiKey;
         apiKey = apiKey.replace(/['"]+/g, '');
-        const response = await this.$axios.$get('api/gallery', { headers: { 'x-api-key': apiKey } });
+        const headers = { 
+          'x-api-key': apiKey,
+          'x-auth-strategy': this.$auth.strategy.name
+        };
+
+        // If the authentication strategy is 'local', include the token in the headers
+        if (this.$auth.strategy.name === 'local') {
+          const token = this.$auth.strategy.token.get();
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await this.$axios.$get('api/gallery', { headers });
         this.data = response.data;
         this.filterData = response.filterData;
         this.filterField = response.filterField;
