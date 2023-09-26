@@ -1,37 +1,8 @@
-require('dotenv').config();
-
 import { NuxtConfig } from '@nuxt/types'
 
-const getAuthConfig = () => {
-  return {
-    strategies: {
-      auth0: {
-        domain: process.env.AUTH0_DOMAIN,
-        clientId: process.env.AUTH0_CLIENT_ID,
-        ...(process.env.AUTH0_AUDIENCE ? { audience: process.env.AUTH0_AUDIENCE } : {})
-      },
-      local: {
-        token: {
-          property: 'token',
-          required: true,
-          type: 'Bearer',
-          maxAge: 1800
-        },
-        endpoints: {
-          login: { url: '/api/login', method: 'post', propertyName: 'token' },
-          logout: false,
-          user: false
-        }
-      }
-    },
-    redirect: {
-      login: '/login',
-      logout: '/login',
-      callback: '/login',
-      home: '/map', // Redirect to /map after login
-    }
-  };
-};
+const auth0Domain: string = process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g, '') || '';
+const auth0ClientId: string = process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, '') || '';
+const auth0Audience: string = process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, '') || '';
 
 const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -88,7 +59,32 @@ const config: NuxtConfig = {
     '@nuxtjs/axios'
   ],
 
-  auth: getAuthConfig(),
+  auth: {
+    strategies: {
+      auth0: {
+        scheme: '~src/runtimeConfigurableScheme.ts'
+      },
+      local: {
+        token: {
+          property: 'token',
+          required: true,
+          type: 'Bearer',
+          maxAge: 1800
+        },
+        endpoints: {
+          login: { url: '/api/login', method: 'post', propertyName: 'token' },
+          logout: false,
+          user: false
+        }
+      }
+    },
+    redirect: {
+      login: '/login',
+      logout: '/login',
+      callback: '/login',
+      home: '/map', // Redirect to /map after login
+    }
+  },
 
   axios: {
     baseURL: 'http://127.0.0.1:8080',
@@ -96,6 +92,18 @@ const config: NuxtConfig = {
   },
 
   publicRuntimeConfig: {
+    auth: {
+      strategies: {
+        auth0: {
+          domain: auth0Domain,
+          clientId: auth0ClientId,
+          endpoints: {
+            authorization: `https://${auth0Domain}/authorize`,
+          },
+          ...(auth0Audience !== "" ? { auth0Audience } : {})
+        }
+      }
+    },
     apiKey: process.env.VUE_APP_API_KEY,
   },
 
