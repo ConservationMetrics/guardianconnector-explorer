@@ -40,7 +40,7 @@ export default {
       mediaBasePath: ''
     };
   },
-  async created() {
+  async mounted() {
       try {
         let apiKey = this.$config.apiKey;
         apiKey = apiKey.replace(/['"]+/g, '');
@@ -55,7 +55,7 @@ export default {
           headers['Authorization'] = `Bearer ${token}`;
         }
 
-        const response = await this.$axios.$get('api/gallery', { headers });
+        const response = await this.$axios.$get('/api/gallery', { headers });
         this.data = response.data;
         this.filterData = response.filterData;
         this.filterField = response.filterField;
