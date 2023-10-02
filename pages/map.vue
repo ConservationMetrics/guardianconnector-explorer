@@ -55,7 +55,7 @@ export default {
       mapbox3d: false
     };
   },
-  async created() {
+  async mounted() {
     try {
       let apiKey = this.$config.apiKey;
       apiKey = apiKey.replace(/['"]+/g, '');
@@ -70,7 +70,7 @@ export default {
         headers['Authorization'] = `Bearer ${token}`;
       }
       
-      const response = await this.$axios.$get('api/map', { headers });
+      const response = await this.$axios.$get('/api/map', { headers });
       this.data = response.data;
       this.filterData = response.filterData;
       this.filterField = response.filterField;
