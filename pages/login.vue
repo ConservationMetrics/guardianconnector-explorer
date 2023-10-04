@@ -18,6 +18,11 @@
     components: {
       // Login
     },
+    beforeMount() {
+      if (this.$auth.loggedIn) {
+        this.$router.push('/map');
+      }
+    },    
     mounted() {
       const hashParams = new URLSearchParams(window.location.hash.substring(1));
       const error = hashParams.get('error');
@@ -25,6 +30,13 @@
 
       if (error === 'access_denied') {
         this.errorMessage = decodeURIComponent(errorDescription);
+      }
+    },
+    watch: {
+      '$auth.loggedIn'(loggedIn) {
+        if (loggedIn) {
+          this.$router.push('/map');
+        }
       }
     },
     methods: {
