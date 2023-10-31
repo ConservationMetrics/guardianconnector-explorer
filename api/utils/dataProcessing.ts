@@ -159,9 +159,9 @@ const hasValidCoordinates = (obj: Record<string, any>): boolean => {
 const filterGeoData = (data: Array<Record<string, any>>): Array<Record<string, any>> => {
   const geoData = data.filter(
     (feature) =>
-      hasValidCoordinates(feature) &&
-      hasKeyIncludingSubstring(feature, "g__type")
+      hasValidCoordinates(feature)
   );
+
   return geoData;
 };
 
@@ -193,5 +193,84 @@ const transformData = (filteredData: Array<Record<string, any>>): Array<Record<s
   return transformedData;
 };
 
+// Process different geometry types and extract coordinates
+const processGeolocation = (obj: any): any => {
+  try {
+    const geometryType = obj.Geotype;
+    let coordinates;
 
-export { filterData, filterGeoData, filterDataByExtension, transformData };
+    // Convert string to array
+    if (!Array.isArray(obj.Geocoordinates)) {
+      coordinates = JSON.parse(obj.Geocoordinates);
+    } else {
+      coordinates = obj.Geocoordinates;
+    }
+    if (
+      geometryType === "Point" &&
+      Array.isArray(coordinates) &&
+      coordinates.length === 2
+    ) {
+      obj.Geocoordinates = coordinates;
+    } else if (geometryType === "LineString") {
+      obj.Geocoordinates = coordinates;
+    } else if (geometryType === "Polygon") {
+      obj.Geocoordinates = [coordinates];
+    }
+  } catch (error) {
+    console.error("Error parsing coordinates:", error);
+  }
+  return obj;
+};
+
+const getRandomColor = (): any => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
+const processGeoData = (transformedData: Array<Record<string, any>>, filterField: string | undefined): Array<Record<string, any>> => {
+  const colorMap = new Map<string, string>();
+
+  // Add geometry type and process coordinates for each item
+  const processedGeoData = transformedData.map((item) => {
+    if (!item.Geotype) {
+      let coordinateKey = Object.keys(item).find(key => key.toLowerCase().includes("coordinates"));
+      if (coordinateKey) {
+        let coordinates = JSON.parse(item[coordinateKey]);
+        if (Array.isArray(coordinates) && coordinates.length === 2 && typeof coordinates[0] === 'number' && typeof coordinates[1] === 'number') {
+          item.Geotype = "Point";
+        } else {
+          item.Geotype = "Polygon";
+        }  
+      }
+    }
+
+    // Add random color to each item per the filter field
+    if (filterField !== undefined) {
+      const filterFieldValue = item[filterField];
+      if (filterFieldValue) {
+        if (!colorMap.has(filterFieldValue)) {
+          colorMap.set(filterFieldValue, getRandomColor());
+        }
+        item['filter-color'] = colorMap.get(filterFieldValue);
+      } else {
+        item['filter-color'] = '#FFA500'; // Fallback color of orange
+      }
+    } else {
+      // Handle the case when filterField is undefined
+      // For example, you might want to set a default color
+      item['filter-color'] = '#FFA500'; // Fallback color of orange
+    }
+
+    return processGeolocation(item);
+  });
+
+  return processedGeoData;
+}
+
+
+
+export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData };

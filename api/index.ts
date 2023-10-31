@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 import setupDatabaseConnection from './utils/dbConnection';
 import fetchData from './utils/dbOperations';
-import { filterData, filterGeoData, filterDataByExtension, transformData } from './utils/dataProcessing';
+import { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData } from './utils/dataProcessing';
 
 interface EnvVars {
   VUE_APP_API_KEY: string;
@@ -190,11 +190,13 @@ app.get('/map', async (req: express.Request, res: express.Response) => {  try {
     const filteredData = filterData(mainData, columnsData, UNWANTED_COLUMNS, UNWANTED_SUBSTRINGS); 
     // Filter only data with valid geofields
     const filteredGeoData = filterGeoData(filteredData); 
-        // Transform data
-    const transformedData = transformData(filteredGeoData)
+    // Transform data
+    const transformedData = transformData(filteredGeoData);
+    // Process geodata
+    const processedGeoData = processGeoData(transformedData, FRONT_END_FILTER_FIELD);
 
     const response = {
-      data: transformedData, 
+      data: processedGeoData, 
       filterData: FRONT_END_FILTERING === "YES",
       filterField: FRONT_END_FILTER_FIELD,
       imageExtensions: imageExtensions, 

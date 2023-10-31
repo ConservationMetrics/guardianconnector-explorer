@@ -11,17 +11,17 @@
           @filter="filter"
       />
     </div>
-    <Feature
-      v-for="(feature, index) in filteredData"
-      :key="index"
-      :embed-media="embedMedia"
-      :media-base-path="mediaBasePath"
-      :file-paths="getFilePaths(feature, allExtensions)"
-      :feature="feature"
-      :image-extensions="imageExtensions"
-      :audio-extensions="audioExtensions"
-      :video-extensions="videoExtensions"
-    />
+      <Feature
+        v-for="(feature, index) in paginatedData"
+        :key="index"
+        :embed-media="embedMedia"
+        :media-base-path="mediaBasePath"
+        :file-paths="getFilePaths(feature, allExtensions)"
+        :feature="feature"
+        :image-extensions="imageExtensions"
+        :audio-extensions="audioExtensions"
+        :video-extensions="videoExtensions"
+      />
   </div>
 </template>
 
@@ -45,9 +45,16 @@ export default {
   data() {
     return {
       filteredData: this.data,
+      currentPage: 1,
+      itemsPerPage: 100
     };
   },
   computed: {
+    paginatedData() {
+      const start = 0;
+      const end = this.currentPage * this.itemsPerPage;
+      return this.filteredData.slice(start, end);
+    },
     allExtensions() {
       return [
         ...this.imageExtensions,
@@ -56,7 +63,18 @@ export default {
       ];
     },
   },
+  mounted() {
+    window.addEventListener('scroll', this.handleScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('scroll', this.handleScroll);
+  },
   methods: {
+    handleScroll() {
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+        this.currentPage++;
+      }
+    },
     getFilePaths: getFilePaths,
     filter(value) {
       if (value === 'null') {
