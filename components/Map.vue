@@ -166,6 +166,7 @@ export default {
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = JSON.parse(e.features[0].properties.feature);
+          delete featureObject['filter-color'];
           this.selectedFeature = featureObject;
           this.showSidebar = true;
         });
@@ -188,8 +189,8 @@ export default {
       bearing: this.mapboxBearing || 0,
     });
 
-    this.filteredData = this.data; // Initialize filteredData with the original data
-    this.processedData = this.data; // Initialize processedData with the original data
+    this.filteredData = this.data;
+    this.processedData = this.data;
 
     this.map.on("load", () => {
 
