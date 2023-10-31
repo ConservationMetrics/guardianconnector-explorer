@@ -1,4 +1,5 @@
 <template>
+  <v-lazy-component>
   <div class="feature p-4 rounded-lg shadow-lg">
     <!-- Conditional rendering depending on file extension -->
     <Media
@@ -29,10 +30,12 @@
       </div>
     </div>
   </div>
+  </v-lazy-component>
 </template>
 
 <script>
 import Media from "@/components/Media.vue";
+import LazyComponent from 'v-lazy-component'
 
 export default {
   components: { Media },

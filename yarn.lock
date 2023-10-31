@@ -10140,6 +10140,11 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
 
+v-lazy-component@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/v-lazy-component/-/v-lazy-component-3.0.9.tgz#e9f5b0659d525c99b0cb8daf790d69ad10ba6474"
+  integrity sha512-B9hiaSVdhPGLen2LFx7CD0Z1Hul3KBUk0Yzs76fxO8tk4OWD7WvTiHFdGTHk8yWRwKqTt1XUz/PvKFyadm/EtQ==
+
 vary@^1.1.2, vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
