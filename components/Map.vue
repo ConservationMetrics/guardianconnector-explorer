@@ -1,10 +1,22 @@
 <template>
   <div id="map">
-    <DataFilter v-if="filterData === true" :data="data" :filter-field="filterField" @filter="filter" />
-    <FeaturePopup :show-sidebar="showSidebar" :embed-media="embedMedia" :media-base-path="mediaBasePath"
-      :file-paths="getFilePaths(selectedFeature, allExtensions)" :feature="selectedFeature"
-      :image-extensions="imageExtensions" :audio-extensions="audioExtensions" :video-extensions="videoExtensions"
-      @close="showSidebar = false" />
+    <DataFilter
+      v-if="filterData === true"
+      :data="data"
+      :filter-field="filterField"
+      @filter="filter"
+    />
+    <FeaturePopup
+      :show-sidebar="showSidebar"
+      :embed-media="embedMedia"
+      :media-base-path="mediaBasePath"
+      :file-paths="getFilePaths(selectedFeature, allExtensions)"
+      :feature="selectedFeature"
+      :image-extensions="imageExtensions"
+      :audio-extensions="audioExtensions"
+      :video-extensions="videoExtensions"
+      @close="showSidebar = false"
+    />
   </div>
 </template>
 
@@ -56,7 +68,7 @@ export default {
   methods: {
     filter(value) {
       if (value === 'null') {
-        this.filteredData = this.processedData;
+        this.filteredData = [...this.processedData];
       } else {
         this.filteredData = this.processedData.filter(item => item[this.filterField] === value);
       }
@@ -64,15 +76,6 @@ export default {
     },
 
     getFilePaths: getFilePaths,
-
-    getRandomColor() {
-      const letters = '0123456789ABCDEF';
-      let color = '#';
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    },
 
     onFeatureClick(feature) {
       this.selectedFeature = feature;
@@ -83,102 +86,89 @@ export default {
       // Remove existing data layers from the map
       if (this.map) {
         this.map.getStyle().layers.forEach(layer => {
-          if (layer.id.startsWith('Point-') || layer.id.startsWith('LineString-') || layer.id.startsWith('Polygon-')) {
-            this.map.removeLayer(layer.id);
-            this.map.removeSource(layer.id);
+          if (layer.id.startsWith('data-layer')) {
+            if (this.map.getLayer(layer.id)) {
+              this.map.removeLayer(layer.id);
+            }
           }
         });
+        if (this.map.getSource('data-source')) {
+          this.map.removeSource('data-source');
+        }
       }
 
-      this.filteredData.forEach((feature) => {
-        const geoJsonFeature = {
+      // Create a GeoJSON source with all the features
+      const geoJsonSource = {
+        type: "FeatureCollection",
+        features: this.filteredData.map(feature => ({
           type: "Feature",
           geometry: {
             type: feature.Geotype,
             coordinates: feature.Geocoordinates,
           },
-        };
+          properties: {
+            feature
+          },
+        })),
+      };
 
-        let color = this.colorMap.get(feature[this.filterField]);
-        if (!color) {
-          color = this.getRandomColor();
-          this.colorMap.set(feature[this.filterField], color);
-        }
+      // Add the source to the map
+      this.map.addSource('data-source', {
+        type: "geojson",
+        data: geoJsonSource,
+      });
 
-        // Process and render Point geometry
-        if (geoJsonFeature.geometry.type === "Point") {
-          const id = feature.Id;
-          const pointLayer = {
-            id: `Point-${id}`, // Unique ID for the layer
-            type: 'circle',
-            source: {
-              type: "geojson",
-              data: geoJsonFeature,
-            },
-            paint: {
-              'circle-radius': 6,
-              'circle-color': color,
-              'circle-stroke-width': 2,
-              'circle-stroke-color': '#fff'
-            },
-          };
-          this.map.addLayer(pointLayer);
+      // Add a layer for Point features
+      this.map.addLayer({
+        id: 'data-layer-point',
+        type: 'circle',
+        source: 'data-source',
+        filter: ['==', '$type', 'Point'],
+        paint: {
+          'circle-radius': 6,
+          'circle-color': ['get', 'filter-color', ['get', 'feature']],
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#fff'
+        },
+      });
 
-          this.map.on("mouseenter", pointLayer.id, () => {
-            this.map.getCanvas().style.cursor = "pointer";
-          });
-          this.map.on("mouseleave", pointLayer.id, () => {
-            this.map.getCanvas().style.cursor = "";
-          });
+      // Add a layer for LineString features
+      this.map.addLayer({
+        id: 'data-layer-linestring',
+        type: 'line',
+        source: 'data-source',
+        filter: ['==', '$type', 'LineString'],
+        paint: {
+          'line-color': ['get', 'filter-color', ['get', 'feature']],
+          'line-width': 2,
+        },
+      });
 
-          this.map.on("click", pointLayer.id, () => {
-            this.selectedFeature = feature;
-            this.showSidebar = true;
-          });
-        }
+      // Add a layer for Polygon features
+      this.map.addLayer({
+        id: 'data-layer-polygon',
+        type: 'fill',
+        source: 'data-source',
+        filter: ['==', '$type', 'Polygon'],
+        paint: {
+          'fill-color': ['get', 'filter-color', ['get', 'feature']],
+          'fill-opacity': 0.5,
+        },
+      });
 
-        // Process and render LineString or Polygon geometry
-        else if (geoJsonFeature.geometry.type === "LineString" || geoJsonFeature.geometry.type === "Polygon") {
-          const geometryType = geoJsonFeature.geometry.type;
-          const id = feature.Id;
-
-          const featureLayer = {
-            id: `${geometryType}-${id}`, // Unique ID for the layer
-            type: geometryType === "Polygon" ? "fill" : "line",
-            source: {
-              type: "geojson",
-              data: geoJsonFeature,
-            },
-            paint: {
-              ...(geometryType === "Polygon" && {
-                "fill-color": "#3FB1CE",
-                "fill-opacity": 0.75,
-              }),
-              ...(geometryType === "LineString" && {
-                "line-color": "#3FB1CE",
-                "line-opacity": 0.75,
-                "line-width": 8,
-              }),
-            },
-          };
-
-          // TODO: get these event listeners working for non-Point geometries
-          if (geometryType === "Polygon" || geometryType === "LineString") {
-            this.map.on("mouseenter", featureLayer.id, () => {
-              this.map.getCanvas().style.cursor = "pointer";
-            });
-            this.map.on("mouseleave", featureLayer.id, () => {
-              this.map.getCanvas().style.cursor = "";
-            });
-          }
-
-          this.map.on("click", featureLayer.id, () => {
-            this.selectedFeature = feature;
-            this.showSidebar = true;
-          });
-
-          this.map.addLayer(featureLayer);
-        }
+      // Add event listeners
+      ['data-layer-point', 'data-layer-linestring', 'data-layer-polygon'].forEach(layerId => {
+        this.map.on("mouseenter", layerId, () => {
+          this.map.getCanvas().style.cursor = "pointer";
+        });
+        this.map.on("mouseleave", layerId, () => {
+          this.map.getCanvas().style.cursor = "";
+        });
+        this.map.on("click", layerId, (e) => {
+          let featureObject = JSON.parse(e.features[0].properties.feature);
+          this.selectedFeature = featureObject;
+          this.showSidebar = true;
+        });
       });
     },
   },
@@ -199,6 +189,8 @@ export default {
     });
 
     this.filteredData = this.data; // Initialize filteredData with the original data
+    this.processedData = this.data; // Initialize processedData with the original data
+
     this.map.on("load", () => {
 
       // Add 3D Terrain if set in env var

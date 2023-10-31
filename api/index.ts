@@ -193,7 +193,7 @@ app.get('/map', async (req: express.Request, res: express.Response) => {  try {
     // Transform data
     const transformedData = transformData(filteredGeoData);
     // Process geodata
-    const processedGeoData = processGeoData(transformedData);
+    const processedGeoData = processGeoData(transformedData, FRONT_END_FILTER_FIELD);
 
     const response = {
       data: processedGeoData, 

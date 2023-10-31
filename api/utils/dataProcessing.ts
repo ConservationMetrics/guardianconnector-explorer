@@ -222,7 +222,19 @@ const processGeolocation = (obj: any): any => {
   return obj;
 };
 
-const processGeoData = (transformedData: Array<Record<string, any>>): Array<Record<string, any>> => {
+const getRandomColor = (): any => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+};
+
+const processGeoData = (transformedData: Array<Record<string, any>>, filterField: string | undefined): Array<Record<string, any>> => {
+  const colorMap = new Map<string, string>();
+
+  // Add geometry type and process coordinates for each item
   const processedGeoData = transformedData.map((item) => {
     if (!item.Geotype) {
       let coordinateKey = Object.keys(item).find(key => key.toLowerCase().includes("coordinates"));
@@ -235,8 +247,27 @@ const processGeoData = (transformedData: Array<Record<string, any>>): Array<Reco
         }  
       }
     }
+
+    // Add random color to each item per the filter field
+    if (filterField !== undefined) {
+      const filterFieldValue = item[filterField];
+      if (filterFieldValue) {
+        if (!colorMap.has(filterFieldValue)) {
+          colorMap.set(filterFieldValue, getRandomColor());
+        }
+        item['filter-color'] = colorMap.get(filterFieldValue);
+      } else {
+        item['filter-color'] = '#FFA500'; // Fallback color of orange
+      }
+    } else {
+      // Handle the case when filterField is undefined
+      // For example, you might want to set a default color
+      item['filter-color'] = '#FFA500'; // Fallback color of orange
+    }
+
     return processGeolocation(item);
   });
+
   return processedGeoData;
 }
 
