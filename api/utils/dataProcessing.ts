@@ -159,9 +159,9 @@ const hasValidCoordinates = (obj: Record<string, any>): boolean => {
 const filterGeoData = (data: Array<Record<string, any>>): Array<Record<string, any>> => {
   const geoData = data.filter(
     (feature) =>
-      hasValidCoordinates(feature) &&
-      hasKeyIncludingSubstring(feature, "g__type")
+      hasValidCoordinates(feature)
   );
+
   return geoData;
 };
 
@@ -193,5 +193,53 @@ const transformData = (filteredData: Array<Record<string, any>>): Array<Record<s
   return transformedData;
 };
 
+// Process different geometry types and extract coordinates
+const processGeolocation = (obj: any): any => {
+  try {
+    const geometryType = obj.Geotype;
+    let coordinates;
 
-export { filterData, filterGeoData, filterDataByExtension, transformData };
+    // Convert string to array
+    if (!Array.isArray(obj.Geocoordinates)) {
+      coordinates = JSON.parse(obj.Geocoordinates);
+    } else {
+      coordinates = obj.Geocoordinates;
+    }
+    if (
+      geometryType === "Point" &&
+      Array.isArray(coordinates) &&
+      coordinates.length === 2
+    ) {
+      obj.Geocoordinates = coordinates;
+    } else if (geometryType === "LineString") {
+      obj.Geocoordinates = coordinates;
+    } else if (geometryType === "Polygon") {
+      obj.Geocoordinates = [coordinates];
+    }
+  } catch (error) {
+    console.error("Error parsing coordinates:", error);
+  }
+  return obj;
+};
+
+const processGeoData = (transformedData: Array<Record<string, any>>): Array<Record<string, any>> => {
+  const processedGeoData = transformedData.map((item) => {
+    if (!item.Geotype) {
+      let coordinateKey = Object.keys(item).find(key => key.toLowerCase().includes("coordinates"));
+      if (coordinateKey) {
+        let coordinates = JSON.parse(item[coordinateKey]);
+        if (Array.isArray(coordinates) && coordinates.length === 2 && typeof coordinates[0] === 'number' && typeof coordinates[1] === 'number') {
+          item.Geotype = "Point";
+        } else {
+          item.Geotype = "Polygon";
+        }  
+      }
+    }
+    return processGeolocation(item);
+  });
+  return processedGeoData;
+}
+
+
+
+export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData };

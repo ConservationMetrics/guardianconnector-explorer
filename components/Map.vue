@@ -44,14 +44,6 @@ export default {
       colorMap: new Map(),
     };
   },
-  watch: {
-    data: {
-      immediate: true,
-      handler(newData) {
-        this.processedData = newData.map(this.processGeolocation);
-      },
-    },
-  },
   computed: {
     allExtensions() {
       return [
@@ -82,36 +74,6 @@ export default {
       return color;
     },
 
-    // Process different geometry types and extract coordinates
-    processGeolocation(obj) {
-      try {
-        const geometryType = obj.Geotype;
-        let coordinates;
-
-        // Convert string to array
-        if (!Array.isArray(obj.Geocoordinates)) {
-          coordinates = JSON.parse(obj.Geocoordinates);
-        } else {
-          coordinates = obj.Geocoordinates;
-        }
-
-        if (
-          geometryType === "Point" &&
-          Array.isArray(coordinates) &&
-          coordinates.length === 2
-        ) {
-          obj.Geocoordinates = coordinates;
-        } else if (geometryType === "LineString") {
-          obj.Geocoordinates = coordinates;
-        } else if (geometryType === "Polygon") {
-          obj.Geocoordinates = [coordinates];
-        }
-      } catch (error) {
-        console.error("Error parsing coordinates:", error);
-      }
-      return obj;
-    },
-
     onFeatureClick(feature) {
       this.selectedFeature = feature;
       this.showSidebar = true;
@@ -129,7 +91,6 @@ export default {
       }
 
       this.filteredData.forEach((feature) => {
-        feature = this.processGeolocation(feature);
         const geoJsonFeature = {
           type: "Feature",
           geometry: {
