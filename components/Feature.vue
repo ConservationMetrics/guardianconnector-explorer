@@ -1,41 +1,38 @@
 <template>
-  <v-lazy-component>
-  <div class="feature p-4 rounded-lg shadow-lg">
-    <!-- Conditional rendering depending on file extension -->
-    <Media
-      v-if="embedMedia === true"
-      v-for="filePath in filePaths"
-      :key="filePath"
-      :mediaBasePath="mediaBasePath"
-      :filePath="filePath"
-      :image-extensions="imageExtensions"
-      :audio-extensions="audioExtensions"
-      :video-extensions="videoExtensions"
-    />
-    <div class="mt-4">
-      <div
-        v-for="(value, key) in sortedFeature"
-        :key="key"
-        v-if="
-          value !== null &&
-          value !== '' &&
-          key.toLowerCase() !== 'uuid' &&
-          !key.toLowerCase().includes('photo') &&
-          key.toLowerCase() !== 'audio'
-        "
-        class="mb-2"
-      >
-        <span class="font-bold">{{ key }}</span
-        >: <span>{{ value }}</span>
+    <div class="feature p-4 rounded-lg shadow-lg">
+      <!-- Conditional rendering depending on file extension -->
+      <Media
+        v-if="embedMedia === true"
+        v-for="filePath in filePaths"
+        :key="filePath"
+        :mediaBasePath="mediaBasePath"
+        :filePath="filePath"
+        :image-extensions="imageExtensions"
+        :audio-extensions="audioExtensions"
+        :video-extensions="videoExtensions"
+      />
+      <div class="mt-4">
+        <div
+          v-for="(value, key) in sortedFeature"
+          :key="key"
+          v-if="
+            value !== null &&
+            value !== '' &&
+            key.toLowerCase() !== 'uuid' &&
+            !key.toLowerCase().includes('photo') &&
+            key.toLowerCase() !== 'audio'
+          "
+          class="mb-2"
+        >
+          <span class="font-bold">{{ key }}</span
+          >: <span>{{ value }}</span>
+        </div>
       </div>
     </div>
-  </div>
-  </v-lazy-component>
 </template>
 
 <script>
 import Media from "@/components/Media.vue";
-import LazyComponent from 'v-lazy-component'
 
 export default {
   components: { Media },
