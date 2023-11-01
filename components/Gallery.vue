@@ -5,23 +5,23 @@
   >
     <div class="sticky top-10 right-10 z-10">
       <DataFilter
-          v-if="filterData === true"
-          :data="data"
-          :filter-field="filterField"
-          @filter="filter"
+        v-if="filterData === true"
+        :data="data"
+        :filter-field="filterField"
+        @filter="filter"
       />
     </div>
-      <Feature
-        v-for="(feature, index) in paginatedData"
-        :key="index"
-        :embed-media="embedMedia"
-        :media-base-path="mediaBasePath"
-        :file-paths="getFilePaths(feature, allExtensions)"
-        :feature="feature"
-        :image-extensions="imageExtensions"
-        :audio-extensions="audioExtensions"
-        :video-extensions="videoExtensions"
-      />
+    <Feature
+      v-for="(feature, index) in paginatedData"
+      :key="index"
+      :embed-media="embedMedia"
+      :media-base-path="mediaBasePath"
+      :file-paths="getFilePaths(feature, allExtensions)"
+      :feature="feature"
+      :image-extensions="imageExtensions"
+      :audio-extensions="audioExtensions"
+      :video-extensions="videoExtensions"
+    />
   </div>
 </template>
 
@@ -33,20 +33,20 @@ import getFilePaths from "@/src/utils.ts";
 export default {
   components: { Feature, DataFilter },
   props: [
-    "data", 
+    "data",
     "filterData",
     "filterField",
-    "imageExtensions", 
-    "audioExtensions", 
-    "videoExtensions", 
-    "embedMedia", 
-    "mediaBasePath"
+    "imageExtensions",
+    "audioExtensions",
+    "videoExtensions",
+    "embedMedia",
+    "mediaBasePath",
   ],
   data() {
     return {
       filteredData: this.data,
       currentPage: 1,
-      itemsPerPage: 100
+      itemsPerPage: 100,
     };
   },
   computed: {
@@ -64,23 +64,25 @@ export default {
     },
   },
   mounted() {
-    window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener("scroll", this.handleScroll);
   },
   beforeDestroy() {
-    window.removeEventListener('scroll', this.handleScroll);
+    window.removeEventListener("scroll", this.handleScroll);
   },
   methods: {
     handleScroll() {
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
         this.currentPage++;
       }
     },
     getFilePaths: getFilePaths,
-    filter(value) {
-      if (value === 'null') {
+    filter(values) {
+      if (values.includes("null")) {
         this.filteredData = this.data;
       } else {
-        this.filteredData = this.data.filter(item => item[this.filterField] === value);
+        this.filteredData = this.data.filter((item) =>
+          values.includes(item[this.filterField])
+        );
       }
     },
   },

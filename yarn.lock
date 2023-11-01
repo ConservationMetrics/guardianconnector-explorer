@@ -10207,6 +10207,11 @@ vue-router@^3.6.5:
   resolved "https://registry.yarnpkg.com/vue-router/-/vue-router-3.6.5.tgz#95847d52b9a7e3f1361cb605c8e6441f202afad8"
   integrity sha512-VYXZQLtjuvKxxcshuRAwjHnciqZVoXAjTjcqBTz4rKc8qih9g9pI3hbDjmqXaHdgL3v8pV6P8Z335XvHzESxLQ==
 
+vue-select@^3.20.2:
+  version "3.20.2"
+  resolved "https://registry.yarnpkg.com/vue-select/-/vue-select-3.20.2.tgz#eaa15012b032c154d4fb51ac82ebeda2beeae54b"
+  integrity sha512-ZSzIDzyYsWZULGUxVp1h6u3yi9IZQBWX8r6kSudUI/I5J1HQKpBjRntvkrg6pr87xmm16kdChvHCDN+W84vTKw==
+
 vue-server-renderer@^2.7.10, vue-server-renderer@^2.7.14:
   version "2.7.14"
   resolved "https://registry.yarnpkg.com/vue-server-renderer/-/vue-server-renderer-2.7.14.tgz#986f3fdca63fbb38bb6834698f11e0d6a81f182f"
