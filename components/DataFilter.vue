@@ -9,7 +9,6 @@
       @input="emitFilter"
       label="label"
       v-model="selectedValue"
-      v-if="uniqueValues.length > 0"
     >
       <!-- These are the options in the dropdown -->
       <template v-slot:option="option">
@@ -90,6 +89,7 @@ export default {
   top: 10px;
   right: 10px;
   min-width: 325px;
+  max-width: 600px;
   background: #f5f5f5;
   padding: 10px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
