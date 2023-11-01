@@ -4,6 +4,7 @@
       v-if="filterData === true"
       :data="data"
       :filter-field="filterField"
+      :show-colored-dot="true"
       @filter="filter"
     />
     <FeaturePopup
@@ -45,7 +46,7 @@ export default {
     "mapboxZoom",
     "mapboxPitch",
     "mapboxBearing",
-    "mapbox3d"
+    "mapbox3d",
   ],
   data() {
     return {
@@ -66,11 +67,13 @@ export default {
     },
   },
   methods: {
-    filter(value) {
-      if (value === 'null') {
+    filter(values) {
+      if (values.includes("null")) {
         this.filteredData = [...this.processedData];
       } else {
-        this.filteredData = this.processedData.filter(item => item[this.filterField] === value);
+        this.filteredData = this.processedData.filter((item) =>
+          values.includes(item[this.filterField])
+        );
       }
       this.addDataToMap(); // Call this method to update the map data
     },
@@ -85,79 +88,83 @@ export default {
     addDataToMap() {
       // Remove existing data layers from the map
       if (this.map) {
-        this.map.getStyle().layers.forEach(layer => {
-          if (layer.id.startsWith('data-layer')) {
+        this.map.getStyle().layers.forEach((layer) => {
+          if (layer.id.startsWith("data-layer")) {
             if (this.map.getLayer(layer.id)) {
               this.map.removeLayer(layer.id);
             }
           }
         });
-        if (this.map.getSource('data-source')) {
-          this.map.removeSource('data-source');
+        if (this.map.getSource("data-source")) {
+          this.map.removeSource("data-source");
         }
       }
 
       // Create a GeoJSON source with all the features
       const geoJsonSource = {
         type: "FeatureCollection",
-        features: this.filteredData.map(feature => ({
+        features: this.filteredData.map((feature) => ({
           type: "Feature",
           geometry: {
             type: feature.Geotype,
             coordinates: feature.Geocoordinates,
           },
           properties: {
-            feature
+            feature,
           },
         })),
       };
 
       // Add the source to the map
-      this.map.addSource('data-source', {
+      this.map.addSource("data-source", {
         type: "geojson",
         data: geoJsonSource,
       });
 
       // Add a layer for Point features
       this.map.addLayer({
-        id: 'data-layer-point',
-        type: 'circle',
-        source: 'data-source',
-        filter: ['==', '$type', 'Point'],
+        id: "data-layer-point",
+        type: "circle",
+        source: "data-source",
+        filter: ["==", "$type", "Point"],
         paint: {
-          'circle-radius': 6,
-          'circle-color': ['get', 'filter-color', ['get', 'feature']],
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#fff'
+          "circle-radius": 6,
+          "circle-color": ["get", "filter-color", ["get", "feature"]],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#fff",
         },
       });
 
       // Add a layer for LineString features
       this.map.addLayer({
-        id: 'data-layer-linestring',
-        type: 'line',
-        source: 'data-source',
-        filter: ['==', '$type', 'LineString'],
+        id: "data-layer-linestring",
+        type: "line",
+        source: "data-source",
+        filter: ["==", "$type", "LineString"],
         paint: {
-          'line-color': ['get', 'filter-color', ['get', 'feature']],
-          'line-width': 2,
+          "line-color": ["get", "filter-color", ["get", "feature"]],
+          "line-width": 2,
         },
       });
 
       // Add a layer for Polygon features
       this.map.addLayer({
-        id: 'data-layer-polygon',
-        type: 'fill',
-        source: 'data-source',
-        filter: ['==', '$type', 'Polygon'],
+        id: "data-layer-polygon",
+        type: "fill",
+        source: "data-source",
+        filter: ["==", "$type", "Polygon"],
         paint: {
-          'fill-color': ['get', 'filter-color', ['get', 'feature']],
-          'fill-opacity': 0.5,
+          "fill-color": ["get", "filter-color", ["get", "feature"]],
+          "fill-opacity": 0.5,
         },
       });
 
       // Add event listeners
-      ['data-layer-point', 'data-layer-linestring', 'data-layer-polygon'].forEach(layerId => {
+      [
+        "data-layer-point",
+        "data-layer-linestring",
+        "data-layer-polygon",
+      ].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
           this.map.getCanvas().style.cursor = "pointer";
         });
@@ -166,7 +173,7 @@ export default {
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = JSON.parse(e.features[0].properties.feature);
-          delete featureObject['filter-color'];
+          delete featureObject["filter-color"];
           this.selectedFeature = featureObject;
           this.showSidebar = true;
         });
@@ -180,10 +187,7 @@ export default {
       container: "map",
       style: this.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
       projection: this.mapboxProjection || "globe",
-      center: [
-        this.mapboxLongitude || 0,
-        this.mapboxLatitude || -15
-      ],
+      center: [this.mapboxLongitude || 0, this.mapboxLatitude || -15],
       zoom: this.mapboxZoom || 2.5,
       pitch: this.mapboxPitch || 0,
       bearing: this.mapboxBearing || 0,
@@ -193,16 +197,15 @@ export default {
     this.processedData = this.data;
 
     this.map.on("load", () => {
-
       // Add 3D Terrain if set in env var
       if (this.mapbox3d) {
-        this.map.addSource('mapbox-dem', {
-          'type': 'raster-dem',
-          'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',
-          'tileSize': 512,
-          'maxzoom': 14
+        this.map.addSource("mapbox-dem", {
+          type: "raster-dem",
+          url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+          tileSize: 512,
+          maxzoom: 14,
         });
-        this.map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
+        this.map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
       }
 
       this.addDataToMap();
