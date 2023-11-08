@@ -47,11 +47,20 @@ const config: NuxtConfig = {
   ],
 
   serverMiddleware: [
-    '~/api/index.ts'
+    { path: "/api", handler: "~/api/index.ts" },
   ],
 
   router: {
-    middleware: ['authMiddleware']
+    middleware: ['authMiddleware'],
+    extendRoutes(routes, resolve) {
+      // Filter out default Vue routes for pages
+      const filteredRoutes = routes.filter(route => {
+        return route.name !== 'map' && route.name !== 'gallery';
+      });
+
+      // Replace the original routes array with the filtered one
+      routes.splice(0, routes.length, ...filteredRoutes);
+    },
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules

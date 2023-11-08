@@ -17,7 +17,7 @@ interface EnvVars {
   DB_SSL: string;
   IS_SQLITE: string;
   SQLITE_DB_PATH: string;
-  TABLE: string;
+  TABLES: string;
   UNWANTED_COLUMNS: string;
   UNWANTED_SUBSTRINGS: string;
   EMBED_MEDIA: string;
@@ -61,7 +61,7 @@ const DB_PORT = getEnvVar('DB_PORT', '5432') as string;
 const DB_SSL = getEnvVar('DB_SSL', 'YES') as string;
 const IS_SQLITE = getEnvVar('IS_SQLITE', 'NO', val => val.toUpperCase() === 'YES' ? 'YES' : 'NO') as string;
 const SQLITE_DB_PATH = getEnvVar('SQLITE_DB_PATH');
-const TABLE = getEnvVar('TABLE');
+const TABLES = getEnvVar('TABLES');
 const UNWANTED_COLUMNS = getEnvVar('UNWANTED_COLUMNS');
 const UNWANTED_SUBSTRINGS = getEnvVar('UNWANTED_SUBSTRINGS');
 const FRONT_END_FILTERING = getEnvVar('FRONT_END_FILTERING', 'NO') as string;
@@ -163,95 +163,108 @@ const db = setupDatabaseConnection(
   DB_SSL
 );
 
-// Media extensions
-const imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
-const audioExtensions = ['mp3', 'ogg', 'wav'];
-const videoExtensions = ['mov', 'mp4', 'avi', 'mkv'];
-const allExtensions = [...imageExtensions, ...audioExtensions, ...videoExtensions];
+// If TABLES is undefined or empty, throw an error before proceeding
+if (!TABLES) {
+  throw new Error('The TABLES environment variable is not defined or is empty.');
+} else {
+  const tableNames = TABLES.split(','); 
 
-// Endpoint for raw data
-app.get('/data', async (req: express.Request, res: express.Response) => {  try {
-    // Fetch data
-    const { mainData, columnsData } = await fetchData(db, TABLE, IS_SQLITE);
+  // Media extensions
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+  const audioExtensions = ['mp3', 'ogg', 'wav'];
+  const videoExtensions = ['mov', 'mp4', 'avi', 'mkv'];
+  const allExtensions = [...imageExtensions, ...audioExtensions, ...videoExtensions];
 
-    res.json({ data: mainData, columns: columnsData });
+  tableNames.forEach((table) => {
+    console.log(`Setting up API and views for database table: ${table}`);
 
-  } catch (error:any) {
-    console.error('Error fetching data on API side:', error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
+    // Endpoint for raw data
+    app.get(`/${table}/data`, async (req: express.Request, res: express.Response) => {  try {
+        // Fetch data
+        const { mainData, columnsData } = await fetchData(db, table, IS_SQLITE);
 
-// Endpoint for the map view
-app.get('/map', async (req: express.Request, res: express.Response) => {  try {
-    // Fetch data
-    const { mainData, columnsData } = await fetchData(db, TABLE, IS_SQLITE);
-    // Filter data
-    const filteredData = filterData(mainData, columnsData, UNWANTED_COLUMNS, UNWANTED_SUBSTRINGS); 
-    // Filter only data with valid geofields
-    const filteredGeoData = filterGeoData(filteredData); 
-    // Transform data
-    const transformedData = transformData(filteredGeoData);
-    // Process geodata
-    const processedGeoData = processGeoData(transformedData, FRONT_END_FILTER_FIELD);
+        res.json({ data: mainData, columns: columnsData });
 
-    const response = {
-      data: processedGeoData, 
-      filterData: FRONT_END_FILTERING === "YES",
-      filterField: FRONT_END_FILTER_FIELD,
-      imageExtensions: imageExtensions, 
-      audioExtensions: audioExtensions, 
-      videoExtensions: videoExtensions, 
-      embedMedia: EMBED_MEDIA === "YES",
-      mediaBasePath: MEDIA_BASE_PATH, 
-      mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
-      mapboxStyle: MAPBOX_STYLE, 
-      mapboxProjection: MAPBOX_PROJECTION, 
-      mapboxLatitude: MAPBOX_CENTER_LATITUDE, 
-      mapboxLongitude: MAPBOX_CENTER_LONGITUDE, 
-      mapboxZoom: MAPBOX_ZOOM, 
-      mapboxPitch: MAPBOX_PITCH, 
-      mapboxBearing: MAPBOX_BEARING,
-      mapbox3d: MAPBOX_3D === "YES"
-    };
+      } catch (error:any) {
+        console.error('Error fetching data on API side:', error.message);
+        res.status(500).json({ error: error.message });
+      }
+    });
 
-    res.json(response);
+    // Endpoint for the map view
+    app.get(`/${table}/map`, async (req: express.Request, res: express.Response) => {  try {
+        // Fetch data
+        const { mainData, columnsData } = await fetchData(db, table, IS_SQLITE);
+        // Filter data
+        const filteredData = filterData(mainData, columnsData, UNWANTED_COLUMNS, UNWANTED_SUBSTRINGS); 
+        // Filter only data with valid geofields
+        const filteredGeoData = filterGeoData(filteredData); 
+        // Transform data
+        const transformedData = transformData(filteredGeoData);
+        // Process geodata
+        const processedGeoData = processGeoData(transformedData, FRONT_END_FILTER_FIELD);
 
-  } catch (error:any) {
-    console.error('Error fetching data on API side:', error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
+        const response = {
+          data: processedGeoData, 
+          table: table,
+          filterData: FRONT_END_FILTERING === "YES",
+          filterField: FRONT_END_FILTER_FIELD,
+          imageExtensions: imageExtensions, 
+          audioExtensions: audioExtensions, 
+          videoExtensions: videoExtensions, 
+          embedMedia: EMBED_MEDIA === "YES",
+          mediaBasePath: MEDIA_BASE_PATH, 
+          mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
+          mapboxStyle: MAPBOX_STYLE, 
+          mapboxProjection: MAPBOX_PROJECTION, 
+          mapboxLatitude: MAPBOX_CENTER_LATITUDE, 
+          mapboxLongitude: MAPBOX_CENTER_LONGITUDE, 
+          mapboxZoom: MAPBOX_ZOOM, 
+          mapboxPitch: MAPBOX_PITCH, 
+          mapboxBearing: MAPBOX_BEARING,
+          mapbox3d: MAPBOX_3D === "YES"
+        };
 
-// Endpoint for the gallery view
-app.get('/gallery', async (req: express.Request, res: express.Response) => {  try {
-    // Fetch data
-    const { mainData, columnsData } = await fetchData(db, TABLE, IS_SQLITE);
-    // Filter data
-    const filteredData = filterData(mainData, columnsData, UNWANTED_COLUMNS, UNWANTED_SUBSTRINGS); 
-    // Filter only data with media attachments
-    const dataWithFilesOnly = filterDataByExtension(filteredData, allExtensions);
-    // Transform data
-    const transformedData = transformData(dataWithFilesOnly)
+        res.json(response);
 
-    const response = {
-      data: transformedData, 
-      filterData: FRONT_END_FILTERING === "YES",
-      filterField: FRONT_END_FILTER_FIELD,
-      imageExtensions: imageExtensions, 
-      audioExtensions: audioExtensions, 
-      videoExtensions: videoExtensions, 
-      embedMedia: EMBED_MEDIA === "YES",
-      mediaBasePath: MEDIA_BASE_PATH
-    };
+      } catch (error:any) {
+        console.error('Error fetching data on API side:', error.message);
+        res.status(500).json({ error: error.message });
+      }
+    });
 
-    res.json(response);
-    
-  } catch (error:any) {
-    console.error('Error fetching data on API side:', error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
+    // Endpoint for the gallery view
+    app.get(`/${table}/gallery`, async (req: express.Request, res: express.Response) => {  try {
+        // Fetch data
+        const { mainData, columnsData } = await fetchData(db, table, IS_SQLITE);
+        // Filter data
+        const filteredData = filterData(mainData, columnsData, UNWANTED_COLUMNS, UNWANTED_SUBSTRINGS); 
+        // Filter only data with media attachments
+        const dataWithFilesOnly = filterDataByExtension(filteredData, allExtensions);
+        // Transform data
+        const transformedData = transformData(dataWithFilesOnly)
+
+        const response = {
+          data: transformedData, 
+          table: table,
+          filterData: FRONT_END_FILTERING === "YES",
+          filterField: FRONT_END_FILTER_FIELD,
+          imageExtensions: imageExtensions, 
+          audioExtensions: audioExtensions, 
+          videoExtensions: videoExtensions, 
+          embedMedia: EMBED_MEDIA === "YES",
+          mediaBasePath: MEDIA_BASE_PATH
+        };
+
+        res.json(response);
+        
+      } catch (error:any) {
+        console.error('Error fetching data on API side:', error.message);
+        res.status(500).json({ error: error.message });
+      }
+    });
+  });
+}
 
 export default {
   path: '/api',
