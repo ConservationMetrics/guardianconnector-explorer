@@ -19,10 +19,18 @@
 export default {
   data() {
     return {
-      tables: process.env.NUXT_ENV_TABLES.split(','),
-      embedMedia: process.env.EMBED_MEDIA.toUpperCase() === 'YES',
+      embedMedia: false,
+      tables: []
     };
   },
+    async mounted() {
+      try {
+        this.tables = this.$config.tables;
+        this.embedMedia = this.$config.embedMedia.toUpperCase() === 'YES';
+      } catch (error) {
+      console.error('Error fetching table config on client side:', error);
+    }
+  }
 };
 </script>
 

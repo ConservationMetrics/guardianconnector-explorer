@@ -3,7 +3,7 @@ import { NuxtConfig } from '@nuxt/types'
 const auth0Domain: string = process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g, '') || '';
 const auth0ClientId: string = process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, '') || '';
 const auth0Audience: string = process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, '') || '';
-const tables = process.env.NUXT_ENV_TABLES?.split(',') || [];
+const tables: string[] = process.env.NUXT_ENV_TABLES?.replace(/['"]+/g, '').split(',') || [];
 
 const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -52,7 +52,7 @@ const config: NuxtConfig = {
   ],
 
   router: {
-    middleware: ['authMiddleware'],
+    middleware: ['authMiddleware', 'dynamicRoutes'],
     extendRoutes(routes, resolve) {
       // Filter out default Vue routes for pages
       const filteredRoutes = routes.filter(route => {
@@ -131,6 +131,8 @@ const config: NuxtConfig = {
       }
     },
     apiKey: process.env.VUE_APP_API_KEY,
+    tables: process.env.NUXT_ENV_TABLES?.replace(/['"]+/g, '').split(',') || [],
+    embedMedia: process.env.EMBED_MEDIA?.replace(/['"]+/g, '') || 'NO',
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
