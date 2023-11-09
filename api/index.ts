@@ -17,7 +17,7 @@ interface EnvVars {
   DB_SSL: string;
   IS_SQLITE: string;
   SQLITE_DB_PATH: string;
-  TABLES: string;
+  NUXT_ENV_TABLES: string;
   UNWANTED_COLUMNS: string;
   UNWANTED_SUBSTRINGS: string;
   EMBED_MEDIA: string;
@@ -61,7 +61,7 @@ const DB_PORT = getEnvVar('DB_PORT', '5432') as string;
 const DB_SSL = getEnvVar('DB_SSL', 'YES') as string;
 const IS_SQLITE = getEnvVar('IS_SQLITE', 'NO', val => val.toUpperCase() === 'YES' ? 'YES' : 'NO') as string;
 const SQLITE_DB_PATH = getEnvVar('SQLITE_DB_PATH');
-const TABLES = getEnvVar('TABLES');
+const TABLES = getEnvVar('NUXT_ENV_TABLES');
 const UNWANTED_COLUMNS = getEnvVar('UNWANTED_COLUMNS');
 const UNWANTED_SUBSTRINGS = getEnvVar('UNWANTED_SUBSTRINGS');
 const FRONT_END_FILTERING = getEnvVar('FRONT_END_FILTERING', 'NO') as string;

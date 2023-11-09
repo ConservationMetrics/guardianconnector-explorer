@@ -1,6 +1,6 @@
 # GuardianConnector Views
 
-This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an API from a SQLite or PostgreSQL database, and renders tabular data on different views including a map and a media gallery.
+This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an API from a SQLite or PostgreSQL database, and renders tabular data from one or more tables on different views including a map and a media gallery.
 
 ## Configure
 
@@ -16,7 +16,9 @@ To get started, copy `.env.example` to `.env` and add your database and table in
 
 **Database:** To use SQLite instead of Postgres, set  `SQLITE` to `YES` and provide a path value for `SQLITE_DB_PATH`.
 
-**Media attachments:** If your data is storing filenames for media attachments, you can embed them by setting `EMBED_MEDIA` to `YES`, and by providing the path to the exact location where media attachments are stored in `MEDIA_PATH`.
+**Tables:** GuardianConnector Views can render multiple tables. You can specify the tables in your database in `NUXT_ENV_TABLES`, separated by commas. For each table, there will be `map` and (if media attachments are enabled) `gallery` routes. All of the possible view routes are shown in the `/` index.html route.
+
+**Media attachments:** If your data is storing filenames for media attachments, you can embed them by setting `EMBED_MEDIA` to `YES`, and by providing the path to the exact location where media attachments are stored in `MEDIA_PATH`. If this variable is not set to `YES`, then the gallery view will be disabled.
 
 **Dropdown filter:** You can enable a dropdown that allows you to filter the data on your views. Set `FRONT_END_FILTERING` to `YES` and provide a value for `FRONT_END_FILTER_FIELD` (e.g. "Category" which could be a good choice for Mapeo data).
 

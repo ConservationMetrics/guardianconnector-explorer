@@ -3,6 +3,7 @@ import { NuxtConfig } from '@nuxt/types'
 const auth0Domain: string = process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g, '') || '';
 const auth0ClientId: string = process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, '') || '';
 const auth0Audience: string = process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, '') || '';
+const tables = process.env.NUXT_ENV_TABLES?.split(',') || [];
 
 const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -60,6 +61,22 @@ const config: NuxtConfig = {
 
       // Replace the original routes array with the filtered one
       routes.splice(0, routes.length, ...filteredRoutes);
+
+      tables.forEach((table: string) => {
+        routes.push({
+          name: `${table}-map`,
+          path: `/${table}/map`,
+          component: resolve(__dirname, 'pages/map.vue'),
+          meta: { tableName: table }
+        });
+
+        routes.push({
+          name: `${table}-gallery`,
+          path: `/${table}/gallery`,
+          component: resolve(__dirname, 'pages/gallery.vue'),
+          meta: { tableName: table }
+        });
+      });
     },
   },
 
@@ -91,7 +108,7 @@ const config: NuxtConfig = {
       login: '/login',
       logout: '/login',
       callback: '/login',
-      home: '/map', // Redirect to /map after login
+      home: '/'
     }
   },
 

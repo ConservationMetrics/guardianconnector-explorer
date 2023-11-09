@@ -20,7 +20,7 @@
     },
     beforeMount() {
       if (this.$auth.loggedIn) {
-        this.$router.push('/map');
+        this.$router.push('/');
       }
     },    
     mounted() {
@@ -35,7 +35,7 @@
     watch: {
       '$auth.loggedIn'(loggedIn) {
         if (loggedIn) {
-          this.$router.push('/map');
+          this.$router.push('/');
         }
       }
     },

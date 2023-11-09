@@ -69,8 +69,12 @@ export default {
         const token = this.$auth.strategy.token.get();
         headers['Authorization'] = `Bearer ${token}`;
       }
-      
-      const response = await this.$axios.$get('/api/mapeo_tumucumaque/map', { headers });
+
+      // Get the current table name from the route parameters
+      const table = this.$route.meta.tableName;
+
+      // Use the table name in the API request
+      const response = await this.$axios.$get(`/api/${table}/map`, { headers });
       this.data = response.data;
       this.filterData = response.filterData;
       this.filterField = response.filterField;
