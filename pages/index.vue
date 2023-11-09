@@ -5,10 +5,10 @@
       <h2><strong>Table:</strong> {{ table }}</h2>
       <ul>
         <li>
-          <nuxt-link :to="`/${table}/map`">Map</nuxt-link>
+          <nuxt-link :to="`/map/${table}`">Map</nuxt-link>
         </li>
         <li v-if="embedMedia">
-          <nuxt-link :to="`/${table}/gallery`">Gallery</nuxt-link>
+          <nuxt-link :to="`/gallery/${table}`">Gallery</nuxt-link>
         </li>
       </ul>
     </div>

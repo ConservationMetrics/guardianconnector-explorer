@@ -52,32 +52,7 @@ const config: NuxtConfig = {
   ],
 
   router: {
-    middleware: ['authMiddleware', 'dynamicRoutes'],
-    extendRoutes(routes, resolve) {
-      // Filter out default Vue routes for pages
-      const filteredRoutes = routes.filter(route => {
-        return route.name !== 'map' && route.name !== 'gallery';
-      });
-
-      // Replace the original routes array with the filtered one
-      routes.splice(0, routes.length, ...filteredRoutes);
-
-      tables.forEach((table: string) => {
-        routes.push({
-          name: `${table}-map`,
-          path: `/${table}/map`,
-          component: resolve(__dirname, 'pages/map.vue'),
-          meta: { tableName: table }
-        });
-
-        routes.push({
-          name: `${table}-gallery`,
-          path: `/${table}/gallery`,
-          component: resolve(__dirname, 'pages/gallery.vue'),
-          meta: { tableName: table }
-        });
-      });
-    },
+    middleware: ['authMiddleware'],
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -131,7 +106,7 @@ const config: NuxtConfig = {
       }
     },
     apiKey: process.env.VUE_APP_API_KEY,
-    tables: process.env.NUXT_ENV_TABLES?.replace(/['"]+/g, '').split(',') || [],
+    tables: tables,
     embedMedia: process.env.EMBED_MEDIA?.replace(/['"]+/g, '') || 'NO',
   },
 
