@@ -91,4 +91,5 @@ sw.*
 
 # GuardianConnector Views specific
 .env
+.env.docker
 *.db

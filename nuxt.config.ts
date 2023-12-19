@@ -4,6 +4,16 @@ const auth0Domain: string = process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g,
 const auth0ClientId: string = process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, '') || '';
 const auth0Audience: string = process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, '') || '';
 
+let tablesConfig = {};
+
+try {
+    // Parse NUXT_ENV_VIEWS_CONFIG environment variable into a JSON object
+    tablesConfig = JSON.parse(process.env.NUXT_ENV_VIEWS_CONFIG?.replace(/'/g, '') || '{}');
+} catch (e) {
+    console.error("Failed to parse NUXT_ENV_VIEWS_CONFIG:", e);
+    tablesConfig = {}; 
+}
+
 const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -47,11 +57,11 @@ const config: NuxtConfig = {
   ],
 
   serverMiddleware: [
-    '~/api/index.ts'
+    { path: "/api", handler: "~/api/index.ts" },
   ],
 
   router: {
-    middleware: ['authMiddleware']
+    middleware: ['authMiddleware'],
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -82,7 +92,7 @@ const config: NuxtConfig = {
       login: '/login',
       logout: '/login',
       callback: '/login',
-      home: '/map', // Redirect to /map after login
+      home: '/'
     }
   },
 
@@ -105,6 +115,7 @@ const config: NuxtConfig = {
       }
     },
     apiKey: process.env.VUE_APP_API_KEY,
+    tablesConfig,
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

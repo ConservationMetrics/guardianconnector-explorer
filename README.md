@@ -1,10 +1,12 @@
 # GuardianConnector Views
 
-This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an API from a SQLite or PostgreSQL database, and renders tabular data on different views including a map and a media gallery.
+This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an API from a SQLite or PostgreSQL database, and renders tabular data from one or more tables on different views including a map and a media gallery.
 
 ## Configure
 
 To get started, copy `.env.example` to `.env` and add your database and table information, authentication, and a Mapbox access token.
+
+**Database:** Provide your database information in the relevant variables. To use SQLite instead of Postgres, set `SQLITE` to `YES` and provide a path value for `SQLITE_DB_PATH` (you can ignore `DATABASE` and the `DB_` ones).
 
 **Authentication:** Authentication is optional. If you want to use authentication, set `USE_PASSWORD` to "YES". If not, your pages and components can be accessed without needing users to log in.
 
@@ -12,15 +14,11 @@ To get started, copy `.env.example` to `.env` and add your database and table in
 
 **Local authentication:** GuardianConnector Views can be protected through password and a JavaScript Web Token using the local strategy. You can set the password using `PASSWORD`, and also set a `SECRET_JWT_KEY` to authenticate using the browser, by appending `?secret_key=` to the end of your path.
 
-**Mapbox:** You can optionally provide a Mapbox style, projection, center lat/long, zoom level, pitch, bearing, and if you want the map to render with a 3D terrain layer.
+**Vue API key:** Generate an API key to add to request headers made by the Nuxt front end.
 
-**Database:** To use SQLite instead of Postgres, set  `SQLITE` to `YES` and provide a path value for `SQLITE_DB_PATH`.
+**Mapbox access token:** Provide an access token to be used across the application for authenticating with Mabpox maps. (As of this moment, we are assuming that one token is sufficient for all maps views used, but we can revisit this if needed.)
 
-**Media attachments:** If your data is storing filenames for media attachments, you can embed them by setting `EMBED_MEDIA` to `YES`, and by providing the path to the exact location where media attachments are stored in `MEDIA_PATH`.
-
-**Dropdown filter:** You can enable a dropdown that allows you to filter the data on your views. Set `FRONT_END_FILTERING` to `YES` and provide a value for `FRONT_END_FILTER_FIELD` (e.g. "Category" which could be a good choice for Mapeo data).
-
-**Unwanted columns and substrings:** Many outputs from data collection APIs have a lot of extraneous metadata fields that are not useful to the end user. See [docs/schema.md](docs/schema.md) for a list of these fields that are output by popular data collection APIs. You can determine which fields to filter out in `UNWANTED_COLUMNS` (exact column names will be filtered) and `UNWANTED_SUBSTRINGS` (all columns which include these substrings will be filtered).
+**Views configuration:** GuardianConnector Views can render multiple tables and you can determine which views to show for each table. To configure your tables and views, set the multi-line variable `NUXT_ENV_VIEWS_CONFIG`. For more information on this, please see [config.md](docs/config.md).
 
 ## Build Setup
 
@@ -50,13 +48,34 @@ HOST: 0.0.0.0
 NODE_ENV: production
 ```
 
-## How it works
+If you are using Docker for deployment, you need to parse your `.env` file to 
+turn the multi-line variable `NUXT_ENV_VIEWS_CONFIG` into a single line. To do so,
+Run the `dockerenv.sh` script to generate a `.env.docker` file that can be used in Docker (or to supply environmental variables elsewhere, like on Azure):
+
+```sh
+./bin/dockerenv.sh
+```
+
+Local deployment of Docker:
+
+```sh
+docker run --env-file=.env.docker -it -p 8080:8080 guardianconnector-views:latest
+```
+
+## Available Views
+
+### **Map**
 
 ![GuardianConnector Map with KoboToolbox data](docs/GuardianConnector-Map.jpg)
 _Map view using sample KoboToolbox data, with an image and audio attachment embedded._
 
+### **Gallery**
+
 ![GuardianConnector Gallery with KoboToolbox data](docs/GuardianConnector-Gallery.jpg)
 _Gallery view using sample KoboToolbox data._
+
+
+## How it works
 
 ### Column headers ###
 
