@@ -27,24 +27,27 @@
     },
     methods: {
       async login() {
-        try {
-          await this.$auth.loginWith('local', {
-            data: {
-              password: this.password
-            }
-          })
-          this.$router.push('/map')
-        } catch (error) {
-          if (error.response) {
-            if (error.response.status === 403) {
-              this.error = 'The password you entered is incorrect.';
-            } else if (error.response.data && error.response.data.message) {
-              this.error = error.response.data.message;
+        const authStrategy = this.$config.authStrategy || 'none';
+        if (authStrategy === 'password') {
+          try {
+            await this.$auth.loginWith('password', {
+              data: {
+                password: this.password
+              }
+            })
+            this.$router.push('/')
+          } catch (error) {
+            if (error.response) {
+              if (error.response.status === 403) {
+                this.error = 'The password you entered is incorrect.';
+              } else if (error.response.data && error.response.data.message) {
+                this.error = error.response.data.message;
+              } else {
+                this.error = 'An error occurred while trying to log in.';
+              }
             } else {
-              this.error = 'An error occurred while trying to log in.';
+              this.error = error.message || 'An error occurred while trying to log in.';
             }
-          } else {
-            this.error = error.message || 'An error occurred while trying to log in.';
           }
         }
       }
@@ -52,7 +55,7 @@
     watch: {
       '$auth.loggedIn'(loggedIn) {
         if (loggedIn) {
-          this.$router.push('/map');
+          this.$router.push('/');
         }
       }
     },
@@ -76,7 +79,7 @@
     },
     beforeMount() {
       if (this.$auth.loggedIn) {
-        this.$router.push('/map');
+        this.$router.push('/');
       }
     }
   }

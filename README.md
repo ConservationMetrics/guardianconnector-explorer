@@ -8,11 +8,10 @@ To get started, copy `.env.example` to `.env` and add your database and table in
 
 **Database:** Provide your database information in the relevant variables. To use SQLite instead of Postgres, set `SQLITE` to `YES` and provide a path value for `SQLITE_DB_PATH` (you can ignore `DATABASE` and the `DB_` ones).
 
-**Authentication:** Authentication is optional. If you want to use authentication, set `USE_PASSWORD` to "YES". If not, your pages and components can be accessed without needing users to log in.
+**Authentication strategy:** GuardianConnector Views supports three different authentication strategies: auth0, password (from an environmental var) with JWT key, or none. Set your authentication strategy in `NUXT_ENV_AUTH_STRATEGY`.
 
-**Auth0 authentication:** GuardianConnector Views supports an auth0 strategy. Add your env variables for auth0 to get this to work. 
-
-**Local authentication:** GuardianConnector Views can be protected through password and a JavaScript Web Token using the local strategy. You can set the password using `PASSWORD`, and also set a `SECRET_JWT_KEY` to authenticate using the browser, by appending `?secret_key=` to the end of your path.
+* If you are using an auth0 strategy, then you need to provide a domain, client ID, client secret, audience, and base URL.
+* If you are using a password strategy, then you need to provide a password, and secret JWT key.
 
 **Vue API key:** Generate an API key to add to request headers made by the Nuxt front end.
 

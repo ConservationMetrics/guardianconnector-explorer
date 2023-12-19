@@ -15,14 +15,14 @@ interface EnvVars {
   DB_PORT: string;
   DB_SSL: string;
   IS_SQLITE: string;
+  MAPBOX_ACCESS_TOKEN: string;
+  NUXT_ENV_AUTH_STRATEGY: string;
+  NUXT_ENV_VIEWS_CONFIG: string;
   SQLITE_DB_PATH: string;
   PORT: string,
-  USE_PASSWORD: string;
   PASSWORD: string;
   SECRET_JWT_KEY: string;
   VUE_APP_API_KEY: string;
-  MAPBOX_ACCESS_TOKEN: string;
-  NUXT_ENV_VIEWS_CONFIG: string;
 }
 
 interface ViewConfig {
@@ -61,6 +61,7 @@ const getEnvVar = (key: keyof EnvVars, defaultValue?: string, transform?: (val: 
   return result;
 };
 
+const AUTH_STRATEGY = getEnvVar('NUXT_ENV_AUTH_STRATEGY', 'none');
 const DATABASE = getEnvVar('DATABASE');
 const DB_HOST = getEnvVar('DB_HOST');
 const DB_USER = getEnvVar('DB_USER');
@@ -69,7 +70,6 @@ const DB_PORT = getEnvVar('DB_PORT', '5432') as string;
 const DB_SSL = getEnvVar('DB_SSL', 'YES') as string;
 const IS_SQLITE = getEnvVar('IS_SQLITE', 'NO', val => val.toUpperCase() === 'YES' ? 'YES' : 'NO') as string;
 const SQLITE_DB_PATH = getEnvVar('SQLITE_DB_PATH');
-const USE_PASSWORD = getEnvVar('USE_PASSWORD', 'NO');
 const PASSWORD = getEnvVar('PASSWORD');
 const MAPBOX_ACCESS_TOKEN = getEnvVar('MAPBOX_ACCESS_TOKEN', 'pk.ey') as string;
 const SECRET_JWT_KEY = getEnvVar('SECRET_JWT_KEY', 'secret-jwt-key') as string;
@@ -80,23 +80,18 @@ const app = express();
 
 app.use(express.json());
 
-// Middleware for checking the JWT in each request
-const checkApiAndJwt = (req: express.Request, res: express.Response, next: NextFunction) => {
+// Middleware for checking the auth strategy and JWT token
+const checkAuthStrategy = (req: express.Request, res: express.Response, next: NextFunction) => {
   const apiKey = req.headers['x-api-key'];
   if (apiKey !== API_KEY) {
     res.status(403).send('Forbidden');
     return;
   }
-  
-  if (USE_PASSWORD === 'NO') {
-    next();
-    return;
-  }
 
-  const authStrategy = req.headers['x-auth-strategy'];
+  // const authStrategy = req.headers['x-auth-strategy'];
 
   // Only check for the JWT token if the authentication strategy is 'local'
-  if (authStrategy === 'local') {
+  if (AUTH_STRATEGY === 'password') {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -115,6 +110,7 @@ const checkApiAndJwt = (req: express.Request, res: express.Response, next: NextF
     });
   } else {
     next();
+    return;
   }
 };
 
@@ -144,8 +140,7 @@ app.post('/login', (req: express.Request, res: express.Response) => {
 });
 
 // Apply middleware to Views routes
-app.use(checkApiAndJwt);
-
+app.use(checkAuthStrategy);
 
 const db = setupDatabaseConnection(
   IS_SQLITE, 

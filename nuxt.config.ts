@@ -1,11 +1,11 @@
 import { NuxtConfig } from '@nuxt/types'
 
+const authStrategy: string = process.env.NUXT_ENV_AUTH_STRATEGY?.replace(/['"]+/g, '') || 'none';
 const auth0Domain: string = process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g, '') || '';
 const auth0ClientId: string = process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, '') || '';
 const auth0Audience: string = process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, '') || '';
 
 let tablesConfig = {};
-
 try {
     // Parse NUXT_ENV_VIEWS_CONFIG environment variable into a JSON object
     tablesConfig = JSON.parse(process.env.NUXT_ENV_VIEWS_CONFIG?.replace(/'/g, '') || '{}');
@@ -71,10 +71,16 @@ const config: NuxtConfig = {
 
   auth: {
     strategies: {
+      none: {
+        scheme: 'local',
+        tokenRequired: false,
+        tokenType: false
+      },
       auth0: {
         scheme: '~src/runtimeConfigurableScheme.ts'
       },
-      local: {
+      password: {
+        scheme: 'local',
         token: {
           property: 'token',
           required: true,
@@ -115,6 +121,7 @@ const config: NuxtConfig = {
       }
     },
     apiKey: process.env.VUE_APP_API_KEY,
+    authStrategy,
     tablesConfig,
   },
 
