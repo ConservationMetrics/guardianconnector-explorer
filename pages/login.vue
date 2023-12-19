@@ -1,45 +1,48 @@
 <template>
-    <component :is="loginComponent" />
+  <component :is="loginComponent" />
 </template>
-  
-  <script>
-  import PasswordLogin from '~/components/PasswordLogin.vue'
-  import Auth0Login from '~/components/Auth0Login.vue'
-  
-  export default {
-    data() {
-      return {
-        errorMessage: "",
-        authStrategy: 'none'
-      };
-    },
-    async mounted() {
-      try {
-        this.authStrategy = this.$config.authStrategy;
-      } catch (error) {
-        console.error("Error fetching authStrategy config on client side:", error);
-      }
-    },
-    components: {
-      PasswordLogin,
-      Auth0Login
-    },
-    computed: {
-      loginComponent() {
-        return this.authStrategy === 'auth0' ? 'Auth0Login' : 'PasswordLogin';
-      }
-    },
-    beforeMount() {
-      if (this.$auth.loggedIn || this.authStrategy === 'none') {
-        this.$router.push('/');
-      }
-    },    
-    watch: {
-      '$auth.loggedIn'(loggedIn) {
-        if (loggedIn) {
-          this.$router.push('/');
-        }
-      }
+
+<script>
+import PasswordLogin from "~/components/PasswordLogin.vue";
+import Auth0Login from "~/components/Auth0Login.vue";
+
+export default {
+  data() {
+    return {
+      errorMessage: "",
+      authStrategy: "none",
+    };
+  },
+  async mounted() {
+    try {
+      this.authStrategy = this.$config.authStrategy;
+    } catch (error) {
+      console.error(
+        "Error fetching authStrategy config on client side:",
+        error
+      );
     }
-  }
-  </script>
+  },
+  components: {
+    PasswordLogin,
+    Auth0Login,
+  },
+  computed: {
+    loginComponent() {
+      return this.authStrategy === "auth0" ? "Auth0Login" : "PasswordLogin";
+    },
+  },
+  beforeMount() {
+    if (this.$auth.loggedIn || this.authStrategy === "none") {
+      this.$router.push("/");
+    }
+  },
+  watch: {
+    "$auth.loggedIn"(loggedIn) {
+      if (loggedIn) {
+        this.$router.push("/");
+      }
+    },
+  },
+};
+</script>
