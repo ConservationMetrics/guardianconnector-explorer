@@ -164,7 +164,8 @@ if (!VIEWS_CONFIG) {
 } else {
   let VIEWS: Views;
   try {
-    VIEWS = JSON.parse(VIEWS_CONFIG.replace(/'/g, '"'));
+    // Remove single quotes from stringified JSON
+    VIEWS = JSON.parse(VIEWS_CONFIG.replace(/'/g, ''));
   } catch (error: any) {
     throw new Error('Error parsing NUXT_ENV_VIEWS_CONFIG: ' + error.message);
   }

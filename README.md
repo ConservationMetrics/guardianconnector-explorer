@@ -48,6 +48,20 @@ HOST: 0.0.0.0
 NODE_ENV: production
 ```
 
+If you are using Docker for deployment, you need to parse your `.env` file to 
+turn the multi-line variable `NUXT_ENV_VIEWS_CONFIG` into a single line. To do so,
+Run the `dockerenv.sh` script to generate a `.env.docker` file that can be used in Docker (or to supply environmental variables elsewhere, like on Azure):
+
+```sh
+./bin/dockerenv.sh
+```
+
+Local deployment of Docker:
+
+```sh
+docker run --env-file=.env.docker -it -p 8080:8080 guardianconnector-views:latest
+```
+
 ## Available Views
 
 ### **Map**
