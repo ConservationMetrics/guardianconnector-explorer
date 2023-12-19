@@ -3,7 +3,6 @@ import { NuxtConfig } from '@nuxt/types'
 const auth0Domain: string = process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g, '') || '';
 const auth0ClientId: string = process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, '') || '';
 const auth0Audience: string = process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, '') || '';
-const tables: string[] = process.env.NUXT_ENV_TABLES?.replace(/['"]+/g, '').split(',') || [];
 
 const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -106,8 +105,7 @@ const config: NuxtConfig = {
       }
     },
     apiKey: process.env.VUE_APP_API_KEY,
-    tables: tables,
-    embedMedia: process.env.EMBED_MEDIA?.replace(/['"]+/g, '') || 'NO',
+    tablesConfig: process.env.NUXT_ENV_VIEWS_CONFIG?.replace(/'/g, '"') || "",
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

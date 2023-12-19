@@ -1,14 +1,11 @@
 <template>
   <div class="container">
     <h1>Available Views</h1>
-    <div v-for="table in tables" :key="table" class="table-item">
-      <h2><strong>Table:</strong> {{ table }}</h2>
+    <div v-for="(config, tableName) in tablesConfig" :key="tableName" class="table-item">
+      <h2><strong>Table:</strong> {{ tableName }}</h2>
       <ul>
-        <li>
-          <nuxt-link :to="`/map/${table}`">Map</nuxt-link>
-        </li>
-        <li v-if="embedMedia">
-          <nuxt-link :to="`/gallery/${table}`">Gallery</nuxt-link>
+        <li v-for="view in config.VIEWS.split(',')" :key="view">
+          <nuxt-link :to="`/${view}/${tableName}`">{{ formatViewName(view) }}</nuxt-link>
         </li>
       </ul>
     </div>
@@ -19,16 +16,19 @@
 export default {
   data() {
     return {
-      embedMedia: false,
-      tables: []
+      tablesConfig: []
     };
   },
     async mounted() {
       try {
-        this.tables = this.$config.tables;
-        this.embedMedia = this.$config.embedMedia.toUpperCase() === 'YES';
+        this.tablesConfig = this.$config.tablesConfig;
       } catch (error) {
       console.error('Error fetching table config on client side:', error);
+    }
+  },
+  methods: {
+    formatViewName(view) {
+      return view.charAt(0).toUpperCase() + view.slice(1).toLowerCase().replace(/_/g, ' ');
     }
   }
 };
