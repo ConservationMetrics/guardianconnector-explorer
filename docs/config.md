@@ -28,6 +28,7 @@ Currently available options:
 
 * `map` 
 * `gallery`
+* `alerts`
   
 The routes for all views are listed on the index.html route (`/`).
 

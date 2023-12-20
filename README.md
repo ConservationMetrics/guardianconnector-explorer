@@ -73,6 +73,8 @@ _Map view using sample KoboToolbox data, with an image and audio attachment embe
 ![GuardianConnector Gallery with KoboToolbox data](docs/GuardianConnector-Gallery.jpg)
 _Gallery view using sample KoboToolbox data._
 
+### **Alerts (change detection)**
+
 
 ## How it works
 

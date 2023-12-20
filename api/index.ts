@@ -272,6 +272,28 @@ if (!VIEWS_CONFIG) {
         }
       });
     }
+
+    if (VIEWS[table].VIEWS.includes("alerts")) {
+      // Endpoint for the gallery view
+      app.get(`/${table}/alerts`, async (req: express.Request, res: express.Response) => {  try {
+          // Fetch data
+          const { mainData, columnsData } = await fetchData(db, table, IS_SQLITE);
+
+          const response = {
+            data: mainData, 
+            table: table,
+            embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
+            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH
+          };
+
+          res.json(response);
+          
+        } catch (error:any) {
+          console.error('Error fetching data on API side:', error.message);
+          res.status(500).json({ error: error.message });
+        }
+      });
+    }
   });
 }
 
