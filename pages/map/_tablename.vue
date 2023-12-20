@@ -32,9 +32,7 @@ export default {
       title: 'GuardianConnector Views: Map'
     }
   },
-  components: {
-    Map
-  },
+  components: { Map },
   async asyncData({ params, $axios, app }) {
     // Get the current table name from the route parameters
     const table = params.tablename;

@@ -5,6 +5,15 @@
       :data="alertsData"
       :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
+      :mapbox-access-token="mapboxAccessToken"
+      :mapbox-style="mapboxStyle"
+      :mapbox-projection="mapboxProjection"
+      :mapbox-latitude="mapboxLatitude"
+      :mapbox-longitude="mapboxLongitude"
+      :mapbox-zoom="mapboxZoom"
+      :mapbox-pitch="mapboxPitch"
+      :mapbox-bearing="mapboxBearing"
+      :mapbox3d="mapbox3d"
     />
   </div>
 </template>
@@ -44,7 +53,16 @@ export default {
         dataFetched: true,
         alertsData: response.data,
         embedMedia: response.embedMedia,
-        mediaBasePath: response.mediaBasePath
+        mediaBasePath: response.mediaBasePath,
+        mapboxAccessToken: response.mapboxAccessToken,
+        mapboxStyle: response.mapboxStyle,
+        mapboxProjection: response.mapboxProjection,
+        mapboxLatitude: response.mapboxLatitude,
+        mapboxLongitude: response.mapboxLongitude,
+        mapboxZoom: response.mapboxZoom,
+        mapboxPitch: response.mapboxPitch,
+        mapboxBearing: response.mapboxBearing,
+        mapbox3d: response.mapbox3d
       };
     } catch (error) {
       // Handle errors as appropriate
