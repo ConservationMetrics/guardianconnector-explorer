@@ -15,9 +15,9 @@
       v-for="(feature, index) in paginatedData"
       :key="index"
       :embed-media="embedMedia"
-      :media-base-path="mediaBasePath"
-      :file-paths="getFilePaths(feature, allExtensions)"
+      :file-paths="getFilePathsWithExtension(feature, allExtensions)"
       :feature="feature"
+      :media-base-path="mediaBasePath"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
@@ -28,7 +28,7 @@
 <script>
 import Feature from "@/components/Feature.vue";
 import DataFilter from "@/components/DataFilter.vue";
-import getFilePaths from "@/src/utils.ts";
+import getFilePathsWithExtension from "@/src/utils.ts";
 
 export default {
   components: { Feature, DataFilter },
@@ -75,7 +75,7 @@ export default {
         this.currentPage++;
       }
     },
-    getFilePaths: getFilePaths,
+    getFilePathsWithExtension: getFilePathsWithExtension,
     filter(values) {
       if (values.includes("null")) {
         this.filteredData = this.data;

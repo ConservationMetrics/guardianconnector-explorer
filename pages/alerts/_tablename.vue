@@ -3,6 +3,7 @@
     <Alerts 
       v-if="dataFetched"
       :data="alertsData"
+      :image-extensions="imageExtensions"
       :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
       :mapbox-access-token="mapboxAccessToken"
@@ -52,6 +53,7 @@ export default {
       return {
         dataFetched: true,
         alertsData: response.data,
+        imageExtensions: response.imageExtensions,
         embedMedia: response.embedMedia,
         mediaBasePath: response.mediaBasePath,
         mapboxAccessToken: response.mapboxAccessToken,

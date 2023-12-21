@@ -39,6 +39,7 @@ interface ViewConfig {
   MAPBOX_PITCH: string;
   MAPBOX_BEARING: string;
   MAPBOX_3D: string;
+  LINK_TO_GCCD_RESOURCES: string;
   UNWANTED_COLUMNS?: string;
   UNWANTED_SUBSTRINGS?: string;
 }
@@ -246,7 +247,8 @@ if (!VIEWS_CONFIG) {
           // Fetch data
           const { mainData, columnsData } = await fetchData(db, table, IS_SQLITE);
 
-          const changeDetectionData = prepareChangeDetectionData(mainData);
+          // Prepare change detection data for the alerts view
+          const changeDetectionData = prepareChangeDetectionData(mainData, VIEWS[table].EMBED_MEDIA === "YES", VIEWS[table].LINK_TO_GCCD_RESOURCES === "YES");
           
           // Convert data to GeoJSON format
           const geojsonData = transformToGeojson(changeDetectionData);
@@ -255,6 +257,7 @@ if (!VIEWS_CONFIG) {
             data: geojsonData, 
             table: table,
             embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
+            imageExtensions: imageExtensions, 
             mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
             mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
             mapboxStyle: VIEWS[table].MAPBOX_STYLE, 

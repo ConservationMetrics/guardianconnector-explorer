@@ -8,13 +8,13 @@
       @filter="filter"
     />
     <FeaturePopup
-      :show-sidebar="showSidebar"
       :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
-      :file-paths="getFilePaths(selectedFeature, allExtensions)"
+      :file-paths="getFilePathsWithExtension(selectedFeature, allExtensions)"
       :feature="selectedFeature"
-      :image-extensions="imageExtensions"
+      :show-sidebar="showSidebar"
       :audio-extensions="audioExtensions"
+      :image-extensions="imageExtensions"
       :video-extensions="videoExtensions"
       @close="showSidebar = false"
     />
@@ -25,7 +25,7 @@
 import mapboxgl from "mapbox-gl";
 import DataFilter from "@/components/DataFilter.vue";
 import FeaturePopup from "@/components/FeaturePopup.vue";
-import getFilePaths from "@/src/utils.ts";
+import getFilePathsWithExtension from "@/src/utils.ts";
 
 export default {
   components: { DataFilter, FeaturePopup },
@@ -78,7 +78,7 @@ export default {
       this.addDataToMap(); // Call this method to update the map data
     },
 
-    getFilePaths: getFilePaths,
+    getFilePathsWithExtension: getFilePathsWithExtension,
 
     onFeatureClick(feature) {
       this.selectedFeature = feature;
