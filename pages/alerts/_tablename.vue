@@ -1,13 +1,8 @@
 <template>
   <div>
-    <Map
+    <Alerts 
       v-if="dataFetched"
-      :data="mapData"
-      :filter-data="filterData"
-      :filter-field="filterField"
-      :image-extensions="imageExtensions"
-      :audio-extensions="audioExtensions"
-      :video-extensions="videoExtensions"
+      :data="alertsData"
       :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
       :mapbox-access-token="mapboxAccessToken"
@@ -24,15 +19,15 @@
 </template>
 
 <script>
-import Map from "~/components/Map.vue";
+import Alerts from "~/components/Alerts.vue";
 
 export default {
   head() {
     return {
-      title: 'GuardianConnector Views: Map'
+      title: 'GuardianConnector Views: Change Detection Alerts'
     }
   },
-  components: { Map },
+  components: { Alerts },
   async asyncData({ params, $axios, app }) {
     // Get the current table name from the route parameters
     const table = params.tablename;
@@ -51,17 +46,12 @@ export default {
 
     try {
       // Use the table name in the API request
-      const response = await $axios.$get(`/api/${table}/map`, { headers });
+      const response = await $axios.$get(`/api/${table}/alerts`, { headers });
 
       // Return the data to be merged with the component's data
       return {
         dataFetched: true,
-        mapData: response.data,
-        filterData: response.filterData,
-        filterField: response.filterField,
-        imageExtensions: response.imageExtensions,
-        audioExtensions: response.audioExtensions,
-        videoExtensions: response.videoExtensions,
+        alertsData: response.data,
         embedMedia: response.embedMedia,
         mediaBasePath: response.mediaBasePath,
         mapboxAccessToken: response.mapboxAccessToken,
@@ -76,7 +66,7 @@ export default {
       };
     } catch (error) {
       // Handle errors as appropriate
-      console.error('Error fetching map data:', error);
+      console.error('Error fetching alerts data:', error);
       // Return default data
       return {
         dataFetched: false

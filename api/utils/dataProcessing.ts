@@ -271,6 +271,42 @@ const processGeoData = (transformedData: Array<Record<string, any>>, filterField
   return processedGeoData;
 }
 
+const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): { 
+  type: string; 
+  features: Array<{ 
+    type: string; 
+    properties: { [key: string]: any }; 
+    geometry?: { [key: string]: any };
+  }>;
+} => {
+  const features = inputArray.map(input => {
+    const feature = { 
+      type: "feature", 
+      properties: {} as { [key: string]: any },
+      geometry: {} as { [key: string]: any }
+    };
+
+    Object.entries(input).forEach(([key, value]) => {
+      if (key.startsWith("g__")) {
+        const geometryKey = key.substring(3); // Removes 'g__' prefix
+        if (geometryKey === "coordinates") {
+          feature.geometry[geometryKey] = JSON.parse(value);
+        } else {
+          feature.geometry[geometryKey] = value;
+        }
+      } else {
+        feature.properties[key] = value;
+      }
+    });
+
+    return feature;
+  });
+
+  return {
+    type: "FeatureCollection",
+    features: features
+  };
+};
 
 
-export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData };
+export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, transformToGeojson };

@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 import setupDatabaseConnection from './utils/dbConnection';
 import fetchData from './utils/dbOperations';
-import { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData } from './utils/dataProcessing';
+import { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, transformToGeojson } from './utils/dataProcessing';
 
 interface EnvVars {
   DATABASE: string;
@@ -240,6 +240,39 @@ if (!VIEWS_CONFIG) {
       });
     }
 
+    if (VIEWS[table].VIEWS.includes("alerts")) {
+      // Endpoint for the gallery view
+      app.get(`/${table}/alerts`, async (req: express.Request, res: express.Response) => {  try {
+          // Fetch data
+          const { mainData, columnsData } = await fetchData(db, table, IS_SQLITE);
+          // Convert data to GeoJSON format
+          const geojsonData = transformToGeojson(mainData);
+
+          const response = {
+            data: geojsonData, 
+            table: table,
+            embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
+            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+            mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
+            mapboxStyle: VIEWS[table].MAPBOX_STYLE, 
+            mapboxProjection: VIEWS[table].MAPBOX_PROJECTION, 
+            mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE, 
+            mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE, 
+            mapboxZoom: VIEWS[table].MAPBOX_ZOOM, 
+            mapboxPitch: VIEWS[table].MAPBOX_PITCH, 
+            mapboxBearing: VIEWS[table].MAPBOX_BEARING,
+            mapbox3d: VIEWS[table].MAPBOX_3D === "YES"
+          };
+
+          res.json(response);
+          
+        } catch (error:any) {
+          console.error('Error fetching data on API side:', error.message);
+          res.status(500).json({ error: error.message });
+        }
+      });
+    }
+
     if (VIEWS[table].VIEWS.includes("gallery")) {
       // Endpoint for the gallery view
       app.get(`/${table}/gallery`, async (req: express.Request, res: express.Response) => {  try {
@@ -272,6 +305,7 @@ if (!VIEWS_CONFIG) {
         }
       });
     }
+
   });
 }
 
