@@ -80,11 +80,6 @@ export default {
 
     getFilePathsWithExtension: getFilePathsWithExtension,
 
-    onFeatureClick(feature) {
-      this.selectedFeature = feature;
-      this.showSidebar = true;
-    },
-
     addDataToMap() {
       // Remove existing data layers from the map
       if (this.map) {
@@ -209,6 +204,21 @@ export default {
       }
 
       this.addDataToMap();
+
+      // Navigation Control (zoom buttons and compass)
+      const nav = new mapboxgl.NavigationControl();
+      this.map.addControl(nav, 'bottom-right');
+
+      // Scale Control
+      const scale = new mapboxgl.ScaleControl({
+        maxWidth: 80,
+        unit: 'metric'
+      });
+      this.map.addControl(scale, 'bottom-left');
+
+      // Fullscreen Control
+      const fullscreenControl = new mapboxgl.FullscreenControl();
+      this.map.addControl(fullscreenControl, 'bottom-right')
     });
   },
   beforeDestroy() {
