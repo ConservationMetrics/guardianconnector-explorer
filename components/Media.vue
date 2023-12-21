@@ -13,6 +13,7 @@
           class="w-full h-auto rounded-lg"
           loading="lazy"
         />
+        <span v-if="imageCaption !== false "><center><em>{{ imageCaption }}</em></center></span>
       </a>
     </div>
     <div v-if="isAudio" class="mb-4">
@@ -41,6 +42,7 @@ export default {
   props: [
     "mediaBasePath",
     "filePath",
+    "imageCaption",
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",

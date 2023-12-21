@@ -7,6 +7,7 @@
       :key="filePath"
       :mediaBasePath="mediaBasePath"
       :filePath="filePath"
+      :image-caption="imageCaption"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
@@ -60,6 +61,7 @@ export default {
     "mediaBasePath",
     "filePaths",
     "feature",
+    "imageCaption",
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",

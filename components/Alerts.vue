@@ -4,6 +4,7 @@
       :embed-media="embedMedia"
       :feature="selectedFeature"
       :file-paths="imageUrl"
+      :image-caption="imageCaption"
       :image-extensions="imageExtensions"
       :preview-map-link="previewMapLink"
       :media-base-path="mediaBasePath"      
@@ -38,59 +39,61 @@ export default {
       showSidebar: false,
       selectedFeature: null,
       imageUrl: [],
+      imageCaption: null,
       previewMapLink: null
     };
   },
   computed: {
   },
   methods: {
-    onFeatureClick(feature) {
-      this.selectedFeature = feature;
-      this.imageUrl = [feature.properties.image_url];
-      this.previewMapLink = [feature.properties.preview_link];
-      this.showSidebar = true;
-    },
-
     addDataToMap() {
       const geoJsonSource = this.data;
 
-      // Add the source to the map
-      this.map.addSource("data-source", {
+      console.log(geoJsonSource)
+
+
+      // Add the most recent alerts source to the map
+      this.map.addSource("recent-alerts", {
         type: "geojson",
-        data: geoJsonSource,
+        data: geoJsonSource.mostRecentAlerts,
       });
 
-      // Add a layer for Point features
+      // Add the other alerts source to the map
+      this.map.addSource("alerts", {
+        type: "geojson",
+        data: geoJsonSource.otherAlerts,
+      });
+
+
+      // Add a layer for most recent alerts
       this.map.addLayer({
-        id: "data-layer-point",
-        type: "circle",
-        source: "data-source",
-        filter: ["==", "$type", "Point"],
+        id: "recent-alerts",
+        type: "fill",
+        source: "recent-alerts",
+        filter: ["==", "$type", "Polygon"],
         paint: {
-          "circle-radius": 6,
-          "circle-color": "#FF0000",
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#fff",
+          "fill-color": "#EC00FF",
+          "fill-opacity": 0.5,
         },
-      });
-
-      // Add a layer for LineString features
+      });     
+      
+      // Add a stroke for most recent alerts
       this.map.addLayer({
-        id: "data-layer-linestring",
+        id: "recent-alerts-stroke",
         type: "line",
-        source: "data-source",
-        filter: ["==", "$type", "LineString"],
+        source: "recent-alerts",
+        filter: ["==", "$type", "Polygon"],
         paint: {
-          "line-color": "#FF0000",
+          "line-color": "#EC00FF",
           "line-width": 2,
         },
-      });
+      });   
 
-      // Add a layer for Polygon features
-      this.map.addLayer({
-        id: "data-layer-polygon",
+        // Add a layer for other alerts
+        this.map.addLayer({
+        id: "alerts",
         type: "fill",
-        source: "data-source",
+        source: "alerts",
         filter: ["==", "$type", "Polygon"],
         paint: {
           "fill-color": "#FF0000",
@@ -98,11 +101,11 @@ export default {
         },
       });     
       
-      // Add a stroke for Polygon features
+      // Add a stroke for other alerts
       this.map.addLayer({
-        id: "data-layer-polygon-outline",
+        id: "alerts-stroke",
         type: "line",
-        source: "data-source",
+        source: "alerts",
         filter: ["==", "$type", "Polygon"],
         paint: {
           "line-color": "#FF0000",
@@ -112,9 +115,8 @@ export default {
       
       // Add event listeners
       [
-        "data-layer-point",
-        "data-layer-linestring",
-        "data-layer-polygon",
+        "recent-alerts",
+        "alerts",
       ].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
           this.map.getCanvas().style.cursor = "pointer";
@@ -125,8 +127,10 @@ export default {
         this.map.on("click", layerId, (e) => {
           let featureObject = e.features[0].properties;
           this.imageUrl = [e.features[0].properties.image_url];
+          this.imageCaption = "Imagery source: " + e.features[0].properties.image_caption;
           this.previewMapLink = [e.features[0].properties.preview_link];
           delete featureObject["image_url"];
+          delete featureObject["image_caption"];
           delete featureObject["preview_link"];
           this.selectedFeature = featureObject;
           this.showSidebar = true;
