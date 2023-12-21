@@ -13,6 +13,10 @@ const filterColumns = (
   );
 };
 
+// Remove underscores from keys
+const removeUnderscores = (key: string): string => {
+  return key.replace(/^_/, "");
+};
 
 // Rewrite keys to be more legible
 const transformKey = (key: string): string => {
@@ -271,6 +275,21 @@ const processGeoData = (transformedData: Array<Record<string, any>>, filterField
   return processedGeoData;
 }
 
+const prepareChangeDetectionData = (data: Array<Record<string, any>>): Array<Record<string, any>> => {
+  const changeDetectionData = data.map((item) => {
+    const transformedItem: Record<string, any> = {};
+    Object.entries(item).forEach(([key, value]) => {
+      let transformedKey = removeUnderscores(key);
+      if (transformedKey === "topic") {
+        transformedKey = "source";
+      }
+      transformedItem[transformedKey] = value;
+    });
+    return transformedItem;
+  });
+  return changeDetectionData;
+}
+
 const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): { 
   type: string; 
   features: Array<{ 
@@ -309,4 +328,4 @@ const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): {
 };
 
 
-export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, transformToGeojson };
+export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, prepareChangeDetectionData, transformToGeojson };

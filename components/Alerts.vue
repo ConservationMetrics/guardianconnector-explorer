@@ -1,5 +1,10 @@
 <template>
   <div id="map">
+    <FeaturePopup
+      :show-sidebar="showSidebar"
+      :feature="selectedFeature"
+      @close="showSidebar = false"
+    />
   </div>
 </template>
   
@@ -25,6 +30,8 @@ export default {
   ],
   data() {
     return {
+      showSidebar: false,
+      selectedFeature: null,
     };
   },
   computed: {
@@ -36,8 +43,12 @@ export default {
   methods: {
     getFilePaths: getFilePaths,
 
-    addDataToMap() {
+    onFeatureClick(feature) {
+      this.selectedFeature = feature;
+      this.showSidebar = true;
+    },
 
+    addDataToMap() {
       const geoJsonSource = this.data;
 
       // Add the source to the map
@@ -94,7 +105,26 @@ export default {
           "line-color": "#FF0000",
           "line-width": 2,
         },
-      });     
+      });   
+      
+      // Add event listeners
+      [
+        "data-layer-point",
+        "data-layer-linestring",
+        "data-layer-polygon",
+      ].forEach((layerId) => {
+        this.map.on("mouseenter", layerId, () => {
+          this.map.getCanvas().style.cursor = "pointer";
+        });
+        this.map.on("mouseleave", layerId, () => {
+          this.map.getCanvas().style.cursor = "";
+        });
+        this.map.on("click", layerId, (e) => {
+          let featureObject = e.features[0].properties;
+          this.selectedFeature = featureObject;
+          this.showSidebar = true;
+        });
+      });
     }
   },
   mounted() {
@@ -144,5 +174,15 @@ body {
   top: 0;
   bottom: 0;
   width: 100%;
+}
+
+.mapboxgl-popup-content {
+  word-wrap: break-word;
+}
+
+.popup-media {
+  width: 100%;
+  display: block;
+  margin-top: 5px;
 }
 </style>

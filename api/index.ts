@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 import setupDatabaseConnection from './utils/dbConnection';
 import fetchData from './utils/dbOperations';
-import { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, transformToGeojson } from './utils/dataProcessing';
+import { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, prepareChangeDetectionData, transformToGeojson } from './utils/dataProcessing';
 
 interface EnvVars {
   DATABASE: string;
@@ -245,8 +245,11 @@ if (!VIEWS_CONFIG) {
       app.get(`/${table}/alerts`, async (req: express.Request, res: express.Response) => {  try {
           // Fetch data
           const { mainData, columnsData } = await fetchData(db, table, IS_SQLITE);
+
+          const changeDetectionData = prepareChangeDetectionData(mainData);
+          
           // Convert data to GeoJSON format
-          const geojsonData = transformToGeojson(mainData);
+          const geojsonData = transformToGeojson(changeDetectionData);
 
           const response = {
             data: geojsonData, 
