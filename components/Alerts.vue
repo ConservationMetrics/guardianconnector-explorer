@@ -185,7 +185,7 @@ export default {
 
           // Fields that may or may not exist, depending on views config
           let imageUrl = featureObject.image_url;
-          imageUrl && (this.imageUrl = imageUrl);
+          imageUrl && (this.imageUrl = [imageUrl]);
           let imageCaption = featureObject.image_caption;
           imageCaption && (this.imageCaption = "Imagery source: " + imageCaption);
           let previewMapLink = featureObject.preview_link;
