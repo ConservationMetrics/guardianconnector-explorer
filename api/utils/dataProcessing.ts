@@ -13,7 +13,6 @@ const filterColumns = (
   );
 };
 
-
 // Rewrite keys to be more legible
 const transformKey = (key: string): string => {
   let transformedKey = key.replace(/^g__/, "Geo").replace(/^p__/, "").replace(/_/g, " ");  
@@ -51,6 +50,9 @@ const transformValue = (key: string, value: any): any => {
   return transformedValue;
 };
 
+const capitalizeFirstLetter = (string: string): string => {
+  return string.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+};
 
 // Filter data using SQL column mapping
 type Column = {
@@ -271,6 +273,44 @@ const processGeoData = (transformedData: Array<Record<string, any>>, filterField
   return processedGeoData;
 }
 
+const prepareChangeDetectionData = (
+  data: Array<Record<string, any>>,
+  embedMedia: boolean,
+  linkToGCCDResources: boolean
+): Array<Record<string, any>> => {
+  const changeDetectionData = data.map((item) => {
+    const transformedItem: Record<string, any> = {};
+
+    // Keep fields starting with 'g__'
+    Object.keys(item).forEach(key => {
+      if (key.startsWith('g__')) {
+        transformedItem[key] = item[key];
+      }
+    });
+
+    // Include only the transformed fields
+    transformedItem["Alert type"] = capitalizeFirstLetter(item.alert_type?.replace(/_/g, ' ') ?? '');
+    transformedItem["Alert area (hectares)"] = typeof item.area_alert_ha === 'number' ? item.area_alert_ha.toFixed(2) : item.area_alert_ha;
+    transformedItem["Month detected"] = `${item.month_detec}-${item.year_detec}`;
+    transformedItem["Satellite"] = item.satellite;
+    transformedItem["Territory"] = capitalizeFirstLetter(item.territory_name ?? '');
+    transformedItem["Alert ID"] = item._id;
+    transformedItem["Alert detection range"] = `${item.date_start_t1} to ${item.date_end_t1}`;
+
+    if (embedMedia) {
+      transformedItem["image_url"] = `alerts/${item.territory_id}/${item.year_detec}/${item.month_detec}/${item._id}/resources/output_t1.jpg`;
+    }
+
+    if (linkToGCCDResources) {
+      transformedItem["preview_link"] = `alerts/${item.territory_id}/${item.year_detec}/${item.month_detec}/${item._id}/output.html`;
+    }
+
+    return transformedItem;
+  });
+
+  return changeDetectionData;
+};
+
 const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): { 
   type: string; 
   features: Array<{ 
@@ -309,4 +349,4 @@ const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): {
 };
 
 
-export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, transformToGeojson };
+export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, prepareChangeDetectionData, transformToGeojson };

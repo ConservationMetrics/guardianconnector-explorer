@@ -3,6 +3,7 @@
     <button class="close-btn" @click="$emit('close')">X</button>
     <Feature
       :embed-media="embedMedia"
+      :preview-map-link="previewMapLink"
       :mediaBasePath="mediaBasePath"
       :filePaths="filePaths"
       :feature="filteredFeature"
@@ -20,6 +21,7 @@ export default {
   components: { Feature },
   props: [
     "embedMedia",
+    "previewMapLink",
     "mediaBasePath",
     "filePaths",
     "feature",

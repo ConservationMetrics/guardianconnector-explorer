@@ -1,17 +1,27 @@
 <template>
   <div id="map">
+    <FeaturePopup
+      :embed-media="embedMedia"
+      :feature="selectedFeature"
+      :file-paths="imageUrl"
+      :image-extensions="imageExtensions"
+      :preview-map-link="previewMapLink"
+      :media-base-path="mediaBasePath"      
+      :show-sidebar="showSidebar"
+      @close="showSidebar = false"
+    />
   </div>
 </template>
   
 <script>
 import mapboxgl from "mapbox-gl";
-import getFilePaths from "@/src/utils.ts";
 
 export default {
   components: { },
   props: [
     "data",
     "embedMedia",
+    "imageExtensions",
     "mediaBasePath",
     "mapboxAccessToken",
     "mapboxStyle",
@@ -21,23 +31,27 @@ export default {
     "mapboxZoom",
     "mapboxPitch",
     "mapboxBearing",
-    "mapbox3d",
+    "mapbox3d"
   ],
   data() {
     return {
+      showSidebar: false,
+      selectedFeature: null,
+      imageUrl: [],
+      previewMapLink: null
     };
   },
   computed: {
-    allExtensions() {
-      return [
-      ];
-    },
   },
   methods: {
-    getFilePaths: getFilePaths,
+    onFeatureClick(feature) {
+      this.selectedFeature = feature;
+      this.imageUrl = [feature.properties.image_url];
+      this.previewMapLink = [feature.properties.preview_link];
+      this.showSidebar = true;
+    },
 
     addDataToMap() {
-
       const geoJsonSource = this.data;
 
       // Add the source to the map
@@ -94,7 +108,30 @@ export default {
           "line-color": "#FF0000",
           "line-width": 2,
         },
-      });     
+      });   
+      
+      // Add event listeners
+      [
+        "data-layer-point",
+        "data-layer-linestring",
+        "data-layer-polygon",
+      ].forEach((layerId) => {
+        this.map.on("mouseenter", layerId, () => {
+          this.map.getCanvas().style.cursor = "pointer";
+        });
+        this.map.on("mouseleave", layerId, () => {
+          this.map.getCanvas().style.cursor = "";
+        });
+        this.map.on("click", layerId, (e) => {
+          let featureObject = e.features[0].properties;
+          this.imageUrl = [e.features[0].properties.image_url];
+          this.previewMapLink = [e.features[0].properties.preview_link];
+          delete featureObject["image_url"];
+          delete featureObject["preview_link"];
+          this.selectedFeature = featureObject;
+          this.showSidebar = true;
+        });
+      });
     }
   },
   mounted() {
@@ -144,5 +181,15 @@ body {
   top: 0;
   bottom: 0;
   width: 100%;
+}
+
+.mapboxgl-popup-content {
+  word-wrap: break-word;
+}
+
+.popup-media {
+  width: 100%;
+  display: block;
+  margin-top: 5px;
 }
 </style>

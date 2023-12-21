@@ -47,21 +47,26 @@ export default {
   ],
   computed: {
     isImage() {
-      const extension = this.getExtension(this.filePath);
-      return this.imageExtensions.includes(extension);
+      return this.checkExtension(this.imageExtensions);
+
     },
     isAudio() {
-      const extension = this.getExtension(this.filePath);
-      return this.audioExtensions.includes(extension);
+      return this.checkExtension(this.audioExtensions);
+
     },
     isVideo() {
-      const extension = this.getExtension(this.filePath);
-      return this.videoExtensions.includes(extension);
+      return this.checkExtension(this.videoExtensions);
+
     },
   },
   methods: {
     getExtension(filePath) {
       return filePath.split(".").pop().toLowerCase();
+    },
+    checkExtension(extensions) {
+      if (!extensions) return false;
+      const extension = this.getExtension(this.filePath);
+      return extensions.includes(extension);
     },
   },
 };

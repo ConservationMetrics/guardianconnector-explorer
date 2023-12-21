@@ -1,5 +1,5 @@
 // Function to get file paths from a feature object
-export default function getFilePaths(feature: {[key: string]: any}, allExtensions: string[]): string[] {  
+export default function getFilePathsWithExtension(feature: {[key: string]: any}, allExtensions: string[]): string[] {  
   if (!feature) return [];
 
   // Get the value of the uuidKey or set it to null if it doesn't exist
