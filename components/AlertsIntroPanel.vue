@@ -16,27 +16,31 @@
         </p>
         <div class="mb-2">
           <span class="font-bold">Type of alerts:</span>
-          {{ statistics.type_of_alerts.join(", ") }}
+          {{ statistics.typeOfAlerts.join(", ") }}
+        </div>
+        <div class="mb-2">
+          <span class="font-bold">Data provider(s):</span>
+          {{ statistics.dataProviders.join(", ") }}
         </div>
         <div class="mb-2">
           <span class="font-bold">Alert detection range:</span>
-          {{ statistics.alert_detection_range }}
+          {{ statistics.alertDetectionRange }}
         </div>
         <div class="mb-2">
           <span class="font-bold">Date of most recent alerts published:</span>
-          {{ statistics.recent_alerts_date }}
+          {{ statistics.recentAlertsDate }}
         </div>
         <div class="mb-2">
           <span class="font-bold">Number of most recent alerts:</span>
-          {{ statistics.recent_alerts_number }}
+          {{ statistics.recentAlertsNumber }}
         </div>
         <div class="mb-2">
           <span class="font-bold">Total number of alerts:</span>
-          {{ statistics.alerts_total }}
+          {{ statistics.alertsTotal }}
         </div>
         <div class="mb-2">
           <span class="font-bold">Total number of hectares affected:</span>
-          {{ statistics.hectares_total }}
+          {{ statistics.hectaresTotal }}
         </div>
       </div>
     </div>
@@ -46,7 +50,7 @@
         <div class="mb-2">
           <LineChart :data="chartData" />
         </div>
-        <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.recent_alerts_date }}</em></p>
+        <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.recentAlertsDate }}</em></p>
       </div>
     </div>
   </div>
@@ -66,11 +70,11 @@ export default {
   computed: {
     chartData() {
         return {
-        labels: Object.keys(this.statistics.hectares_per_month),
+        labels: Object.keys(this.statistics.hectaresPerMonth),
         datasets: [
           {
             label: "Hectares affected",
-            data: Object.values(this.statistics.hectares_per_month),
+            data: Object.values(this.statistics.hectaresPerMonth),
             borderColor: "#f87979",
             backgroundColor: 'rgba(0, 0, 0, 0)',
             pointBackgroundColor: "#f87979",

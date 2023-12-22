@@ -357,26 +357,20 @@ const prepareChangeDetectionData = (
     };
 
     // Include only the transformed fields
-    transformedItem["Alert type"] = capitalizeFirstLetter(
-      item.alert_type?.replace(/_/g, " ") ?? ""
-    );
+
+    transformedItem["Territory"] = capitalizeFirstLetter(item.territory_name ?? "");
+    transformedItem["Alert ID"] = item._id;
+    transformedItem["Alert detection range"] = `${item.date_start_t1} to ${item.date_end_t1}`;
+    transformedItem["Month detected"] = `${item.month_detec}-${item.year_detec}`;
+    transformedItem["Data provider"] = capitalizeFirstLetter(`${item._topic}`);
+    transformedItem["Alert type"] = item.alert_type?.replace(/_/g, " ") ?? "";
     transformedItem["Alert area (hectares)"] =
       typeof item.area_alert_ha === "number"
         ? item.area_alert_ha.toFixed(2)
         : item.area_alert_ha;
-    transformedItem[
-      "Month detected"
-    ] = `${item.month_detec}-${item.year_detec}`;
     transformedItem["Satellite used for detection"] =
       satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
-    transformedItem["Territory"] = capitalizeFirstLetter(
-      item.territory_name ?? ""
-    );
-    transformedItem["Alert ID"] = item._id;
-    transformedItem[
-      "Alert detection range"
-    ] = `${item.date_start_t1} to ${item.date_end_t1}`;
-
+      
     if (embedMedia) {
       transformedItem[
         "image_url"
@@ -389,10 +383,6 @@ const prepareChangeDetectionData = (
         "preview_link"
       ] = `alerts/${item.territory_id}/${item.year_detec}/${item.month_detec}/${item._id}/output.html`;
     }
-
-    transformedItem[
-      "Month detected"
-    ] = `${item.month_detec}-${item.year_detec}`;
 
     // Segregate data based on the latest month detected
     if (transformedItem["Month detected"] === latestMonthStr) {
@@ -411,14 +401,21 @@ interface AlertRecord {
   month_detec: string;
   year_detec: string;
   area_alert_ha: string;
+  _topic: string;
 }
 
 const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   const territory =
     data[0].territory_name.charAt(0).toUpperCase() +
     data[0].territory_name.slice(1);
-  const type_of_alerts = Array.from(
+  const typeOfAlerts = Array.from(
     new Set(data.map((item) => item.alert_type.replace(/_/g, " ")))
+  );
+
+  const dataProviders = Array.from(
+    new Set(data.map((item) => item._topic.replace(/_/g, " ")))
+  ).map((provider) => 
+    provider.replace(/\b\w/g, (char) => char.toUpperCase())
   );
 
   // Create Date objects for sorting and comparisons
@@ -447,14 +444,14 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   });
 
   // Calculate hectares per month for the last 12 months
-  const hectares_per_month: Record<string, number> = {};
+  const hectaresPerMonth: Record<string, number> = {};
   last12MonthsData.forEach((item) => {
     const monthYear = `${item.month_detec.padStart(2, "0")}-${item.year_detec}`;
     const hectares = parseFloat(item.area_alert_ha);
-    hectares_per_month[monthYear] =
-      (hectares_per_month[monthYear] || 0) + (isNaN(hectares) ? 0 : hectares);
-    hectares_per_month[monthYear] = parseFloat(
-      hectares_per_month[monthYear].toFixed(2)
+    hectaresPerMonth[monthYear] =
+      (hectaresPerMonth[monthYear] || 0) + (isNaN(hectares) ? 0 : hectares);
+      hectaresPerMonth[monthYear] = parseFloat(
+        hectaresPerMonth[monthYear].toFixed(2)
     );
   });
 
@@ -468,29 +465,30 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   ).dateString;
 
   // Count the number of alerts for the most recent date
-  const recent_alerts_number = data.filter(
+  const recentAlertsNumber = data.filter(
     (item) =>
       `${item.month_detec.padStart(2, "0")}-${item.year_detec}` ===
       recentAlertDate
   ).length;
 
   // Calculate total number of alerts
-  const alerts_total = data.length;
+  const alertsTotal = data.length;
 
   // Calculate total hectares
-  const hectares_total = data
+  const hectaresTotal = data
     .reduce((total, item) => total + parseFloat(item.area_alert_ha), 0)
     .toFixed(2);
 
   return {
     territory,
-    type_of_alerts,
-    alert_detection_range: `${earliestDateStr} to ${latestDateStr}`,
-    recent_alerts_date: recentAlertDate,
-    recent_alerts_number,
-    alerts_total,
-    hectares_total,
-    hectares_per_month,
+    typeOfAlerts,
+    dataProviders,
+    alertDetectionRange: `${earliestDateStr} to ${latestDateStr}`,
+    recentAlertsDate: recentAlertDate,
+    recentAlertsNumber,
+    alertsTotal,
+    hectaresTotal,
+    hectaresPerMonth,
   };
 };
 
