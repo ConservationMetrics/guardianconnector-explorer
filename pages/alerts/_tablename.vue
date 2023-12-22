@@ -3,6 +3,7 @@
     <Alerts 
       v-if="dataFetched"
       :data="alertsData"
+      :statistics="statistics"
       :image-extensions="imageExtensions"
       :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
@@ -53,6 +54,7 @@ export default {
       return {
         dataFetched: true,
         alertsData: response.data,
+        statistics: response.statistics,
         imageExtensions: response.imageExtensions,
         embedMedia: response.embedMedia,
         mediaBasePath: response.mediaBasePath,
