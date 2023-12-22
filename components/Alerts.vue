@@ -18,9 +18,11 @@
   
 <script>
 import mapboxgl from "mapbox-gl";
+import bbox from '@turf/bbox';
+import FeaturePopup from "./FeaturePopup.vue";
 
 export default {
-  components: { },
+  components: { FeaturePopup },
   props: [
     "data",
     "embedMedia",
@@ -83,6 +85,79 @@ export default {
         const avgLat = (totalLat / numCoords).toFixed(6);
 
         return `${avgLat}, ${avgLng}`;
+    },
+
+    addPulsingCircles() {
+      if (!this.map.isSourceLoaded('recent-alerts')) {
+        this.map.once('idle', () => {
+          this.addPulsingCircles();
+        });
+        return;
+      }
+      // Define the pulsing dot CSS
+      const pulsingDot = document.createElement('div');
+      pulsingDot.className = 'pulsing-dot';
+     
+      // Add the CSS for the pulsing effect
+      const styles = `
+        @keyframes pulse {
+          0% { transform: scale(1); opacity: 1; }
+          100% { transform: scale(1.5); opacity: 0; }
+        }
+        .pulsing-dot {
+          width: 30px;
+          height: 30px;
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+        }
+
+        .pulsing-dot::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: 5px solid #EC00FF;
+          border-radius: inherit;
+          box-shadow: 0 0 0 2px #EC00FF;
+          animation: pulse 2s infinite;
+        }
+      `;
+      const styleSheet = document.createElement('style');
+      styleSheet.type = 'text/css';
+      styleSheet.innerText = styles;
+      document.head.appendChild(styleSheet);
+
+      const features = this.map.queryRenderedFeatures({ layers: ['recent-alerts'] });
+
+      features.forEach((feature) => {
+        const bounds = bbox(feature);
+
+        // Create a new marker element for this feature
+        const pulsingMarker = pulsingDot.cloneNode();
+        
+        // Calculate the center of the bounding box
+        const lng = (bounds[0] + bounds[2]) / 2;
+        const lat = (bounds[1] + bounds[3]) / 2;
+
+        // Create a new marker and add it to the map
+        const marker = new mapboxgl.Marker(pulsingMarker)
+          .setLngLat([parseFloat(lng), parseFloat(lat)])
+          .addTo(this.map);
+
+      });
+    },
+
+    removePulsingCirclesUponInteraction() {
+      const events = ['mousedown', 'touchstart', 'wheel', 'zoomstart', 'dragstart'];
+      events.forEach(event => {
+        this.map.on(event, () => {
+          // Directly remove all markers
+          document.querySelectorAll('.pulsing-dot').forEach(el => el.remove());
+        });
+      });
     },
 
     addDataToMap() {
@@ -252,6 +327,8 @@ export default {
       }
 
       this.addDataToMap();
+      this.addPulsingCircles();
+      this.removePulsingCirclesUponInteraction();
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
@@ -267,9 +344,18 @@ export default {
       // Fullscreen Control
       const fullscreenControl = new mapboxgl.FullscreenControl();
       this.map.addControl(fullscreenControl, 'top-right');
-      });
+    });
   },
+  
+
   beforeDestroy() {
+    // Remove event listeners
+    this.map.off('mousedown', this.removePulsingCircles);
+    this.map.off('touchstart', this.removePulsingCircles);
+    this.map.off('wheel', this.removePulsingCircles);
+    this.map.off('zoomstart', this.removePulsingCircles);
+    this.map.off('dragstart', this.removePulsingCircles);
+
     if (this.map) {
       this.map.remove();
     }
