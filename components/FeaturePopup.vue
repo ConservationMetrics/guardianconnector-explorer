@@ -4,6 +4,7 @@
     <AlertsIntroPanel 
       v-if="showIntroPanel"
       :statistics="statistics"
+      :allDataGeojson="allDataGeojson"
     />
     <Feature
       v-if="feature"
@@ -17,7 +18,11 @@
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
     />
-    <Download v-if="showDownloadButtons" :feature-geojson="featureGeojson" />
+    <Download 
+      v-if="downloadAlert" 
+      :geojson="featureGeojson" 
+      :type-of-data="'alert'" 
+    />
   </div>
 </template>
 
@@ -29,6 +34,7 @@ import AlertsIntroPanel from "@/components/AlertsIntroPanel.vue";
 export default {
   components: { AlertsIntroPanel, Feature, Download },
   props: [
+    "allDataGeojson",
     "embedMedia",
     "previewMapLink",
     "mediaBasePath",
@@ -40,7 +46,7 @@ export default {
     "audioExtensions",
     "videoExtensions",
     "showSidebar",
-    "showDownloadButtons",
+    "downloadAlert",
     "showIntroPanel",
     "statistics"
   ],
