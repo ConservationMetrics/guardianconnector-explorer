@@ -277,8 +277,24 @@ const prepareChangeDetectionData = (
   data: Array<Record<string, any>>,
   embedMedia: boolean,
   linkToGCCDResources: boolean
-): Array<Record<string, any>> => {
-  const changeDetectionData = data.map((item) => {
+): { mostRecentAlerts: Array<Record<string, any>>, otherAlerts: Array<Record<string, any>> } => {
+  let latestDate = new Date(0); // Initialize to a very early date
+  let latestMonthStr = '';
+
+  // Determine the most recent month
+  data.forEach(item => {
+    const monthYearStr = `${item.month_detec}-${item.year_detec}`;
+    const date = new Date(item.year_detec, item.month_detec - 1);
+    if (date > latestDate) {
+      latestDate = date;
+      latestMonthStr = monthYearStr;
+    }
+  });
+
+  const mostRecentAlerts: Array<Record<string, any>> = [];
+  const otherAlerts: Array<Record<string, any>> = [];
+
+  data.forEach((item) => {
     const transformedItem: Record<string, any> = {};
 
     // Keep fields starting with 'g__'
@@ -288,46 +304,72 @@ const prepareChangeDetectionData = (
       }
     });
 
+    // To rewrite the satellite prefix field
+    const satelliteLookup: { [key: string]: string } = {
+      "S1": "Sentinel-1",
+      "S2": "Sentinel-2",
+      "PS": "Planetscope",
+      "L8": "Landsat 8",
+      "L9": "Landsat 9",
+      "WV1": "WorldView-1",
+      "WV2": "WorldView-2",
+      "WV3": "WorldView-3",
+      "WV4": "WorldView-4",
+      "IK": "IKONOS",
+    };
+
     // Include only the transformed fields
     transformedItem["Alert type"] = capitalizeFirstLetter(item.alert_type?.replace(/_/g, ' ') ?? '');
     transformedItem["Alert area (hectares)"] = typeof item.area_alert_ha === 'number' ? item.area_alert_ha.toFixed(2) : item.area_alert_ha;
     transformedItem["Month detected"] = `${item.month_detec}-${item.year_detec}`;
-    transformedItem["Satellite"] = item.satellite;
+    transformedItem["Satellite used for detection"] = satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
     transformedItem["Territory"] = capitalizeFirstLetter(item.territory_name ?? '');
     transformedItem["Alert ID"] = item._id;
     transformedItem["Alert detection range"] = `${item.date_start_t1} to ${item.date_end_t1}`;
 
     if (embedMedia) {
       transformedItem["image_url"] = `alerts/${item.territory_id}/${item.year_detec}/${item.month_detec}/${item._id}/resources/output_t1.jpg`;
+      transformedItem["image_caption"] = satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
     }
-
     if (linkToGCCDResources) {
       transformedItem["preview_link"] = `alerts/${item.territory_id}/${item.year_detec}/${item.month_detec}/${item._id}/output.html`;
     }
 
-    return transformedItem;
+    transformedItem["Month detected"] = `${item.month_detec}-${item.year_detec}`;
+
+    // Segregate data based on the latest month detected
+    if (transformedItem["Month detected"] === latestMonthStr) {
+      mostRecentAlerts.push(transformedItem);
+    } else {
+      otherAlerts.push(transformedItem);
+    }
   });
 
-  return changeDetectionData;
+  return { mostRecentAlerts, otherAlerts };
 };
 
 const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): { 
   type: string; 
   features: Array<{ 
     type: string; 
+    id?: string | undefined;
     properties: { [key: string]: any }; 
     geometry?: { [key: string]: any };
   }>;
 } => {
   const features = inputArray.map(input => {
     const feature = { 
-      type: "feature", 
+      type: "Feature", 
+      id: undefined,
       properties: {} as { [key: string]: any },
       geometry: {} as { [key: string]: any }
     };
 
     Object.entries(input).forEach(([key, value]) => {
-      if (key.startsWith("g__")) {
+      if (key === "Alert ID") {
+        feature.id = value.substring(4);
+        feature.properties[key] = value;
+      } else if (key.startsWith("g__")) {
         const geometryKey = key.substring(3); // Removes 'g__' prefix
         if (geometryKey === "coordinates") {
           feature.geometry[geometryKey] = JSON.parse(value);

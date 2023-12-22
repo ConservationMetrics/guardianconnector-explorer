@@ -251,7 +251,10 @@ if (!VIEWS_CONFIG) {
           const changeDetectionData = prepareChangeDetectionData(mainData, VIEWS[table].EMBED_MEDIA === "YES", VIEWS[table].LINK_TO_GCCD_RESOURCES === "YES");
           
           // Convert data to GeoJSON format
-          const geojsonData = transformToGeojson(changeDetectionData);
+          const geojsonData = {
+            mostRecentAlerts: transformToGeojson(changeDetectionData.mostRecentAlerts), 
+            otherAlerts: transformToGeojson(changeDetectionData.otherAlerts)
+          };
 
           const response = {
             data: geojsonData, 

@@ -7,6 +7,7 @@
       :key="filePath"
       :mediaBasePath="mediaBasePath"
       :filePath="filePath"
+      :image-caption="imageCaption"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
@@ -27,7 +28,7 @@
         <span class="font-bold">{{ key }}</span
         >: <span>{{ value }}</span>
       </div>
-      <span v-if="previewMapLink !== false ">
+      <span v-if="previewMapLink !== null ">
             <a
               class="text-blue-500 hover:text-blue-700"
               :href="mediaBasePath + '/' + previewMapLink + '?inline=true'"
@@ -60,6 +61,7 @@ export default {
     "mediaBasePath",
     "filePaths",
     "feature",
+    "imageCaption",
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",

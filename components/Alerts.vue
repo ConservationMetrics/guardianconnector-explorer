@@ -4,11 +4,12 @@
       :embed-media="embedMedia"
       :feature="selectedFeature"
       :file-paths="imageUrl"
+      :image-caption="imageCaption"
       :image-extensions="imageExtensions"
       :preview-map-link="previewMapLink"
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
-      @close="showSidebar = false"
+      @close="resetSelectedFeature"
     />
   </div>
 </template>
@@ -37,84 +38,119 @@ export default {
     return {
       showSidebar: false,
       selectedFeature: null,
+      selectedFeatureId: null,
+      selectedFeatureSource: null,
       imageUrl: [],
+      imageCaption: null,
       previewMapLink: null
     };
   },
   computed: {
   },
   methods: {
-    onFeatureClick(feature) {
-      this.selectedFeature = feature;
-      this.imageUrl = [feature.properties.image_url];
-      this.previewMapLink = [feature.properties.preview_link];
-      this.showSidebar = true;
-    },
+    resetSelectedFeature() {
+      if (this.selectedFeatureId && this.selectedFeatureSource) {
+        // Reset the feature state of the previously selected feature
+        this.map.setFeatureState(
+          { source: this.selectedFeatureSource, id: this.selectedFeatureId },
+          { selected: false }
+        );
 
+        // Reset the component state
+        this.selectedFeatureId = null;
+        this.selectedFeatureSource = null;
+        this.selectedFeature = null;
+        this.showSidebar = false;
+      }
+    },
     addDataToMap() {
       const geoJsonSource = this.data;
 
-      // Add the source to the map
-      this.map.addSource("data-source", {
+      // Add the most recent alerts source to the map
+      this.map.addSource("recent-alerts", {
         type: "geojson",
-        data: geoJsonSource,
+        data: geoJsonSource.mostRecentAlerts,
       });
 
-      // Add a layer for Point features
-      this.map.addLayer({
-        id: "data-layer-point",
-        type: "circle",
-        source: "data-source",
-        filter: ["==", "$type", "Point"],
-        paint: {
-          "circle-radius": 6,
-          "circle-color": "#FF0000",
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#fff",
-        },
+      // Add the other alerts source to the map
+      this.map.addSource("alerts", {
+        type: "geojson",
+        data: geoJsonSource.otherAlerts,
       });
 
-      // Add a layer for LineString features
-      this.map.addLayer({
-        id: "data-layer-linestring",
-        type: "line",
-        source: "data-source",
-        filter: ["==", "$type", "LineString"],
-        paint: {
-          "line-color": "#FF0000",
-          "line-width": 2,
-        },
-      });
 
-      // Add a layer for Polygon features
+      // Add a layer for most recent alerts
       this.map.addLayer({
-        id: "data-layer-polygon",
+        id: "recent-alerts",
         type: "fill",
-        source: "data-source",
+        source: "recent-alerts",
         filter: ["==", "$type", "Polygon"],
         paint: {
-          "fill-color": "#FF0000",
-          "fill-opacity": 0.5,
+          "fill-color": [
+            'case',
+              ['boolean', ['feature-state', 'selected'], false],
+              '#FFFF00',
+              '#EC00FF'
+            ],          
+            "fill-opacity": 0.5,
         },
       });     
       
-      // Add a stroke for Polygon features
+      // Add a stroke for most recent alerts
       this.map.addLayer({
-        id: "data-layer-polygon-outline",
+        id: "recent-alerts-stroke",
         type: "line",
-        source: "data-source",
+        source: "recent-alerts",
         filter: ["==", "$type", "Polygon"],
         paint: {
-          "line-color": "#FF0000",
+          "line-color": [
+            'case',
+              ['boolean', ['feature-state', 'selected'], false],
+              '#FFFF00',
+              '#EC00FF'
+          ],
+          "line-width": 2,
+        },
+      });   
+
+        // Add a layer for other alerts
+        this.map.addLayer({
+        id: "alerts",
+        type: "fill",
+        source: "alerts",
+        filter: ["==", "$type", "Polygon"],
+        paint: {
+          "fill-color": [
+            'case',
+              ['boolean', ['feature-state', 'selected'], false],
+              '#FFFF00',
+              '#FF0000'
+          ],   
+            "fill-opacity": 0.5,
+        },
+      });     
+      
+      // Add a stroke for other alerts
+      this.map.addLayer({
+        id: "alerts-stroke",
+        type: "line",
+        source: "alerts",
+        filter: ["==", "$type", "Polygon"],
+        paint: {
+          "line-color": [
+            'case',
+              ['boolean', ['feature-state', 'selected'], false],
+              '#FFFF00',
+              '#FF0000'
+          ],  
           "line-width": 2,
         },
       });   
       
       // Add event listeners
       [
-        "data-layer-point",
-        "data-layer-linestring",
-        "data-layer-polygon",
+        "recent-alerts",
+        "alerts",
       ].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
           this.map.getCanvas().style.cursor = "pointer";
@@ -124,10 +160,39 @@ export default {
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = e.features[0].properties;
-          this.imageUrl = [e.features[0].properties.image_url];
-          this.previewMapLink = [e.features[0].properties.preview_link];
-          delete featureObject["image_url"];
-          delete featureObject["preview_link"];
+          let featureId = e.features[0].id;
+
+          // Reset the previously selected feature
+          if (this.selectedFeatureId && this.selectedFeatureSource) {
+            this.map.setFeatureState(
+              { source: this.selectedFeatureSource, id: this.selectedFeatureId },
+              { selected: false }
+            );
+          }
+
+          // Set new feature state
+          this.map.setFeatureState(
+            { source: layerId, id: featureId },
+            { selected: true }
+          );
+
+          // Update component state
+          this.selectedFeatureId = featureId;
+          this.selectedFeatureSource = layerId;
+          this.selectedFeature = featureObject;
+          this.showSidebar = true;
+
+          // Fields that may or may not exist, depending on views config
+          let imageUrl = featureObject.image_url;
+          imageUrl && (this.imageUrl = [imageUrl]);
+          let imageCaption = featureObject.image_caption;
+          imageCaption && (this.imageCaption = "Imagery source: " + imageCaption);
+          let previewMapLink = featureObject.preview_link;
+          previewMapLink && (this.previewMapLink = previewMapLink);
+          delete featureObject["image_url"], delete featureObject["image_caption"], delete featureObject["preview_link"];
+
+          // Update component state
+          this.selectedFeatureId = featureId;
           this.selectedFeature = featureObject;
           this.showSidebar = true;
         });
@@ -160,7 +225,22 @@ export default {
       }
 
       this.addDataToMap();
-    });
+
+      // Navigation Control (zoom buttons and compass)
+      const nav = new mapboxgl.NavigationControl();
+      this.map.addControl(nav, 'top-right');
+
+      // Scale Control
+      const scale = new mapboxgl.ScaleControl({
+        maxWidth: 80,
+        unit: 'metric'
+      });
+      this.map.addControl(scale, 'bottom-left');
+
+      // Fullscreen Control
+      const fullscreenControl = new mapboxgl.FullscreenControl();
+      this.map.addControl(fullscreenControl, 'top-right');
+      });
   },
   beforeDestroy() {
     if (this.map) {
