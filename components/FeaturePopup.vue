@@ -12,24 +12,28 @@
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
     />
+    <Download v-if="showDownloadButtons" :feature-geojson="featureGeojson" />
   </div>
 </template>
 
 <script>
 import Feature from "@/components/Feature.vue";
+import Download from "@/components/Download.vue";
 
 export default {
-  components: { Feature },
+  components: { Feature, Download },
   props: [
     "embedMedia",
     "previewMapLink",
     "mediaBasePath",
     "filePaths",
     "feature",
+    "featureGeojson",
     "imageCaption",
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",
+    "showDownloadButtons",
     "showSidebar",
   ],
   computed: {

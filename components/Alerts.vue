@@ -3,12 +3,14 @@
     <FeaturePopup
       :embed-media="embedMedia"
       :feature="selectedFeature"
+      :feature-geojson="selectedFeatureGeojson"
       :file-paths="imageUrl"
       :image-caption="imageCaption"
       :image-extensions="imageExtensions"
       :preview-map-link="previewMapLink"
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
+      :show-download-buttons="showDownloadButtons"
       @close="resetSelectedFeature"
     />
   </div>
@@ -37,7 +39,9 @@ export default {
   data() {
     return {
       showSidebar: false,
+      showDownloadButtons: true,
       selectedFeature: null,
+      selectedFeatureGeojson: null,
       selectedFeatureId: null,
       selectedFeatureSource: null,
       imageUrl: [],
@@ -57,12 +61,30 @@ export default {
         );
 
         // Reset the component state
+        this.selectedFeature = null;
+        this.selectedFeatureGeojson = null;
         this.selectedFeatureId = null;
         this.selectedFeatureSource = null;
-        this.selectedFeature = null;
         this.showSidebar = false;
       }
     },
+
+    calculateCentroid(coords) {
+        let totalLat = 0;
+        let totalLng = 0;
+        const numCoords = coords.length;
+
+        coords.forEach(coord => {
+            totalLng += coord[0];
+            totalLat += coord[1];
+        });
+
+        const avgLng = (totalLng / numCoords).toFixed(6);
+        const avgLat = (totalLat / numCoords).toFixed(6);
+
+        return `${avgLat}, ${avgLng}`;
+    },
+
     addDataToMap() {
       const geoJsonSource = this.data;
 
@@ -160,7 +182,11 @@ export default {
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = e.features[0].properties;
-          let featureId = e.features[0].id;
+          featureObject["Geographic centroid"] = this.calculateCentroid(e.features[0].geometry.coordinates[0]);
+
+          const featureGeojson = (({ type, geometry, properties }) => ({ type, geometry, properties }))(e.features[0]);
+
+          const featureId = e.features[0].id;
 
           // Reset the previously selected feature
           if (this.selectedFeatureId && this.selectedFeatureSource) {
@@ -177,16 +203,17 @@ export default {
           );
 
           // Update component state
+          this.selectedFeature = featureObject;
+          this.selectedFeatureGeojson = featureGeojson;
           this.selectedFeatureId = featureId;
           this.selectedFeatureSource = layerId;
-          this.selectedFeature = featureObject;
           this.showSidebar = true;
 
           // Fields that may or may not exist, depending on views config
           let imageUrl = featureObject.image_url;
           imageUrl && (this.imageUrl = [imageUrl]);
           let imageCaption = featureObject.image_caption;
-          imageCaption && (this.imageCaption = "Imagery source: " + imageCaption);
+          imageCaption && (this.imageCaption = "Preview imagery source: " + imageCaption);
           let previewMapLink = featureObject.preview_link;
           previewMapLink && (this.previewMapLink = previewMapLink);
           delete featureObject["image_url"], delete featureObject["image_caption"], delete featureObject["preview_link"];
