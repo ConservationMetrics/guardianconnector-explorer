@@ -53,10 +53,18 @@
         <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.recentAlertsDate }}</em></p>
       </div>
     </div>
+    <div class="p-4" v-if="allDataGeojson">
+      <h3 class="text-2xl font-semibold mb-2 text-center">Download all alerts</h3>
+      <Download 
+        :geojson="allDataGeojson" 
+        :type-of-data="'all'" 
+      />
+    </div>
   </div>
 </template>
 
 <script>
+import Download from "@/components/Download.vue";
 import { Line as LineChart } from "vue-chartjs";
 import { Chart, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
 
@@ -64,9 +72,9 @@ Chart.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale,
 
 
 export default {
-  props: ["statistics"],
+  props: ["statistics", "allDataGeojson"],
   name: "LineChartComponent",
-  components: { LineChart },
+  components: { Download, LineChart },
   computed: {
     chartData() {
         return {

@@ -1,6 +1,7 @@
 <template>
   <div id="map">
     <FeaturePopup
+      :all-data-geojson="data"
       :embed-media="embedMedia"
       :feature="selectedFeature"
       :feature-geojson="selectedFeatureGeojson"
@@ -11,7 +12,7 @@
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
       :show-intro-panel="showIntroPanel"
-      :show-download-buttons="showDownloadButtons"
+      :download-alert="downloadAlert"
       :statistics="statistics"
       @close="resetSelectedFeature"
     />
@@ -45,7 +46,7 @@ export default {
     return {
       showSidebar: true,
       showIntroPanel: true,
-      showDownloadButtons: false,
+      downloadAlert: false,
       selectedFeature: null,
       selectedFeatureGeojson: null,
       selectedFeatureId: null,
@@ -284,7 +285,7 @@ export default {
           this.selectedFeatureSource = layerId;
           this.showSidebar = true;
           this.showIntroPanel = false;
-          this.showDownloadButtons = true;
+          this.downloadAlert = true;
 
           // Fields that may or may not exist, depending on views config
           let imageUrl = featureObject.image_url;
