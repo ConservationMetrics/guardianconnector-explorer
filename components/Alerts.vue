@@ -63,6 +63,23 @@ export default {
         this.showSidebar = false;
       }
     },
+
+    calculateCentroid(coords) {
+        let totalLat = 0;
+        let totalLng = 0;
+        const numCoords = coords.length;
+
+        coords.forEach(coord => {
+            totalLng += coord[0]; // Longitude is the first element
+            totalLat += coord[1]; // Latitude is the second element
+        });
+
+        const avgLng = (totalLng / numCoords).toFixed(6);
+        const avgLat = (totalLat / numCoords).toFixed(6);
+
+        return `${avgLat}, ${avgLng}`;
+    },
+
     addDataToMap() {
       const geoJsonSource = this.data;
 
@@ -160,6 +177,7 @@ export default {
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = e.features[0].properties;
+          featureObject["Geographic centroid"] = this.calculateCentroid(e.features[0].geometry.coordinates[0]);
           let featureId = e.features[0].id;
 
           // Reset the previously selected feature
