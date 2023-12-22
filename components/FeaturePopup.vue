@@ -12,7 +12,7 @@
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
     />
-    <Download :feature-geojson="featureGeojson" />
+    <Download v-if="showDownloadButtons" :feature-geojson="featureGeojson" />
   </div>
 </template>
 
@@ -33,6 +33,7 @@ export default {
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",
+    "showDownloadButtons",
     "showSidebar",
   ],
   computed: {

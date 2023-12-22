@@ -10,6 +10,7 @@
       :preview-map-link="previewMapLink"
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
+      :show-download-buttons="showDownloadButtons"
       @close="resetSelectedFeature"
     />
   </div>
@@ -38,6 +39,7 @@ export default {
   data() {
     return {
       showSidebar: false,
+      showDownloadButtons: true,
       selectedFeature: null,
       selectedFeatureGeojson: null,
       selectedFeatureId: null,
