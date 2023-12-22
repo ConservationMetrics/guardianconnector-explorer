@@ -1,7 +1,12 @@
 <template>
   <div v-if="showSidebar" class="sidebar">
     <button class="close-btn" @click="$emit('close')">X</button>
+    <AlertsIntroPanel 
+      v-if="showIntroPanel"
+      :statistics="statistics"
+    />
     <Feature
+      v-if="feature"
       :embed-media="embedMedia"
       :preview-map-link="previewMapLink"
       :mediaBasePath="mediaBasePath"
@@ -19,9 +24,10 @@
 <script>
 import Feature from "@/components/Feature.vue";
 import Download from "@/components/Download.vue";
+import AlertsIntroPanel from "@/components/AlertsIntroPanel.vue";
 
 export default {
-  components: { Feature, Download },
+  components: { AlertsIntroPanel, Feature, Download },
   props: [
     "embedMedia",
     "previewMapLink",
@@ -33,8 +39,10 @@ export default {
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",
-    "showDownloadButtons",
     "showSidebar",
+    "showDownloadButtons",
+    "showIntroPanel",
+    "statistics"
   ],
   computed: {
     filteredFeature() {

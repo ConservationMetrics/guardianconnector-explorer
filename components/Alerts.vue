@@ -10,7 +10,9 @@
       :preview-map-link="previewMapLink"
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
+      :show-intro-panel="showIntroPanel"
       :show-download-buttons="showDownloadButtons"
+      :statistics="statistics"
       @close="resetSelectedFeature"
     />
   </div>
@@ -36,12 +38,14 @@ export default {
     "mapboxZoom",
     "mapboxPitch",
     "mapboxBearing",
-    "mapbox3d"
+    "mapbox3d",
+    "statistics"
   ],
   data() {
     return {
-      showSidebar: false,
-      showDownloadButtons: true,
+      showSidebar: true,
+      showIntroPanel: true,
+      showDownloadButtons: false,
       selectedFeature: null,
       selectedFeatureGeojson: null,
       selectedFeatureId: null,
@@ -55,20 +59,17 @@ export default {
   },
   methods: {
     resetSelectedFeature() {
-      if (this.selectedFeatureId && this.selectedFeatureSource) {
-        // Reset the feature state of the previously selected feature
-        this.map.setFeatureState(
-          { source: this.selectedFeatureSource, id: this.selectedFeatureId },
-          { selected: false }
-        );
+      this.map.setFeatureState(
+        { source: this.selectedFeatureSource, id: this.selectedFeatureId },
+        { selected: false }
+      );
 
-        // Reset the component state
-        this.selectedFeature = null;
-        this.selectedFeatureGeojson = null;
-        this.selectedFeatureId = null;
-        this.selectedFeatureSource = null;
-        this.showSidebar = false;
-      }
+      // Reset the component state
+      this.selectedFeature = null;
+      this.selectedFeatureGeojson = null;
+      this.selectedFeatureId = null;
+      this.selectedFeatureSource = null;
+      this.showSidebar = false;
     },
 
     calculateCentroid(coords) {
@@ -175,7 +176,6 @@ export default {
         data: geoJsonSource.otherAlerts,
       });
 
-
       // Add a layer for most recent alerts
       this.map.addLayer({
         id: "recent-alerts",
@@ -210,8 +210,8 @@ export default {
         },
       });   
 
-        // Add a layer for other alerts
-        this.map.addLayer({
+      // Add a layer for other alerts
+      this.map.addLayer({
         id: "alerts",
         type: "fill",
         source: "alerts",
@@ -283,6 +283,8 @@ export default {
           this.selectedFeatureId = featureId;
           this.selectedFeatureSource = layerId;
           this.showSidebar = true;
+          this.showIntroPanel = false;
+          this.showDownloadButtons = true;
 
           // Fields that may or may not exist, depending on views config
           let imageUrl = featureObject.image_url;

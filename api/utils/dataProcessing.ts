@@ -278,7 +278,7 @@ const prepareChangeDetectionData = (
   embedMedia: boolean,
   linkToGCCDResources: boolean
 ): { mostRecentAlerts: Array<Record<string, any>>, otherAlerts: Array<Record<string, any>> } => {
-  let latestDate = new Date(0); // Initialize to a very early date
+  let latestDate = new Date(0);
   let latestMonthStr = '';
 
   // Determine the most recent month
@@ -348,6 +348,63 @@ const prepareChangeDetectionData = (
   return { mostRecentAlerts, otherAlerts };
 };
 
+interface AlertRecord {
+  territory_name: string;
+  alert_type: string;
+  month_detec: string;
+  year_detec: string;
+  area_alert_ha: string;
+}
+
+const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
+  const territory = data[0].territory_name.charAt(0).toUpperCase() + data[0].territory_name.slice(1);
+  const type_of_alerts = Array.from(new Set(data.map(item => item.alert_type.replace(/_/g, ' '))));
+
+  // Create Date objects for sorting and comparisons
+  const formattedDates = data.map(item => ({
+    date: new Date(`${item.year_detec}-${item.month_detec.padStart(2, '0')}-01`),
+    dateString: `${item.month_detec.padStart(2, '0')}-${item.year_detec}`
+  }));
+
+  // Sort dates to find the earliest and latest
+  formattedDates.sort((a, b) => a.date.getTime() - b.date.getTime());
+  const earliestDate = formattedDates[0].dateString;
+  const latestDate = formattedDates[formattedDates.length - 1].dateString;
+
+  // Find the most recent alert date
+  const recentAlertDate = formattedDates.reduce((latest, current) => current.date > latest.date ? current : latest, formattedDates[0]).dateString;
+
+  // Count the number of alerts for the most recent date
+  const recent_alerts_number = data.filter(item => `${item.month_detec.padStart(2, '0')}-${item.year_detec}` === recentAlertDate).length;
+
+  // Calculate total number of alerts
+  const alerts_total = data.length;
+
+  // Calculate total hectares
+  const hectares_total = data.reduce((total, item) => total + parseFloat(item.area_alert_ha), 0).toFixed(2);
+
+  // Calculate hectares per month
+  const hectares_per_month: Record<string, number> = {};
+  data.forEach(item => {
+    const monthYear = `${item.month_detec.padStart(2, '0')}-${item.year_detec}`;
+    const hectares = parseFloat(item.area_alert_ha);
+    hectares_per_month[monthYear] = (hectares_per_month[monthYear] || 0) + (isNaN(hectares) ? 0 : hectares);
+    hectares_per_month[monthYear] = parseFloat(hectares_per_month[monthYear].toFixed(2));
+  });
+
+  return {
+    territory,
+    type_of_alerts,
+    alert_detection_range: `${earliestDate} to ${latestDate}`,
+    recent_alerts_date: recentAlertDate,
+    recent_alerts_number,
+    alerts_total,
+    hectares_total,
+    hectares_per_month,
+  };
+};
+
+
 const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): { 
   type: string; 
   features: Array<{ 
@@ -391,4 +448,13 @@ const transformToGeojson = (inputArray: Array<{ [key: string]: any }>): {
 };
 
 
-export { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, prepareChangeDetectionData, transformToGeojson };
+export { 
+  filterData, 
+  filterGeoData, 
+  filterDataByExtension, 
+  transformData, 
+  processGeoData, 
+  prepareChangeDetectionData, 
+  prepareStatistics,
+  transformToGeojson 
+};

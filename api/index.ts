@@ -5,7 +5,16 @@ import jwt from 'jsonwebtoken';
 
 import setupDatabaseConnection from './utils/dbConnection';
 import fetchData from './utils/dbOperations';
-import { filterData, filterGeoData, filterDataByExtension, transformData, processGeoData, prepareChangeDetectionData, transformToGeojson } from './utils/dataProcessing';
+import { 
+  filterData, 
+  filterGeoData, 
+  filterDataByExtension, 
+  transformData, 
+  processGeoData, 
+  prepareChangeDetectionData, 
+  prepareStatistics,
+  transformToGeojson 
+} from './utils/dataProcessing';
 
 interface EnvVars {
   DATABASE: string;
@@ -250,6 +259,9 @@ if (!VIEWS_CONFIG) {
           // Prepare change detection data for the alerts view
           const changeDetectionData = prepareChangeDetectionData(mainData, VIEWS[table].EMBED_MEDIA === "YES", VIEWS[table].LINK_TO_GCCD_RESOURCES === "YES");
           
+          // Prepare statistics data for the alerts view
+          const statistics = prepareStatistics(mainData);
+
           // Convert data to GeoJSON format
           const geojsonData = {
             mostRecentAlerts: transformToGeojson(changeDetectionData.mostRecentAlerts), 
@@ -258,6 +270,7 @@ if (!VIEWS_CONFIG) {
 
           const response = {
             data: geojsonData, 
+            statistics: statistics,
             table: table,
             embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
             imageExtensions: imageExtensions, 
