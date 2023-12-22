@@ -39,6 +39,7 @@ export default {
       showSidebar: false,
       selectedFeature: null,
       selectedFeatureId: null,
+      selectedFeatureSource: null,
       imageUrl: [],
       imageCaption: null,
       previewMapLink: null
@@ -48,19 +49,16 @@ export default {
   },
   methods: {
     resetSelectedFeature() {
-      if (this.selectedFeatureId) {
+      if (this.selectedFeatureId && this.selectedFeatureSource) {
         // Reset the feature state of the previously selected feature
-        this.map.queryRenderedFeatures({ layers: ["recent-alerts", "alerts"] }).forEach(feature => {
-          if (feature.properties["Alert ID"] === this.selectedFeatureId) {
-            this.map.setFeatureState(
-              { source: feature.source, id: feature.id },
-              { selected: false }
-            );
-          }
-        });
+        this.map.setFeatureState(
+          { source: this.selectedFeatureSource, id: this.selectedFeatureId },
+          { selected: false }
+        );
 
         // Reset the component state
         this.selectedFeatureId = null;
+        this.selectedFeatureSource = null;
         this.selectedFeature = null;
         this.showSidebar = false;
       }
@@ -162,26 +160,27 @@ export default {
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = e.features[0].properties;
-          let featureId = featureObject["Alert ID"];
+          let featureId = e.features[0].id;
 
-          // Check if there is a previously selected feature
-          if (this.selectedFeatureId) {
-            // Find the previously selected feature and reset its style
-            this.map.queryRenderedFeatures({ layers: [layerId] }).forEach(feature => {
-              if (feature.properties["Alert ID"] === this.selectedFeatureId) {
-                this.map.setFeatureState(
-                  { source: layerId, id: feature.id },
-                  { selected: false }
-                );
-              }
-            });
+          // Reset the previously selected feature
+          if (this.selectedFeatureId && this.selectedFeatureSource) {
+            this.map.setFeatureState(
+              { source: this.selectedFeatureSource, id: this.selectedFeatureId },
+              { selected: false }
+            );
           }
 
           // Set new feature state
           this.map.setFeatureState(
-            { source: layerId, id: e.features[0].id },
+            { source: layerId, id: featureId },
             { selected: true }
           );
+
+          // Update component state
+          this.selectedFeatureId = featureId;
+          this.selectedFeatureSource = layerId;
+          this.selectedFeature = featureObject;
+          this.showSidebar = true;
 
           // Fields that may or may not exist, depending on views config
           let imageUrl = featureObject.image_url;
