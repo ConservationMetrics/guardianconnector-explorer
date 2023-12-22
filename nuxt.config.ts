@@ -127,7 +127,8 @@ const config: NuxtConfig = {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: [(context) => context.isLegacy ? 'axios' : undefined, 'defu'],
+    transpile: [(context) => context.isLegacy ? 'axios' : undefined, 'defu', 'chart.js', 'vue-chartjs']
+
   },
 
   server: {
