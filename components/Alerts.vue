@@ -62,13 +62,28 @@ export default {
   methods: {
     resetToInitialState() {
       this.resetSelectedFeature();
-      this.addPulsingCircles();
       this.showSidebar = true;
       this.showIntroPanel = true;
       this.downloadAlert = false;
       this.imageUrl = [];
       this.imageCaption = null;
       this.previewMapLink = null;
+
+      // Fly to the initial position
+      this.map.flyTo({
+        center: [this.mapboxLongitude || 0, this.mapboxLatitude || -15],
+        zoom: this.mapboxZoom || 2.5,
+        pitch: this.mapboxPitch || 0,
+        bearing: this.mapboxBearing || 0,
+      });
+
+      // Add pulsing circles after the map has finished flying 
+      // to the initial position. This is for reasons of user experience,
+      // as well as the fact that queryRenderedFeatures() will only return
+      // features that are visible in the browser viewport.)
+      this.map.once('idle', () => {
+        this.addPulsingCircles();
+      });
     },
 
     handleSidebarClose() {
@@ -107,7 +122,7 @@ export default {
     },
 
     addPulsingCircles() {
-      // Wait until the map is loaded
+      // Wait until the map has loaded recent-alerts
       if (!this.map.isSourceLoaded('recent-alerts')) {
         this.map.once('idle', () => {
           this.addPulsingCircles();
@@ -129,7 +144,7 @@ export default {
           height: 30px;
           position: absolute;
           border-radius: 50%;
-          pointer-events: none;
+          pointer-events: none!important;
         }
 
         .pulsing-dot::before {
@@ -170,14 +185,8 @@ export default {
       });
     },
 
-    removePulsingCirclesUponInteraction() {
-      const events = ['mousedown', 'touchstart', 'wheel', 'zoomstart', 'dragstart'];
-      events.forEach(event => {
-        this.map.on(event, () => {
-          // Directly remove all markers
-          document.querySelectorAll('.pulsing-dot').forEach(el => el.remove());
-        });
-      });
+    removePulsingCircles() {
+      document.querySelectorAll('.pulsing-dot').forEach(el => el.remove());
     },
 
     addDataToMap() {
@@ -264,10 +273,7 @@ export default {
       });   
       
       // Add event listeners
-      [
-        "recent-alerts",
-        "alerts",
-      ].forEach((layerId) => {
+      ["recent-alerts", "alerts"].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
           this.map.getCanvas().style.cursor = "pointer";
         });
@@ -279,7 +285,6 @@ export default {
           featureObject["Geographic centroid"] = this.calculateCentroid(e.features[0].geometry.coordinates[0]);
 
           const featureGeojson = (({ type, geometry, properties }) => ({ type, geometry, properties }))(e.features[0]);
-
           const featureId = e.features[0].id;
 
           // Reset the previously selected feature
@@ -318,6 +323,8 @@ export default {
           this.selectedFeatureId = featureId;
           this.selectedFeature = featureObject;
           this.showSidebar = true;
+
+          this.removePulsingCircles();
         });
       });
     }
@@ -349,7 +356,6 @@ export default {
 
       this.addDataToMap();
       this.addPulsingCircles();
-      this.removePulsingCirclesUponInteraction();
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
