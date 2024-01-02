@@ -28,7 +28,7 @@
         <span class="font-bold">{{ key }}</span
         >: <span>{{ value }}</span>
       </div>
-      <span v-if="previewMapLink !== null ">
+      <span v-if="previewMapLink">
             <a
               class="text-blue-500 hover:text-blue-700"
               :href="mediaBasePath + '/' + previewMapLink + '?inline=true'"
