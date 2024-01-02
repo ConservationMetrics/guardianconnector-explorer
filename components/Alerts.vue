@@ -1,5 +1,6 @@
 <template>
   <div id="map">
+    <button v-if="!showSidebar" @click="resetToInitialState" class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2">Reset Dashboard</button>
     <FeaturePopup
       :all-data-geojson="data"
       :embed-media="embedMedia"
@@ -14,7 +15,7 @@
       :show-intro-panel="showIntroPanel"
       :download-alert="downloadAlert"
       :statistics="statistics"
-      @close="resetSelectedFeature"
+      @close="handleSidebarClose"
     />
   </div>
 </template>
@@ -59,18 +60,34 @@ export default {
   computed: {
   },
   methods: {
+    resetToInitialState() {
+      this.resetSelectedFeature();
+      this.addPulsingCircles();
+      this.showSidebar = true;
+      this.showIntroPanel = true;
+      this.downloadAlert = false;
+      this.imageUrl = [];
+      this.imageCaption = null;
+      this.previewMapLink = null;
+    },
+
+    handleSidebarClose() {
+      this.showSidebar = false;
+      this.resetSelectedFeature();
+    },
+
     resetSelectedFeature() {
+      if (!this.selectedFeatureId || !this.selectedFeatureSource) {
+        return
+      }
       this.map.setFeatureState(
         { source: this.selectedFeatureSource, id: this.selectedFeatureId },
         { selected: false }
       );
-
-      // Reset the component state
       this.selectedFeature = null;
       this.selectedFeatureGeojson = null;
       this.selectedFeatureId = null;
       this.selectedFeatureSource = null;
-      this.showSidebar = false;
     },
 
     calculateCentroid(coords) {
@@ -90,6 +107,7 @@ export default {
     },
 
     addPulsingCircles() {
+      // Wait until the map is loaded
       if (!this.map.isSourceLoaded('recent-alerts')) {
         this.map.once('idle', () => {
           this.addPulsingCircles();
@@ -349,16 +367,7 @@ export default {
       this.map.addControl(fullscreenControl, 'top-right');
     });
   },
-  
-
   beforeDestroy() {
-    // Remove event listeners
-    this.map.off('mousedown', this.removePulsingCircles);
-    this.map.off('touchstart', this.removePulsingCircles);
-    this.map.off('wheel', this.removePulsingCircles);
-    this.map.off('zoomstart', this.removePulsingCircles);
-    this.map.off('dragstart', this.removePulsingCircles);
-
     if (this.map) {
       this.map.remove();
     }
@@ -387,5 +396,12 @@ body {
   width: 100%;
   display: block;
   margin-top: 5px;
+}
+
+.reset-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
 }
 </style>
