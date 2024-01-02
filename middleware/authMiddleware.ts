@@ -8,9 +8,9 @@ interface CustomContext extends Context {
 
 const authMiddleware: Middleware = ({ app, $auth, redirect }) => {
   const AUTH_STRATEGY = process.env.NUXT_ENV_AUTH_STRATEGY ? process.env.NUXT_ENV_AUTH_STRATEGY.replace(/['"]+/g, '') : 'none';
-  if (AUTH_STRATEGY === 'auth0' && (!$auth.loggedIn || $auth.strategy.name !== 'auth0')) {
+  if (AUTH_STRATEGY === 'auth0' && !$auth.loggedIn) {
     return redirect('/login')
-  } else if (AUTH_STRATEGY === 'password' && (!$auth.loggedIn || $auth.strategy.name !== 'password')) {
+  } else if (AUTH_STRATEGY === 'password' && !$auth.loggedIn) {
     return redirect('/login')
   }
 }
