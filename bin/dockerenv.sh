@@ -28,13 +28,13 @@ while IFS= read -r line || [[ -n "$line" ]]; do
         # Replace multiple spaces with a single space
         line=$(echo $line | tr -s ' ')
         # Append the line without a newline
-        echo -n "$line" >> "$output_file"
+        echo -n "$line" | sed 's/[[:space:]]*$//' >> "$output_file"
         # Check for the end of the multi-line config
         if [[ $line =~ \}.*\'$ ]]; then
             inside_multiline_config=false
         fi
     else
         # Write normal lines to the output file
-        echo "$line" >> "$output_file"
+        echo "$line" | sed 's/[[:space:]]*$//' >> "$output_file"
     fi
 done < "$input_file"

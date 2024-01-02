@@ -50,7 +50,7 @@
         <div class="mb-2">
           <LineChart :data="chartData" />
         </div>
-        <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.recentAlertsDate }}</em></p>
+        <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.earliestAlertsDate }}</em></p>
       </div>
     </div>
     <div class="p-4" v-if="allDataGeojson">

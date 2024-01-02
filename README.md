@@ -1,6 +1,6 @@
 # GuardianConnector Views
 
-This is a [Nuxt](https://nuxt.com/) tool for GuardianConnector which builds an API from a SQLite or PostgreSQL database, and renders tabular data from one or more tables on different views including a map and a media gallery.
+This tool, designed for GuardianConnector and built using [Nuxt](https://nuxt.com/), offers an API compatible with SQLite or PostgreSQL databases, and renders tabular data from one or more tables on different views including a map and a media gallery.
 
 ## Configure
 
@@ -40,7 +40,7 @@ Add `--hostname 0.0.0.0` if you want the app to be accessible across your local 
 
 ## Deployment
 
-For deployment (e.g.) on Azure, the following additional env vars are needed:
+For deployment (e.g. on Azure), the following additional env vars are needed:
 
 ```
 HOST: 0.0.0.0
@@ -75,6 +75,8 @@ _Gallery view using sample KoboToolbox data._
 
 ### **Alerts (change detection)**
 
+![GuardianConnector Alerts with change detection data](docs/GuardianConnector-Alerts.jpg)
+_No data shown on map for proprietary reasons._
 
 ## How it works
 
@@ -90,7 +92,7 @@ Currently, GuardianConnector expects these column headers, which follow the stru
 | p\_\_...     | properties... |
 | p\_\_\_...     | properties.$... |
 
-If found, GuardianConnector Views will use the column mapping SQL table (with "__column" suffix) created by the `warehouse` component of [Frizzle](https://github.com/ConservationMetrics/frizzle) to handle filtering and key/value rewrites.
+If found, GuardianConnector Views will use a column mapping SQL table (with "__column" suffix), like the one created by the `warehouse` component of [Frizzle](https://github.com/ConservationMetrics/frizzle), to handle filtering and key/value rewrites.
 
  Any fields specified in the `.env` file will be filtered out (*see "Unwanted columns and substrings" above*).
 

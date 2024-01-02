@@ -456,7 +456,7 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   });
 
     // Find the earliest date
-  const earliestDateStr = formattedDates[0].dateString;
+  const earliestAlertsDate = formattedDates[0].dateString;
 
   // Find the most recent alert date
   const recentAlertDate = formattedDates.reduce(
@@ -483,7 +483,8 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
     territory,
     typeOfAlerts,
     dataProviders,
-    alertDetectionRange: `${earliestDateStr} to ${latestDateStr}`,
+    alertDetectionRange: `${earliestAlertsDate} to ${latestDateStr}`,
+    earliestAlertsDate: earliestAlertsDate,
     recentAlertsDate: recentAlertDate,
     recentAlertsNumber,
     alertsTotal,
