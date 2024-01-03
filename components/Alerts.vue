@@ -122,6 +122,10 @@ export default {
     },
 
     addPulsingCircles() {
+      if (document.querySelector('.pulsing-dot')) {
+        return;
+      }
+
       // Wait until the map has loaded recent-alerts
       if (!this.map.isSourceLoaded('recent-alerts')) {
         this.map.once('idle', () => {
