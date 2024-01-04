@@ -2,14 +2,14 @@
   <div class="button-container">
     <button
       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
-      @click="typeOfData === 'alert' ? downloadAlertCSV() : downloadAllCSV()"
+      @click="typeOfData === 'alert' ? downloadAlertCSV() : downloadCSVSelection()"
     >
       Download CSV
     </button>
     <button
       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
       @click="
-        typeOfData === 'alert' ? downloadAlertGeoJSON() : downloadAllGeoJSON()
+        typeOfData === 'alert' ? downloadAlertGeoJSON() : downloadGeoJSONSelection()
       "
     >
       Download GeoJSON
@@ -101,7 +101,7 @@ export default {
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
     },
-    downloadAllCSV() {
+    downloadCSVSelection() {
       if (
         !this.geojson ||
         !this.geojson.mostRecentAlerts ||
@@ -171,7 +171,7 @@ export default {
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
     },
-    downloadAllGeoJSON() {
+    downloadGeoJSONSelection() {
       if (
         !this.geojson ||
         !this.geojson.mostRecentAlerts ||

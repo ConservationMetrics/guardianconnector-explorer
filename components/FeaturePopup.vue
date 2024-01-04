@@ -4,7 +4,10 @@
     <AlertsIntroPanel 
       v-if="showIntroPanel"
       :statistics="statistics"
-      :allDataGeojson="allDataGeojson"
+      :show-slider="showSlider"
+      :date-options="dateOptions"
+      :geojson-selection="geojsonSelection"
+      @date-range-changed="$emit('date-range-changed', $event)"
     />
     <Feature
       v-if="feature"
@@ -34,7 +37,6 @@ import AlertsIntroPanel from "@/components/AlertsIntroPanel.vue";
 export default {
   components: { AlertsIntroPanel, Feature, Download },
   props: [
-    "allDataGeojson",
     "embedMedia",
     "previewMapLink",
     "mediaBasePath",
@@ -48,7 +50,10 @@ export default {
     "showSidebar",
     "downloadAlert",
     "showIntroPanel",
-    "statistics"
+    "showSlider",
+    "statistics",
+    "dateOptions",
+    "geojsonSelection",
   ],
   computed: {
     filteredFeature() {

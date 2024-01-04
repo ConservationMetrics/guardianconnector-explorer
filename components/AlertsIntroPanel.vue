@@ -1,14 +1,11 @@
 <template>
   <div>
+    <!-- Header and stats -->
     <div class="feature p-4 rounded-lg shadow-lg">
       <div class="mt-4">
         <h2 class="text-2xl font-semibold mb-2">
           Change detection alerts dashboard: {{ statistics.territory }}
         </h2>
-        <p class="text-l mb-2">
-          This dashboard shows alerts and statistics about change detection for
-          the selected territory.
-        </p>
         <p class="text-l mb-2">
           Most recent alerts shown on map in
           <span style="color: #ec00ff"><strong>purple</strong></span
@@ -44,54 +41,41 @@
         </div>
       </div>
     </div>
-    <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
-      <div class="mt-4">
-        <h3 class="text-2xl font-semibold mb-2">Alerts in the last 12 months</h3>
-        <div class="mb-2">
-          <LineChart :data="chartData" />
-        </div>
-        <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.earliestAlertsDate }}</em></p>
+    <!-- Slider -->
+    <div v-if="showSlider" class="feature p-4 rounded-lg shadow-lg">
+      <AlertSlider 
+        :date-options="dateOptions"     
+        @date-range-changed="$emit('date-range-changed', $event)"
+      />      
+      <div v-if="geojsonSelection">
+        <!-- Download -->
+        <Download 
+          :geojson="geojsonSelection" 
+          :type-of-data="'multiple-alerts'" 
+        />
       </div>
     </div>
-    <div class="p-4" v-if="allDataGeojson">
-      <h3 class="text-2xl font-semibold mb-2 text-center">Download all alerts</h3>
-      <Download 
-        :geojson="allDataGeojson" 
-        :type-of-data="'all'" 
-      />
+    <!-- Chart -->
+    <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
+      <AlertChart :statistics="statistics" />
     </div>
   </div>
 </template>
 
 <script>
 import Download from "@/components/Download.vue";
-import { Line as LineChart } from "vue-chartjs";
-import { Chart, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
-
-Chart.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
-
+import AlertSlider from "@/components/AlertSlider.vue";
+import AlertChart from "@/components/AlertChart.vue";
 
 export default {
-  props: ["statistics", "allDataGeojson"],
-  name: "LineChartComponent",
-  components: { Download, LineChart },
-  computed: {
-    chartData() {
-        return {
-        labels: Object.keys(this.statistics.hectaresPerMonth),
-        datasets: [
-          {
-            label: "Hectares affected",
-            data: Object.values(this.statistics.hectaresPerMonth),
-            borderColor: "#f87979",
-            backgroundColor: 'rgba(0, 0, 0, 0)',
-            pointBackgroundColor: "#f87979",
-            fill: false
-          },
-        ],
-      };
-    },
-  },
+  name: "AlertsIntroPanel",
+  props: [
+    "showSlider",
+    "statistics", 
+    "dateOptions", 
+    "geojsonSelection"
+  ],
+  components: { Download, AlertChart, AlertSlider },
 };
 </script>
 
