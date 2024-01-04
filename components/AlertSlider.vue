@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-4">
+  <div class="mt-4 mb-10">
     <h3 class="text-2xl font-semibold mb-2">Select an alert date range</h3>
     <div class="mb-6">
       <vue-slider
@@ -12,6 +12,7 @@
         :hide-label="true"
         :tooltip="'always'"
         :tooltipPlacement="'bottom'"
+        @drag-start="userInteracted = true"
       />
     </div>
   </div>
@@ -25,9 +26,11 @@ import "vue-slider-component/theme/default.css";
 export default {
   name: "AlertSlider",
   props: ["dateOptions"],
+  components: { VueSlider },
   data() {
     return {
       selectedRange: [],
+      userInteracted: false,
     };
   },
   created() {
@@ -38,7 +41,13 @@ export default {
       ];
     }
   },
-  components: { VueSlider },
+  watch: {
+    selectedRange(newRange) {
+      if (this.userInteracted) {
+        this.$emit('date-range-changed', newRange);
+      }
+    },
+  },
 };
 </script>
 

@@ -4,9 +4,10 @@
     <AlertsIntroPanel 
       v-if="showIntroPanel"
       :statistics="statistics"
-      :showSlider="showSlider"
-      :dateOptions="dateOptions"
-      :allDataGeojson="allDataGeojson"
+      :show-slider="showSlider"
+      :date-options="dateOptions"
+      :geojson-selection="geojsonSelection"
+      @date-range-changed="$emit('date-range-changed', $event)"
     />
     <Feature
       v-if="feature"
@@ -52,7 +53,7 @@ export default {
     "showSlider",
     "statistics",
     "dateOptions",
-    "allDataGeojson",
+    "geojsonSelection",
   ],
   computed: {
     filteredFeature() {

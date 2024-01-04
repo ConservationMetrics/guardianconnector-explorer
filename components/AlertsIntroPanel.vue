@@ -43,19 +43,21 @@
     </div>
     <!-- Slider -->
     <div v-if="showSlider" class="feature p-4 rounded-lg shadow-lg">
-      <AlertSlider :dateOptions="dateOptions" />
+      <AlertSlider 
+        :date-options="dateOptions"     
+        @date-range-changed="$emit('date-range-changed', $event)"
+      />      
+      <div v-if="geojsonSelection">
+        <!-- Download -->
+        <Download 
+          :geojson="geojsonSelection" 
+          :type-of-data="'multiple-alerts'" 
+        />
+      </div>
     </div>
     <!-- Chart -->
     <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
       <AlertChart :statistics="statistics" />
-    </div>
-    <!-- Download -->
-    <div class="p-4" v-if="allDataGeojson">
-      <h3 class="text-2xl font-semibold mb-2 text-center">Download all alerts</h3>
-      <Download 
-        :geojson="allDataGeojson" 
-        :type-of-data="'all'" 
-      />
     </div>
   </div>
 </template>
@@ -71,9 +73,9 @@ export default {
     "showSlider",
     "statistics", 
     "dateOptions", 
-    "allDataGeojson"
+    "geojsonSelection"
   ],
-  components: { Download, AlertChart, AlertSlider }
+  components: { Download, AlertChart, AlertSlider },
 };
 </script>
 
