@@ -394,6 +394,8 @@ export default {
         const last12Dates = dates.slice(-12);
         
         // Replace earlier dates with "Earlier"
+        // TODO: Ensure that any dates that are not in the last 12 are 
+        // being filtered correctly.
         dates = ["Earlier", ...last12Dates];
       }
       
