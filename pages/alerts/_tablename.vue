@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Alerts 
+    <AlertsDashboard 
       v-if="dataFetched"
       :data="alertsData"
       :statistics="statistics"
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import Alerts from "~/components/Alerts.vue";
+import AlertsDashboard from "~/components/AlertsDashboard.vue";
 
 export default {
   head() {
@@ -29,7 +29,7 @@ export default {
       title: 'GuardianConnector Views: Change Detection Alerts'
     }
   },
-  components: { Alerts },
+  components: { AlertsDashboard },
   async asyncData({ params, $axios, app }) {
     // Get the current table name from the route parameters
     const table = params.tablename;

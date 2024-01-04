@@ -43,17 +43,11 @@
     </div>
     <!-- Slider -->
     <div v-if="showSlider" class="feature p-4 rounded-lg shadow-lg">
-      <Slider :dateOptions="dateOptions" />
+      <AlertSlider :dateOptions="dateOptions" />
     </div>
     <!-- Chart -->
     <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
-      <div class="mt-4">
-        <h3 class="text-2xl font-semibold mb-2">Alerts in the last 12 months</h3>
-        <div class="mb-2">
-          <LineChart :data="chartData" />
-        </div>
-        <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.earliestAlertsDate }}</em></p>
-      </div>
+      <AlertChart :statistics="statistics" />
     </div>
     <!-- Download -->
     <div class="p-4" v-if="allDataGeojson">
@@ -68,13 +62,8 @@
 
 <script>
 import Download from "@/components/Download.vue";
-import Slider from "@/components/Slider.vue";
-
-import { Line as LineChart } from "vue-chartjs";
-import { Chart, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
-
-Chart.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
-
+import AlertSlider from "@/components/AlertSlider.vue";
+import AlertChart from "@/components/AlertChart.vue";
 
 export default {
   name: "AlertsIntroPanel",
@@ -84,24 +73,7 @@ export default {
     "dateOptions", 
     "allDataGeojson"
   ],
-  components: { Download, LineChart, },
-  computed: {
-    chartData() {
-        return {
-        labels: Object.keys(this.statistics.hectaresPerMonth),
-        datasets: [
-          {
-            label: "Hectares affected",
-            data: Object.values(this.statistics.hectaresPerMonth),
-            borderColor: "#f87979",
-            backgroundColor: 'rgba(0, 0, 0, 0)',
-            pointBackgroundColor: "#f87979",
-            fill: false
-          },
-        ],
-      };
-    },
-  }
+  components: { Download, AlertChart, AlertSlider }
 };
 </script>
 
