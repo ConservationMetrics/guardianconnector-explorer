@@ -4,6 +4,8 @@
     <AlertsIntroPanel 
       v-if="showIntroPanel"
       :statistics="statistics"
+      :showSlider="showSlider"
+      :dateOptions="dateOptions"
       :allDataGeojson="allDataGeojson"
     />
     <Feature
@@ -34,7 +36,6 @@ import AlertsIntroPanel from "@/components/AlertsIntroPanel.vue";
 export default {
   components: { AlertsIntroPanel, Feature, Download },
   props: [
-    "allDataGeojson",
     "embedMedia",
     "previewMapLink",
     "mediaBasePath",
@@ -48,7 +49,10 @@ export default {
     "showSidebar",
     "downloadAlert",
     "showIntroPanel",
-    "statistics"
+    "showSlider",
+    "statistics",
+    "dateOptions",
+    "allDataGeojson",
   ],
   computed: {
     filteredFeature() {

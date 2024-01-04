@@ -2,7 +2,6 @@
   <div id="map">
     <button v-if="!showSidebar" @click="resetToInitialState" class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2">Reset Dashboard</button>
     <FeaturePopup
-      :all-data-geojson="data"
       :embed-media="embedMedia"
       :feature="selectedFeature"
       :feature-geojson="selectedFeatureGeojson"
@@ -12,22 +11,13 @@
       :preview-map-link="previewMapLink"
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
+      :show-slider="showSlider"
       :show-intro-panel="showIntroPanel"
       :download-alert="downloadAlert"
       :statistics="statistics"
+      :date-options="dateOptions"
+      :all-data-geojson="data"
       @close="handleSidebarClose"
-    />
-    <vue-slider
-      class="date-slider rounded-lg shadow-lg"
-      v-model="dateOptions"
-      :data="dateOptions"
-      :value="dateOptions"
-      :contained="true"
-      :tooltip="'always'"
-      :tooltipPlacement="'bottom'"
-      :width="200"
-      :height="6"
-      :marks="dateOptions"
     />
   </div>
 </template>
@@ -61,6 +51,7 @@ export default {
     return {
       showSidebar: true,
       showIntroPanel: true,
+      showSlider: false,
       dateOptions: [],
       downloadAlert: false,
       selectedFeature: null,
@@ -210,15 +201,25 @@ export default {
 
     getDateOptions() {
       let dates = [];
-      dates.push('01-2024')
       this.data.mostRecentAlerts.features.forEach(feature => {
         dates.push(feature.properties["Month detected"]);
       });
       this.data.otherAlerts.features.forEach(feature => {
         dates.push(feature.properties["Month detected"]);
       });
+
       // Remove duplicates and sort
       dates = [...new Set(dates)].sort((a, b) => new Date(a.split('-')[1], a.split('-')[0]) - new Date(b.split('-')[1], b.split('-')[0]));
+
+      // Check if there are more than 12 dates
+      if (dates.length > 12) {
+        // Keep the last 12 dates
+        const last12Dates = dates.slice(-12);
+        
+        // Replace earlier dates with "Earlier"
+        dates = ["Earlier", ...last12Dates];
+      }
+      
       return dates;
     },
 
@@ -407,6 +408,7 @@ export default {
     });
 
     this.dateOptions = this.getDateOptions();
+    this.showSlider = true;
   },
   beforeDestroy() {
     if (this.map) {
@@ -446,12 +448,4 @@ body {
   z-index: 10;
 }
 
-.date-slider {
-  position: absolute;
-  top: 25px;
-  right: 60px;
-  z-index: 10;
-  background-color: white;
-  margin: 20px;
-}
 </style>

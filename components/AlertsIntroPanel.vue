@@ -1,14 +1,11 @@
 <template>
   <div>
+    <!-- Header and stats -->
     <div class="feature p-4 rounded-lg shadow-lg">
       <div class="mt-4">
         <h2 class="text-2xl font-semibold mb-2">
           Change detection alerts dashboard: {{ statistics.territory }}
         </h2>
-        <p class="text-l mb-2">
-          This dashboard shows alerts and statistics about change detection for
-          the selected territory.
-        </p>
         <p class="text-l mb-2">
           Most recent alerts shown on map in
           <span style="color: #ec00ff"><strong>purple</strong></span
@@ -44,6 +41,11 @@
         </div>
       </div>
     </div>
+    <!-- Slider -->
+    <div v-if="showSlider" class="feature p-4 rounded-lg shadow-lg">
+      <Slider :dateOptions="dateOptions" />
+    </div>
+    <!-- Chart -->
     <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
       <div class="mt-4">
         <h3 class="text-2xl font-semibold mb-2">Alerts in the last 12 months</h3>
@@ -53,6 +55,7 @@
         <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.earliestAlertsDate }}</em></p>
       </div>
     </div>
+    <!-- Download -->
     <div class="p-4" v-if="allDataGeojson">
       <h3 class="text-2xl font-semibold mb-2 text-center">Download all alerts</h3>
       <Download 
@@ -65,6 +68,8 @@
 
 <script>
 import Download from "@/components/Download.vue";
+import Slider from "@/components/Slider.vue";
+
 import { Line as LineChart } from "vue-chartjs";
 import { Chart, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
 
@@ -72,9 +77,14 @@ Chart.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale,
 
 
 export default {
-  props: ["statistics", "allDataGeojson"],
-  name: "LineChartComponent",
-  components: { Download, LineChart },
+  name: "AlertsIntroPanel",
+  props: [
+    "showSlider",
+    "statistics", 
+    "dateOptions", 
+    "allDataGeojson"
+  ],
+  components: { Download, LineChart, },
   computed: {
     chartData() {
         return {
@@ -91,7 +101,7 @@ export default {
         ],
       };
     },
-  },
+  }
 };
 </script>
 
