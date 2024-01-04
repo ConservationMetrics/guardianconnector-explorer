@@ -17,6 +17,18 @@
       :statistics="statistics"
       @close="handleSidebarClose"
     />
+    <vue-slider
+      class="date-slider rounded-lg shadow-lg"
+      v-model="dateOptions"
+      :data="dateOptions"
+      :value="dateOptions"
+      :contained="true"
+      :tooltip="'always'"
+      :tooltipPlacement="'bottom'"
+      :width="200"
+      :height="6"
+      :marks="dateOptions"
+    />
   </div>
 </template>
   
@@ -26,7 +38,9 @@ import bbox from '@turf/bbox';
 import FeaturePopup from "./FeaturePopup.vue";
 
 export default {
-  components: { FeaturePopup },
+  components: { 
+    FeaturePopup
+  },
   props: [
     "data",
     "embedMedia",
@@ -47,6 +61,7 @@ export default {
     return {
       showSidebar: true,
       showIntroPanel: true,
+      dateOptions: [],
       downloadAlert: false,
       selectedFeature: null,
       selectedFeatureGeojson: null,
@@ -191,6 +206,20 @@ export default {
 
     removePulsingCircles() {
       document.querySelectorAll('.pulsing-dot').forEach(el => el.remove());
+    },
+
+    getDateOptions() {
+      let dates = [];
+      dates.push('01-2024')
+      this.data.mostRecentAlerts.features.forEach(feature => {
+        dates.push(feature.properties["Month detected"]);
+      });
+      this.data.otherAlerts.features.forEach(feature => {
+        dates.push(feature.properties["Month detected"]);
+      });
+      // Remove duplicates and sort
+      dates = [...new Set(dates)].sort((a, b) => new Date(a.split('-')[1], a.split('-')[0]) - new Date(b.split('-')[1], b.split('-')[0]));
+      return dates;
     },
 
     addDataToMap() {
@@ -376,6 +405,8 @@ export default {
       const fullscreenControl = new mapboxgl.FullscreenControl();
       this.map.addControl(fullscreenControl, 'top-right');
     });
+
+    this.dateOptions = this.getDateOptions();
   },
   beforeDestroy() {
     if (this.map) {
@@ -413,5 +444,14 @@ body {
   top: 10px;
   left: 10px;
   z-index: 10;
+}
+
+.date-slider {
+  position: absolute;
+  top: 25px;
+  right: 60px;
+  z-index: 10;
+  background-color: white;
+  margin: 20px;
 }
 </style>
