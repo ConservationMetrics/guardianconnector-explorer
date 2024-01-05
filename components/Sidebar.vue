@@ -1,6 +1,7 @@
 <template>
-  <div v-if="showSidebar" class="sidebar">
-    <button class="close-btn" @click="$emit('close')">X</button>
+  <div v-if="showSidebar" class="sidebar" @scroll="handleScroll">
+   <div class="scroll-indicator" v-if="!scrolled">&#x2193;</div> 
+   <button class="close-btn" @click="$emit('close')">X</button>
     <AlertsIntroPanel 
       v-if="showIntroPanel"
       :statistics="statistics"
@@ -55,12 +56,40 @@ export default {
     "dateOptions",
     "geojsonSelection",
   ],
+
+  data() {
+    return {
+      scrolled: false,
+    };
+  },
+
+  methods: {
+    handleScroll(event) {
+      if (!this.scrolled && event.target.scrollTop > 0) {
+        this.scrolled = true;
+      }
+    },
+  },
+
   computed: {
     filteredFeature() {
       const { latitude, longitude, ...rest } = this.feature;
       return rest;
     },
   },
+  watch: {
+    // Show pulsing down arrow when sidebar has new feature or is opened anew
+    feature(newValue) {
+      if (newValue) {
+        this.scrolled = false;
+      }
+    },
+    showSidebar(newValue) {
+      if (newValue) {
+        this.scrolled = false;
+      }
+    }
+  }
 };
 </script>
 
@@ -76,6 +105,43 @@ export default {
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   z-index: 1000;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    height: 50%;
+    width: 100%;
+    bottom: 0;
+    top: auto;
+  }
+
+  .scroll-indicator {
+    display: block!important;
+  }
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 46px;
+  font-weight: bold;
+  color: #333;
+  animation: pulse 1s infinite;
+  display: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.2); /* Slightly larger */
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
 }
 
 .close-btn {

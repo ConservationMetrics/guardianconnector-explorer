@@ -1,7 +1,7 @@
 <template>
   <div id="map">
     <button v-if="!showSidebar" @click="resetToInitialState" class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2">Reset Dashboard</button>
-    <FeaturePopup
+    <Sidebar
       :embed-media="embedMedia"
       :feature="selectedFeature"
       :feature-geojson="selectedFeatureGeojson"
@@ -26,11 +26,11 @@
 <script>
 import mapboxgl from "mapbox-gl";
 import bbox from '@turf/bbox';
-import FeaturePopup from "./FeaturePopup.vue";
+import Sidebar from "./Sidebar.vue";
 
 export default {
   components: { 
-    FeaturePopup
+    Sidebar
   },
   props: [
     "data",
