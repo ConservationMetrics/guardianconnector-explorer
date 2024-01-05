@@ -77,10 +77,13 @@ export default {
       }
 
       const [start, end] = this.selectedDateRange;
+
+      const [startDate, endDate] = this.convertDates(start, end);
+
       const filterFeatures = (features) => {
         return features.filter(feature => {
-          const monthDetected = feature.properties["Month detected"];
-          return monthDetected >= start && monthDetected <= end;
+          const monthDetected = feature.properties["YYYYMM"];
+          return monthDetected >= startDate && monthDetected <= endDate;
         });
       };
 
@@ -390,6 +393,28 @@ export default {
       return dates;
     },
 
+    convertDates(start, end) {
+      // Convert "MM-YYYY" to "YYYYMM" for comparison
+      const convertToDate = (dateStr) => {
+        const [month, year] = dateStr.split('-').map(Number);
+        return (year * 100 + month).toString()
+         // Converts to YYYYMM format
+      };
+
+      if (start === "Earlier") {
+        start = this.statistics.earliestAlertsDate;
+      }
+
+      if (end === "Earlier") {
+        end = this.statistics.twelveMonthsBefore;
+      }
+
+      const startDate = convertToDate(start);
+      const endDate = convertToDate(end);
+
+      return [startDate, endDate];
+    },
+
     handleDateRangeChanged(newRange) {
       // Extract start and end dates from newRange
       let [start, end] = newRange;
@@ -402,15 +427,7 @@ export default {
         end = this.statistics.twelveMonthsBefore;
       }
 
-      // Convert "MM-YYYY" to "YYYYMM" for comparison
-      const convertToDate = (dateStr) => {
-        const [month, year] = dateStr.split('-').map(Number);
-        return (year * 100 + month).toString()
-         // Converts to YYYYMM format
-      };
-
-      const startDate = convertToDate(start);
-      const endDate = convertToDate(end);
+      const [startDate, endDate] = this.convertDates(start, end);
 
       // Update the 'recent-alerts' and 'alerts' layers to only show features within the selected date range
       this.$nextTick(() => {

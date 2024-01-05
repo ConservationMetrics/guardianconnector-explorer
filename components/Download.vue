@@ -107,8 +107,8 @@ export default {
     downloadCSVSelection() {
       if (
         !this.geojson ||
-        this.geojson.mostRecentAlerts.features.length <= 0 ||
-        this.geojson.otherAlerts.features.length <= 0
+        (this.geojson.mostRecentAlerts.features.length <= 0 &&
+        this.geojson.otherAlerts.features.length <= 0)
       ) {
         console.warn("No complete GeoJSON data available to download as CSV.");
         return;
@@ -178,8 +178,8 @@ export default {
     downloadGeoJSONSelection() {
       if (
         !this.geojson ||
-        this.geojson.mostRecentAlerts.features.length <= 0 ||
-        this.geojson.otherAlerts.features.length <= 0
+        (this.geojson.mostRecentAlerts.features.length <= 0 &&
+        this.geojson.otherAlerts.features.length <= 0)
       ) {
         console.warn("No complete GeoJSON data available to download.");
         return;
