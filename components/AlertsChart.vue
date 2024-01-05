@@ -21,7 +21,6 @@ export default {
   components: { LineChart },
   computed: {
     chartData() {
-        console.log(this.statistics);
         return {
         labels: Object.keys(this.statistics.hectaresPerMonth),
         datasets: [

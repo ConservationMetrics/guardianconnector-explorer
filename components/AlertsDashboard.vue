@@ -377,25 +377,13 @@ export default {
     },
 
     getDateOptions() {
-      let dates = [];
-      this.data.mostRecentAlerts.features.forEach(feature => {
-        dates.push(feature.properties["Month detected"]);
-      });
-      this.data.otherAlerts.features.forEach(feature => {
-        dates.push(feature.properties["Month detected"]);
-      });
-
-      // Remove duplicates and sort
-      dates = [...new Set(dates)].sort((a, b) => new Date(a.split('-')[1], a.split('-')[0]) - new Date(b.split('-')[1], b.split('-')[0]));
+      let dates = this.statistics.allDates;
 
       // Check if there are more than 12 dates
+      // Replace any earlier dates with "Earlier"
       if (dates.length > 12) {
-        // Keep the last 12 dates
         const last12Dates = dates.slice(-12);
         
-        // Replace earlier dates with "Earlier"
-        // TODO: Ensure that any dates that are not in the last 12 are 
-        // being filtered correctly.
         dates = ["Earlier", ...last12Dates];
       }
       
@@ -404,15 +392,33 @@ export default {
 
     handleDateRangeChanged(newRange) {
       // Extract start and end dates from newRange
-      const [start, end] = newRange;
+      let [start, end] = newRange;
+
+      if (start === "Earlier") {
+        start = this.statistics.earliestAlertsDate;
+      }
+
+      if (end === "Earlier") {
+        end = this.statistics.twelveMonthsBefore;
+      }
+
+      // Convert "MM-YYYY" to "YYYYMM" for comparison
+      const convertToDate = (dateStr) => {
+        const [month, year] = dateStr.split('-').map(Number);
+        return (year * 100 + month).toString()
+         // Converts to YYYYMM format
+      };
+
+      const startDate = convertToDate(start);
+      const endDate = convertToDate(end);
 
       // Update the 'recent-alerts' and 'alerts' layers to only show features within the selected date range
       this.$nextTick(() => {
         ['recent-alerts', 'alerts', 'recent-alerts-stroke', 'alerts-stroke'].forEach(layerId => {
           this.map.setFilter(layerId, [
             'all',
-            ['>=', ['get', 'Month detected'], start],
-            ['<=', ['get', 'Month detected'], end]
+            ['>=', ['get', 'YYYYMM'], startDate],
+            ['<=', ['get', 'YYYYMM'], endDate]
           ]);
         });
 

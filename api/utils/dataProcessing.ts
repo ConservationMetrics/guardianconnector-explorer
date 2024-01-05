@@ -319,73 +319,27 @@ const prepareChangeDetectionData = (
   let latestDate = new Date(0);
   let latestMonthStr = "";
 
-  // Determine the most recent month
-  data.forEach((item) => {
-    const monthYearStr = `${item.month_detec}-${item.year_detec}`;
-    const date = new Date(item.year_detec, item.month_detec - 1);
-    if (date > latestDate) {
-      latestDate = date;
-      latestMonthStr = monthYearStr;
-    }
-  });
 
   const mostRecentAlerts: Array<Record<string, any>> = [];
   const otherAlerts: Array<Record<string, any>> = [];
 
   data.forEach((item) => {
-    const transformedItem: Record<string, any> = {};
+    // Prepend 0 to single-digit months, if found
+    const formattedMonth = item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
 
-    // Keep fields starting with 'g__'
-    Object.keys(item).forEach((key) => {
-      if (key.startsWith("g__")) {
-        transformedItem[key] = item[key];
-      }
-    });
+    const monthYearStr = `${formattedMonth}-${item.year_detec}`;
+    const date = new Date(item.year_detec, formattedMonth - 1);
 
-    // To rewrite the satellite prefix field
-    const satelliteLookup: { [key: string]: string } = {
-      S1: "Sentinel-1",
-      S2: "Sentinel-2",
-      PS: "Planetscope",
-      L8: "Landsat 8",
-      L9: "Landsat 9",
-      WV1: "WorldView-1",
-      WV2: "WorldView-2",
-      WV3: "WorldView-3",
-      WV4: "WorldView-4",
-      IK: "IKONOS",
-    };
-
-    // Include only the transformed fields
-
-    transformedItem["Territory"] = capitalizeFirstLetter(item.territory_name ?? "");
-    transformedItem["Alert ID"] = item._id;
-    transformedItem["Alert detection range"] = `${item.date_start_t1} to ${item.date_end_t1}`;
-    transformedItem["Month detected"] = `${item.month_detec}-${item.year_detec}`;
-    transformedItem["Data provider"] = capitalizeFirstLetter(`${item._topic}`);
-    transformedItem["Alert type"] = item.alert_type?.replace(/_/g, " ") ?? "";
-    transformedItem["Alert area (hectares)"] =
-      typeof item.area_alert_ha === "number"
-        ? item.area_alert_ha.toFixed(2)
-        : item.area_alert_ha;
-    transformedItem["Satellite used for detection"] =
-      satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
-      
-    if (embedMedia) {
-      transformedItem[
-        "image_url"
-      ] = `alerts/${item.territory_id}/${item.year_detec}/${item.month_detec}/${item._id}/resources/output_t1.jpg`;
-      transformedItem["image_caption"] =
-        satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
+    // Update latest date and month string
+    if (date > latestDate) {
+      latestDate = date;
+      latestMonthStr = monthYearStr;
     }
-    if (linkToGCCDResources) {
-      transformedItem[
-        "preview_link"
-      ] = `alerts/${item.territory_id}/${item.year_detec}/${item.month_detec}/${item._id}/output.html`;
-    }
+
+    const transformedItem = transformItem(item, formattedMonth, embedMedia, linkToGCCDResources);
 
     // Segregate data based on the latest month detected
-    if (transformedItem["Month detected"] === latestMonthStr) {
+    if (monthYearStr === latestMonthStr) {
       mostRecentAlerts.push(transformedItem);
     } else {
       otherAlerts.push(transformedItem);
@@ -394,6 +348,62 @@ const prepareChangeDetectionData = (
 
   return { mostRecentAlerts, otherAlerts };
 };
+
+function transformItem(item: Record<string, any>, formattedMonth: string, embedMedia: boolean, linkToGCCDResources: boolean,): Record<string, any> {
+  const transformedItem: Record<string, any> = {};
+    
+  // Keep fields starting with 'g__'
+  Object.keys(item).forEach((key) => {
+    if (key.startsWith("g__")) {
+      transformedItem[key] = item[key];
+    }
+  });
+
+  // To rewrite the satellite prefix field
+  const satelliteLookup: { [key: string]: string } = {
+    S1: "Sentinel-1",
+    S2: "Sentinel-2",
+    PS: "Planetscope",
+    L8: "Landsat 8",
+    L9: "Landsat 9",
+    WV1: "WorldView-1",
+    WV2: "WorldView-2",
+    WV3: "WorldView-3",
+    WV4: "WorldView-4",
+    IK: "IKONOS",
+  };
+
+  // Include only the transformed fields
+
+  transformedItem["Territory"] = capitalizeFirstLetter(item.territory_name ?? "");
+  transformedItem["Alert ID"] = item._id;
+  transformedItem["Alert detection range"] = `${item.date_start_t1} to ${item.date_end_t1}`;
+  transformedItem["Month detected"] = `${formattedMonth}-${item.year_detec}`;
+  transformedItem["YYYYMM"] = `${item.year_detec}${formattedMonth}`;
+  transformedItem["Data provider"] = capitalizeFirstLetter(`${item._topic}`);
+  transformedItem["Alert type"] = item.alert_type?.replace(/_/g, " ") ?? "";
+  transformedItem["Alert area (hectares)"] =
+    typeof item.area_alert_ha === "number"
+      ? item.area_alert_ha.toFixed(2)
+      : item.area_alert_ha;
+  transformedItem["Satellite used for detection"] =
+    satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
+    
+  if (embedMedia) {
+    transformedItem[
+      "image_url"
+    ] = `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/resources/output_t1.jpg`;
+    transformedItem["image_caption"] =
+      satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
+  }
+  if (linkToGCCDResources) {
+    transformedItem[
+      "preview_link"
+    ] = `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/output.html`;
+  }
+
+  return transformedItem;
+}
 
 interface AlertRecord {
   territory_name: string;
@@ -408,6 +418,7 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   const territory =
     data[0].territory_name.charAt(0).toUpperCase() +
     data[0].territory_name.slice(1);
+
   const typeOfAlerts = Array.from(
     new Set(data.map((item) => item.alert_type.replace(/_/g, " ")))
   );
@@ -431,21 +442,26 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   const latestDate = formattedDates[formattedDates.length - 1].date;
   const latestDateStr = formattedDates[formattedDates.length - 1].dateString;
 
+  // Create an array of all dates
+  const allDates = Array.from(new Set(formattedDates.map((item) => item.dateString)));
+
   // Determine the date 12 months before the latest date
-  const twelveMonthsAgo = new Date(latestDate);
-  twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
+  let twelveMonthsBefore = new Date(latestDate);
+  twelveMonthsBefore.setFullYear(twelveMonthsBefore.getFullYear() - 1);
 
   // Filter and sort the data for the last 12 months
   const last12MonthsData = data.filter((item) => {
     const itemDate = new Date(
       `${item.year_detec}-${item.month_detec.padStart(2, "0")}-01`
     );
-    return itemDate >= twelveMonthsAgo && itemDate <= latestDate;
+    return itemDate >= twelveMonthsBefore && itemDate <= latestDate;
   }).sort((a, b) => {
     const aDate = new Date(`${a.year_detec}-${a.month_detec.padStart(2, "0")}`);
     const bDate = new Date(`${b.year_detec}-${b.month_detec.padStart(2, "0")}`);
     return aDate.getTime() - bDate.getTime();
-  });;
+  });
+
+  const twelveMonthsBeforeStr = `${twelveMonthsBefore.getMonth() + 1}-${twelveMonthsBefore.getFullYear()}`;
 
   // Calculate hectares per month for the last 12 months
   const hectaresPerMonth: Record<string, number> = {};
@@ -488,12 +504,14 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
     typeOfAlerts,
     dataProviders,
     alertDetectionRange: `${earliestAlertsDate} to ${latestDateStr}`,
+    allDates,
     earliestAlertsDate: earliestAlertsDate,
     recentAlertsDate: recentAlertDate,
     recentAlertsNumber,
     alertsTotal,
     hectaresTotal,
     hectaresPerMonth,
+    twelveMonthsBefore: twelveMonthsBeforeStr,
   };
 };
 
