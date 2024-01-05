@@ -319,23 +319,28 @@ const prepareChangeDetectionData = (
   let latestDate = new Date(0);
   let latestMonthStr = "";
 
+  // First pass to find the latest date
+  data.forEach((item) => {
+    const formattedMonth = item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
+    const monthYearStr = `${formattedMonth}-${item.year_detec}`;
+    const date = new Date(item.year_detec, formattedMonth - 1);
+
+    if (date > latestDate) {
+      latestDate = date;
+      latestMonthStr = monthYearStr;
+    }
+  });
 
   const mostRecentAlerts: Array<Record<string, any>> = [];
   const otherAlerts: Array<Record<string, any>> = [];
 
+  // Second pass to segregate the data
   data.forEach((item) => {
     // Prepend 0 to single-digit months, if found
     const formattedMonth = item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
 
     const monthYearStr = `${formattedMonth}-${item.year_detec}`;
-    const date = new Date(item.year_detec, formattedMonth - 1);
-
-    // Update latest date and month string
-    if (date > latestDate) {
-      latestDate = date;
-      latestMonthStr = monthYearStr;
-    }
-
+   
     const transformedItem = transformItem(item, formattedMonth, embedMedia, linkToGCCDResources);
 
     // Segregate data based on the latest month detected
