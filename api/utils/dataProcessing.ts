@@ -435,13 +435,17 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   const twelveMonthsAgo = new Date(latestDate);
   twelveMonthsAgo.setFullYear(twelveMonthsAgo.getFullYear() - 1);
 
-  // Filter the data for the last 12 months
+  // Filter and sort the data for the last 12 months
   const last12MonthsData = data.filter((item) => {
     const itemDate = new Date(
       `${item.year_detec}-${item.month_detec.padStart(2, "0")}-01`
     );
     return itemDate >= twelveMonthsAgo && itemDate <= latestDate;
-  });
+  }).sort((a, b) => {
+    const aDate = new Date(`${a.year_detec}-${a.month_detec.padStart(2, "0")}`);
+    const bDate = new Date(`${b.year_detec}-${b.month_detec.padStart(2, "0")}`);
+    return aDate.getTime() - bDate.getTime();
+  });;
 
   // Calculate hectares per month for the last 12 months
   const hectaresPerMonth: Record<string, number> = {};
