@@ -40,6 +40,7 @@ export default {
       ] = `[${properties["Geographic centroid"]}]`;
       const coordinates = JSON.stringify(geometry.coordinates);
       delete flattened["coordinates"];
+      delete flattened["YYYYMM"];
 
       // Generate CSV data
       const csvColumns = Object.keys(flattened);
@@ -86,6 +87,8 @@ export default {
         return;
       }
 
+      delete this.geojson.properties["YYYYMM"];
+
       const filename = `${this.geojson.properties["Alert ID"]}.geojson`;
       const jsonStr = JSON.stringify(this.geojson, null, 2);
       const blob = new Blob([jsonStr], { type: "application/json" });
@@ -104,10 +107,10 @@ export default {
     downloadCSVSelection() {
       if (
         !this.geojson ||
-        !this.geojson.mostRecentAlerts ||
-        !this.geojson.otherAlerts
+        this.geojson.mostRecentAlerts.features.length <= 0 ||
+        this.geojson.otherAlerts.features.length <= 0
       ) {
-        console.error("No complete GeoJSON data available to download as CSV.");
+        console.warn("No complete GeoJSON data available to download as CSV.");
         return;
       }
 
@@ -129,6 +132,7 @@ export default {
         delete flattened['image_url'];
         delete flattened['image_caption'];
         delete flattened['preview_link'];
+        delete flattened["YYYYMM"];
 
         // Handle coordinates and other properties that need special formatting
         const coordinates = JSON.stringify(geometry.coordinates);
@@ -174,10 +178,10 @@ export default {
     downloadGeoJSONSelection() {
       if (
         !this.geojson ||
-        !this.geojson.mostRecentAlerts ||
-        !this.geojson.otherAlerts
+        this.geojson.mostRecentAlerts.features.length <= 0 ||
+        this.geojson.otherAlerts.features.length <= 0
       ) {
-        console.error("No complete GeoJSON data available to download.");
+        console.warn("No complete GeoJSON data available to download.");
         return;
       }
 
@@ -191,6 +195,7 @@ export default {
         delete feature.properties['image_url'];
         delete feature.properties['image_caption'];
         delete feature.properties['preview_link'];
+        delete feature.properties["YYYYMM"];
       });
 
       // Create a new FeatureCollection GeoJSON object
