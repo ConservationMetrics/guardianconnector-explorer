@@ -21,7 +21,8 @@
           value !== '' &&
           key.toLowerCase() !== 'uuid' &&
           !key.toLowerCase().includes('photo') &&
-          key.toLowerCase() !== 'audio'
+          key.toLowerCase() !== 'audio' &&
+          key.toLowerCase() !== 'yyyymm'
         "
         class="mb-2"
       >
