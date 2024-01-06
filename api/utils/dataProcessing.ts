@@ -467,18 +467,38 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   });
 
   const twelveMonthsBeforeStr = `${twelveMonthsBefore.getMonth() + 1}-${twelveMonthsBefore.getFullYear()}`;
+  
+  // Function to generate last 12 months
+  function getLast12Months() {
+    const months = [];
+    const currentDate = new Date();
+    for (let i = 0; i < 12; i++) {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const year = currentDate.getFullYear();
+      months.push(`${month}-${year}`);
+    }
+    return months;
+  }
 
-  // Calculate hectares per month for the last 12 months
-  const hectaresPerMonth: Record<string, number> = {};
-  last12MonthsData.forEach((item) => {
-    const monthYear = `${item.month_detec.padStart(2, "0")}-${item.year_detec}`;
-    const hectares = parseFloat(item.area_alert_ha);
-    hectaresPerMonth[monthYear] =
-      (hectaresPerMonth[monthYear] || 0) + (isNaN(hectares) ? 0 : hectares);
-      hectaresPerMonth[monthYear] = parseFloat(
-        hectaresPerMonth[monthYear].toFixed(2)
-    );
+  // Initialize hectaresPerMonth with last 12 months
+  type HectaresPerMonth = Record<string, number>;
+  const hectaresPerMonth: HectaresPerMonth = {};
+  getLast12Months().forEach(monthYear => {
+    hectaresPerMonth[monthYear] = 0;
   });
+
+  // Populate hectaresPerMonth with your data
+  last12MonthsData.forEach((item) => {
+    const monthYear: string = `${item.month_detec.padStart(2, "0")}-${item.year_detec}`;
+    if (hectaresPerMonth.hasOwnProperty(monthYear)) {
+      const hectares = parseFloat(item.area_alert_ha);
+      hectaresPerMonth[monthYear] += isNaN(hectares) ? 0 : hectares;
+      hectaresPerMonth[monthYear] = parseFloat(hectaresPerMonth[monthYear].toFixed(2));
+    }
+});
+
+  console.log(hectaresPerMonth)
 
     // Find the earliest date
   const earliestAlertsDate = formattedDates[0].dateString;
