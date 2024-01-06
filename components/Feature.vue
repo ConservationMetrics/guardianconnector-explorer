@@ -29,7 +29,8 @@
       <span v-if="key !== 'Geographic centroid'">{{ value }}</span>
       <span v-else>
         {{ value }} 
-        <a :href="'https://www.google.com/maps/search/' + value" target="_blank">(view on Google maps)</a>
+        <!-- guide on Google search URL construction here: https://developers.google.com/maps/documentation/urls/get-started-->
+        <a :href="'https://www.google.com/maps/search/?api=1&query=' + value" target="_blank">(view on Google maps)</a>
       </span>
       </div>
       <span v-if="previewMapLink">
