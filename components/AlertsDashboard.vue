@@ -212,6 +212,10 @@ export default {
             { selected: true }
           );
 
+          console.log(featureObject)
+
+          delete featureObject["YYYYMM"];
+
           // Update component state
           this.selectedFeature = featureObject;
           this.selectedFeatureGeojson = featureGeojson;

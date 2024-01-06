@@ -21,13 +21,16 @@
           value !== '' &&
           key.toLowerCase() !== 'uuid' &&
           !key.toLowerCase().includes('photo') &&
-          key.toLowerCase() !== 'audio' &&
-          key.toLowerCase() !== 'yyyymm'
+          key.toLowerCase() !== 'audio'
         "
         class="mb-2"
       >
-        <span class="font-bold">{{ key }}</span
-        >: <span>{{ value }}</span>
+      <span class="font-bold">{{ key }}</span>:
+      <span v-if="key !== 'Geographic centroid'">{{ value }}</span>
+      <span v-else>
+        {{ value }} 
+        <a :href="'https://www.google.com/maps/search/' + value" target="_blank">(view on Google maps)</a>
+      </span>
       </div>
       <span v-if="previewMapLink">
             <a
@@ -71,4 +74,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+a {
+  text-decoration: underline;
+}
+</style>
