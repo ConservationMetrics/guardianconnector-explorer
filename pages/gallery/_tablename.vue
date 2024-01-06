@@ -27,7 +27,8 @@ export default {
     }
   },
   components: { Gallery },
-  async asyncData({ params, $axios, app }) {
+  async asyncData({ params, $axios, app, redirect }) {
+
     // Get the current table name from the route parameters
     const table = params.tablename;
 
@@ -62,6 +63,7 @@ export default {
     } catch (error) {
       // Handle errors as appropriate
       console.error('Error fetching gallery data:', error);
+      redirect('/');
       // Return default data
       return {
         dataFetched: false

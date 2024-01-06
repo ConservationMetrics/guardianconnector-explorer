@@ -321,7 +321,8 @@ const prepareChangeDetectionData = (
 
   // First pass to find the latest date
   data.forEach((item) => {
-    const formattedMonth = item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
+    const formattedMonth =
+      item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
     const monthYearStr = `${formattedMonth}-${item.year_detec}`;
     const date = new Date(item.year_detec, formattedMonth - 1);
 
@@ -337,11 +338,17 @@ const prepareChangeDetectionData = (
   // Second pass to segregate the data
   data.forEach((item) => {
     // Prepend 0 to single-digit months, if found
-    const formattedMonth = item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
+    const formattedMonth =
+      item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
 
     const monthYearStr = `${formattedMonth}-${item.year_detec}`;
-   
-    const transformedItem = transformItem(item, formattedMonth, embedMedia, linkToGCCDResources);
+
+    const transformedItem = transformItem(
+      item,
+      formattedMonth,
+      embedMedia,
+      linkToGCCDResources
+    );
 
     // Segregate data based on the latest month detected
     if (monthYearStr === latestMonthStr) {
@@ -354,9 +361,14 @@ const prepareChangeDetectionData = (
   return { mostRecentAlerts, otherAlerts };
 };
 
-function transformItem(item: Record<string, any>, formattedMonth: string, embedMedia: boolean, linkToGCCDResources: boolean,): Record<string, any> {
+function transformItem(
+  item: Record<string, any>,
+  formattedMonth: string,
+  embedMedia: boolean,
+  linkToGCCDResources: boolean
+): Record<string, any> {
   const transformedItem: Record<string, any> = {};
-    
+
   // Keep fields starting with 'g__'
   Object.keys(item).forEach((key) => {
     if (key.startsWith("g__")) {
@@ -380,9 +392,13 @@ function transformItem(item: Record<string, any>, formattedMonth: string, embedM
 
   // Include only the transformed fields
 
-  transformedItem["Territory"] = capitalizeFirstLetter(item.territory_name ?? "");
+  transformedItem["Territory"] = capitalizeFirstLetter(
+    item.territory_name ?? ""
+  );
   transformedItem["Alert ID"] = item._id;
-  transformedItem["Alert detection range"] = `${item.date_start_t1} to ${item.date_end_t1}`;
+  transformedItem[
+    "Alert detection range"
+  ] = `${item.date_start_t1} to ${item.date_end_t1}`;
   transformedItem["Month detected"] = `${formattedMonth}-${item.year_detec}`;
   transformedItem["YYYYMM"] = `${item.year_detec}${formattedMonth}`;
   transformedItem["Data provider"] = capitalizeFirstLetter(`${item._topic}`);
@@ -393,7 +409,7 @@ function transformItem(item: Record<string, any>, formattedMonth: string, embedM
       : item.area_alert_ha;
   transformedItem["Satellite used for detection"] =
     satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
-    
+
   if (embedMedia) {
     transformedItem[
       "image_url"
@@ -430,9 +446,7 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
 
   const dataProviders = Array.from(
     new Set(data.map((item) => item._topic.replace(/_/g, " ")))
-  ).map((provider) => 
-    provider.replace(/\b\w/g, (char) => char.toUpperCase())
-  );
+  ).map((provider) => provider.replace(/\b\w/g, (char) => char.toUpperCase()));
 
   // Create Date objects for sorting and comparisons
   const formattedDates = data.map((item) => ({
@@ -448,33 +462,43 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   const latestDateStr = formattedDates[formattedDates.length - 1].dateString;
 
   // Create an array of all dates
-  const allDates = Array.from(new Set(formattedDates.map((item) => item.dateString)));
+  const allDates = Array.from(
+    new Set(formattedDates.map((item) => item.dateString))
+  );
 
   // Determine the date 12 months before the latest date
   let twelveMonthsBefore = new Date(latestDate);
   twelveMonthsBefore.setFullYear(twelveMonthsBefore.getFullYear() - 1);
 
   // Filter and sort the data for the last 12 months
-  const last12MonthsData = data.filter((item) => {
-    const itemDate = new Date(
-      `${item.year_detec}-${item.month_detec.padStart(2, "0")}-01`
-    );
-    return itemDate >= twelveMonthsBefore && itemDate <= latestDate;
-  }).sort((a, b) => {
-    const aDate = new Date(`${a.year_detec}-${a.month_detec.padStart(2, "0")}`);
-    const bDate = new Date(`${b.year_detec}-${b.month_detec.padStart(2, "0")}`);
-    return aDate.getTime() - bDate.getTime();
-  });
+  const last12MonthsData = data
+    .filter((item) => {
+      const itemDate = new Date(
+        `${item.year_detec}-${item.month_detec.padStart(2, "0")}-01`
+      );
+      return itemDate >= twelveMonthsBefore && itemDate <= latestDate;
+    })
+    .sort((a, b) => {
+      const aDate = new Date(
+        `${a.year_detec}-${a.month_detec.padStart(2, "0")}`
+      );
+      const bDate = new Date(
+        `${b.year_detec}-${b.month_detec.padStart(2, "0")}`
+      );
+      return aDate.getTime() - bDate.getTime();
+    });
 
-  const twelveMonthsBeforeStr = `${twelveMonthsBefore.getMonth() + 1}-${twelveMonthsBefore.getFullYear()}`;
-  
+  const twelveMonthsBeforeStr = `${
+    twelveMonthsBefore.getMonth() + 1
+  }-${twelveMonthsBefore.getFullYear()}`;
+
   // Function to generate last 12 months
   function getLast12Months() {
     const months = [];
     const currentDate = new Date();
     for (let i = 0; i < 12; i++) {
       currentDate.setMonth(currentDate.getMonth() - 1);
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+      const month = String(currentDate.getMonth() + 1).padStart(2, "0");
       const year = currentDate.getFullYear();
       months.push(`${month}-${year}`);
     }
@@ -484,23 +508,25 @@ const prepareStatistics = (data: AlertRecord[]): Record<string, any> => {
   // Initialize hectaresPerMonth with last 12 months
   type HectaresPerMonth = Record<string, number>;
   const hectaresPerMonth: HectaresPerMonth = {};
-  getLast12Months().forEach(monthYear => {
+  getLast12Months().forEach((monthYear) => {
     hectaresPerMonth[monthYear] = 0;
   });
 
   // Populate hectaresPerMonth with your data
   last12MonthsData.forEach((item) => {
-    const monthYear: string = `${item.month_detec.padStart(2, "0")}-${item.year_detec}`;
+    const monthYear: string = `${item.month_detec.padStart(2, "0")}-${
+      item.year_detec
+    }`;
     if (hectaresPerMonth.hasOwnProperty(monthYear)) {
       const hectares = parseFloat(item.area_alert_ha);
       hectaresPerMonth[monthYear] += isNaN(hectares) ? 0 : hectares;
-      hectaresPerMonth[monthYear] = parseFloat(hectaresPerMonth[monthYear].toFixed(2));
+      hectaresPerMonth[monthYear] = parseFloat(
+        hectaresPerMonth[monthYear].toFixed(2)
+      );
     }
-});
+  });
 
-  console.log(hectaresPerMonth)
-
-    // Find the earliest date
+  // Find the earliest date
   const earliestAlertsDate = formattedDates[0].dateString;
 
   // Find the most recent alert date
