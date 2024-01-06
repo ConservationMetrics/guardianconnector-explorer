@@ -212,8 +212,6 @@ export default {
             { selected: true }
           );
 
-          console.log(featureObject)
-
           delete featureObject["YYYYMM"];
 
           // Update component state
@@ -359,7 +357,7 @@ export default {
       styleSheet.innerText = styles;
       document.head.appendChild(styleSheet);
 
-      const features = this.map.queryRenderedFeatures({ layers: ['recent-alerts'] });
+      const features = this.map.querySourceFeatures('recent-alerts');
 
       features.forEach((feature) => {
         const bounds = bbox(feature);
@@ -443,7 +441,24 @@ export default {
           ]);
         });
 
+      // If 'recent-alerts' layer is empty, remove the pulsing circles. If not, add them.
+      const recentAlertsFeatures = this.map.querySourceFeatures('recent-alerts', {
+        sourceLayer: 'recent-alerts',
+        filter: [
+          'all',
+          ['>=', ['get', 'YYYYMM'], startDate],
+          ['<=', ['get', 'YYYYMM'], endDate]
+        ]
+      });
+
+      if (recentAlertsFeatures.length > 0) {
+        this.map.once('idle', () => {
+          this.addPulsingCircles();
+        });
+      } else {
         this.removePulsingCircles();
+      }
+
 
         // Update the selected date range
         this.selectedDateRange = newRange;
