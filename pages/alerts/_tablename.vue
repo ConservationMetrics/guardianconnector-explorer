@@ -16,6 +16,7 @@
       :mapbox-pitch="mapboxPitch"
       :mapbox-bearing="mapboxBearing"
       :mapbox3d="mapbox3d"
+      :map-legend-layers="mapLegendLayers"
     />
   </div>
 </template>
@@ -67,7 +68,8 @@ export default {
         mapboxZoom: response.mapboxZoom,
         mapboxPitch: response.mapboxPitch,
         mapboxBearing: response.mapboxBearing,
-        mapbox3d: response.mapbox3d
+        mapbox3d: response.mapbox3d,
+        mapLegendLayers: response.mapLegendLayers
       };
     } catch (error) {
       // Handle errors as appropriate

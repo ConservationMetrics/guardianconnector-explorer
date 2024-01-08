@@ -20,6 +20,10 @@
       @close="handleSidebarClose"
       @date-range-changed="handleDateRangeChanged"
     />
+    <MapLegend 
+      v-if="mapLegendLayers"
+      :map-legend-layers="mapLegendLayers"
+    />
   </div>
 </template>
   
@@ -27,10 +31,11 @@
 import mapboxgl from "mapbox-gl";
 import bbox from '@turf/bbox';
 import Sidebar from "./Sidebar.vue";
+import MapLegend from "./MapLegend.vue";
 
 export default {
   components: { 
-    Sidebar
+    Sidebar, MapLegend
   },
   props: [
     "data",
@@ -46,6 +51,7 @@ export default {
     "mapboxPitch",
     "mapboxBearing",
     "mapbox3d",
+    "mapLegendLayers",  
     "statistics"
   ],
   data() {

@@ -18,6 +18,10 @@
       :video-extensions="videoExtensions"
       @close="showSidebar = false"
     />
+    <MapLegend 
+      v-if="mapLegendLayers"
+      :map-legend-layers="mapLegendLayers"
+    />
   </div>
 </template>
 
@@ -25,10 +29,11 @@
 import mapboxgl from "mapbox-gl";
 import DataFilter from "@/components/DataFilter.vue";
 import Sidebar from "@/components/Sidebar.vue";
+import MapLegend from "@/components/MapLegend.vue";
 import getFilePathsWithExtension from "@/src/utils.ts";
 
 export default {
-  components: { DataFilter, Sidebar },
+  components: { DataFilter, Sidebar, MapLegend },
   props: [
     "data",
     "filterData",
@@ -47,6 +52,7 @@ export default {
     "mapboxPitch",
     "mapboxBearing",
     "mapbox3d",
+    "mapLegendLayers"
   ],
   data() {
     return {
