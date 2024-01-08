@@ -25,8 +25,13 @@
         "
         class="mb-2"
       >
-        <span class="font-bold">{{ key }}</span
-        >: <span>{{ value }}</span>
+      <span class="font-bold">{{ key }}</span>:
+      <span v-if="key !== 'Geographic centroid'">{{ value }}</span>
+      <span v-else>
+        {{ value }} 
+        <!-- guide on Google search URL construction here: https://developers.google.com/maps/documentation/urls/get-started-->
+        <a :href="'https://www.google.com/maps/search/?api=1&query=' + value" target="_blank">(view on Google maps)</a>
+      </span>
       </div>
       <span v-if="previewMapLink">
             <a
@@ -70,4 +75,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+a {
+  text-decoration: underline;
+}
+</style>

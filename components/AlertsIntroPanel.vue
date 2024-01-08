@@ -43,7 +43,7 @@
     </div>
     <!-- Slider -->
     <div v-if="showSlider" class="feature p-4 rounded-lg shadow-lg">
-      <AlertSlider 
+      <AlertsSlider 
         :date-options="dateOptions"     
         @date-range-changed="$emit('date-range-changed', $event)"
       />      
@@ -57,15 +57,15 @@
     </div>
     <!-- Chart -->
     <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
-      <AlertChart :statistics="statistics" />
+      <AlertsChart :statistics="statistics" />
     </div>
   </div>
 </template>
 
 <script>
 import Download from "@/components/Download.vue";
-import AlertSlider from "@/components/AlertSlider.vue";
-import AlertChart from "@/components/AlertChart.vue";
+import AlertsSlider from "@/components/AlertsSlider.vue";
+import AlertsChart from "@/components/AlertsChart.vue";
 
 export default {
   name: "AlertsIntroPanel",
@@ -75,7 +75,7 @@ export default {
     "dateOptions", 
     "geojsonSelection"
   ],
-  components: { Download, AlertChart, AlertSlider },
+  components: { Download, AlertsChart, AlertsSlider },
 };
 </script>
 

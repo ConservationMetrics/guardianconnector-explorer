@@ -4,7 +4,6 @@
         <div class="mb-2">
           <LineChart :data="chartData" />
         </div>
-        <p class="mb-2"><em>Note: this chart is showing data since {{ statistics.earliestAlertsDate }}</em></p>
     </div>
 </template>
   
@@ -15,7 +14,7 @@ import { Chart, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale
 Chart.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
   
 export default {
-  name: "AlertChart",
+  name: "AlertsChart",
   props: [
     "statistics"
   ],

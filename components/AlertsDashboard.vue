@@ -77,10 +77,13 @@ export default {
       }
 
       const [start, end] = this.selectedDateRange;
+
+      const [startDate, endDate] = this.convertDates(start, end);
+
       const filterFeatures = (features) => {
         return features.filter(feature => {
-          const monthDetected = feature.properties["Month detected"];
-          return monthDetected >= start && monthDetected <= end;
+          const monthDetected = feature.properties["YYYYMM"];
+          return monthDetected >= startDate && monthDetected <= endDate;
         });
       };
 
@@ -208,6 +211,8 @@ export default {
             { source: layerId, id: featureId },
             { selected: true }
           );
+
+          delete featureObject["YYYYMM"];
 
           // Update component state
           this.selectedFeature = featureObject;
@@ -352,7 +357,7 @@ export default {
       styleSheet.innerText = styles;
       document.head.appendChild(styleSheet);
 
-      const features = this.map.queryRenderedFeatures({ layers: ['recent-alerts'] });
+      const features = this.map.querySourceFeatures('recent-alerts');
 
       features.forEach((feature) => {
         const bounds = bbox(feature);
@@ -377,46 +382,83 @@ export default {
     },
 
     getDateOptions() {
-      let dates = [];
-      this.data.mostRecentAlerts.features.forEach(feature => {
-        dates.push(feature.properties["Month detected"]);
-      });
-      this.data.otherAlerts.features.forEach(feature => {
-        dates.push(feature.properties["Month detected"]);
-      });
-
-      // Remove duplicates and sort
-      dates = [...new Set(dates)].sort((a, b) => new Date(a.split('-')[1], a.split('-')[0]) - new Date(b.split('-')[1], b.split('-')[0]));
+      let dates = this.statistics.allDates;
 
       // Check if there are more than 12 dates
+      // Replace any earlier dates with "Earlier"
       if (dates.length > 12) {
-        // Keep the last 12 dates
         const last12Dates = dates.slice(-12);
         
-        // Replace earlier dates with "Earlier"
-        // TODO: Ensure that any dates that are not in the last 12 are 
-        // being filtered correctly.
         dates = ["Earlier", ...last12Dates];
       }
       
       return dates;
     },
 
+    convertDates(start, end) {
+      // Convert "MM-YYYY" to "YYYYMM" for comparison
+      const convertToDate = (dateStr) => {
+        const [month, year] = dateStr.split('-').map(Number);
+        return (year * 100 + month).toString()
+         // Converts to YYYYMM format
+      };
+
+      if (start === "Earlier") {
+        start = this.statistics.earliestAlertsDate;
+      }
+
+      if (end === "Earlier") {
+        end = this.statistics.twelveMonthsBefore;
+      }
+
+      const startDate = convertToDate(start);
+      const endDate = convertToDate(end);
+
+      return [startDate, endDate];
+    },
+
     handleDateRangeChanged(newRange) {
       // Extract start and end dates from newRange
-      const [start, end] = newRange;
+      let [start, end] = newRange;
+
+      if (start === "Earlier") {
+        start = this.statistics.earliestAlertsDate;
+      }
+
+      if (end === "Earlier") {
+        end = this.statistics.twelveMonthsBefore;
+      }
+
+      const [startDate, endDate] = this.convertDates(start, end);
 
       // Update the 'recent-alerts' and 'alerts' layers to only show features within the selected date range
       this.$nextTick(() => {
         ['recent-alerts', 'alerts', 'recent-alerts-stroke', 'alerts-stroke'].forEach(layerId => {
           this.map.setFilter(layerId, [
             'all',
-            ['>=', ['get', 'Month detected'], start],
-            ['<=', ['get', 'Month detected'], end]
+            ['>=', ['get', 'YYYYMM'], startDate],
+            ['<=', ['get', 'YYYYMM'], endDate]
           ]);
         });
 
+      // If 'recent-alerts' layer is empty, remove the pulsing circles. If not, add them.
+      const recentAlertsFeatures = this.map.querySourceFeatures('recent-alerts', {
+        sourceLayer: 'recent-alerts',
+        filter: [
+          'all',
+          ['>=', ['get', 'YYYYMM'], startDate],
+          ['<=', ['get', 'YYYYMM'], endDate]
+        ]
+      });
+
+      if (recentAlertsFeatures.length > 0) {
+        this.map.once('idle', () => {
+          this.addPulsingCircles();
+        });
+      } else {
         this.removePulsingCircles();
+      }
+
 
         // Update the selected date range
         this.selectedDateRange = newRange;
