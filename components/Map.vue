@@ -7,7 +7,7 @@
       :show-colored-dot="true"
       @filter="filter"
     />
-    <FeaturePopup
+    <Sidebar
       :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
       :file-paths="getFilePathsWithExtension(selectedFeature, allExtensions)"
@@ -24,11 +24,11 @@
 <script>
 import mapboxgl from "mapbox-gl";
 import DataFilter from "@/components/DataFilter.vue";
-import FeaturePopup from "@/components/FeaturePopup.vue";
+import Sidebar from "@/components/Sidebar.vue";
 import getFilePathsWithExtension from "@/src/utils.ts";
 
 export default {
-  components: { DataFilter, FeaturePopup },
+  components: { DataFilter, Sidebar },
   props: [
     "data",
     "filterData",
