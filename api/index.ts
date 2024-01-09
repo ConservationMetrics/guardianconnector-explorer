@@ -141,6 +141,7 @@ if (!VIEWS_CONFIG) {
             table: table,
             embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
             imageExtensions: imageExtensions, 
+            logoUrl: VIEWS[table].LOGO_URL,
             mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
             mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
             mapboxStyle: VIEWS[table].MAPBOX_STYLE, 

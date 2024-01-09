@@ -8,6 +8,7 @@
       :show-slider="showSlider"
       :date-options="dateOptions"
       :geojson-selection="geojsonSelection"
+      :logo-url="logoUrl"
       @date-range-changed="$emit('date-range-changed', $event)"
     />
     <Feature
@@ -50,6 +51,7 @@ export default {
     "videoExtensions",
     "showSidebar",
     "downloadAlert",
+    "logoUrl",
     "showIntroPanel",
     "showSlider",
     "statistics",

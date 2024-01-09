@@ -9,6 +9,7 @@
       :image-caption="imageCaption"
       :image-extensions="imageExtensions"
       :preview-map-link="previewMapLink"
+      :logo-url="logoUrl"
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
       :show-slider="showSlider"
@@ -44,6 +45,7 @@ export default {
     "data",
     "embedMedia",
     "imageExtensions",
+    "logoUrl",
     "mediaBasePath",
     "mapboxAccessToken",
     "mapboxStyle",

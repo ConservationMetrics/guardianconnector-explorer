@@ -32,6 +32,7 @@ interface ViewConfig {
   MAPBOX_3D: string;
   MAP_LEGEND_LAYER_IDS: string;
   LINK_TO_GCCD_RESOURCES: string;
+  LOGO_URL: string;
   UNWANTED_COLUMNS?: string;
   UNWANTED_SUBSTRINGS?: string;
 }

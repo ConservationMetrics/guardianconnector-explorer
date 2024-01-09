@@ -3,8 +3,14 @@
     <!-- Header and stats -->
     <div class="feature p-4 rounded-lg shadow-lg">
       <div class="mt-4">
+        <img
+          v-if="logoUrl"
+          :src="logoUrl"
+          class="w-auto mx-auto mb-4 max-h-25"
+          alt="Logo"
+        />
         <h2 class="text-2xl font-semibold mb-2">
-          Change detection alerts dashboard: {{ statistics.territory }}
+          Change detection alerts: {{ statistics.territory }} territory
         </h2>
         <p class="text-l mb-2">
           Most recent alerts shown on map in
@@ -70,6 +76,7 @@ import AlertsChart from "@/components/AlertsChart.vue";
 export default {
   name: "AlertsIntroPanel",
   props: [
+    "logoUrl",
     "showSlider",
     "statistics", 
     "dateOptions", 
