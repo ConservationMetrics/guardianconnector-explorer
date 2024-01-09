@@ -2,7 +2,7 @@
   <div>
     <!-- Header and stats -->
     <div class="feature p-4 rounded-lg shadow-lg">
-      <div class="mt-4">
+      <div>
         <img
           v-if="logoUrl"
           :src="logoUrl"
