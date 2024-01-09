@@ -72,6 +72,10 @@ Adjust the pitch and bearing for the Mapbox map view.
 
 Enable a 3D terrain layer in the Mapbox map.
 
+#### `MAP_LEGEND_LAYER_IDS` (optional)
+
+A comma-separated list of Mapbox layer ids to be rendered in an optional map legend component. In the component, the layer `type` and `color` will be used to set the legend symbol style (currently supported: fill, line, circle), and the layer `id` will be set as the legend description. Note that we are currently only supporting adding layers to the legend where the color is directly set and not across zoom / data range or with data conditions.
+
 #### `UNWANTED_COLUMNS` (optional) and `UNWANTED_SUBSTRINGS` (optional)
 
 List the exact column names (`UNWANTED_COLUMNS`) and/or columns containing specific substrings (`UNWANTED_SUBSTRINGS`) to be filtered out from data collection APIs. Useful for removing unnecessary metadata fields.

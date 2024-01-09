@@ -25,7 +25,6 @@ function getMapboxLayersForLegend(
 }
 
 export function prepareMapLegendLayers(map: mapboxgl.Map, mapLegendLayerIds: string | null): any[] | undefined {
-    console.log(mapLegendLayerIds)
     if (!mapLegendLayerIds || !map.isStyleLoaded()) {
         return;
     }
