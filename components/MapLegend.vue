@@ -1,14 +1,14 @@
 <template>
     <div class="map-legend feature p-4 rounded-lg shadow-lg" >
         <h2 class="text-2xl font-semibold mb-2">Map Legend</h2>
-        <p>{{ mapLegendLayers }}</p>
+        <p>{{ mapLegendContent }}</p>
             
     </div>
   </template>
   
   <script>
   export default {
-    props: ["mapLegendLayers"],
+    props: ["mapLegendContent"],
   };
   </script>
   

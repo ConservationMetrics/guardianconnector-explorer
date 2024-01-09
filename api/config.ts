@@ -30,7 +30,7 @@ interface ViewConfig {
   MAPBOX_PITCH: string;
   MAPBOX_BEARING: string;
   MAPBOX_3D: string;
-  MAP_LEGEND_LAYERS: string;
+  MAP_LEGEND_LAYER_IDS: string;
   LINK_TO_GCCD_RESOURCES: string;
   UNWANTED_COLUMNS?: string;
   UNWANTED_SUBSTRINGS?: string;

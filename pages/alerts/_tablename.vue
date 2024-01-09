@@ -16,7 +16,7 @@
       :mapbox-pitch="mapboxPitch"
       :mapbox-bearing="mapboxBearing"
       :mapbox3d="mapbox3d"
-      :map-legend-layers="mapLegendLayers"
+      :map-legend-layer-ids="mapLegendLayerIds"
     />
   </div>
 </template>
@@ -69,7 +69,7 @@ export default {
         mapboxPitch: response.mapboxPitch,
         mapboxBearing: response.mapboxBearing,
         mapbox3d: response.mapbox3d,
-        mapLegendLayers: response.mapLegendLayers
+        mapLegendLayerIds: response.mapLegendLayerIds
       };
     } catch (error) {
       // Handle errors as appropriate

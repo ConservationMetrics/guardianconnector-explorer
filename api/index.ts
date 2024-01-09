@@ -105,7 +105,7 @@ if (!VIEWS_CONFIG) {
             mapboxPitch: VIEWS[table].MAPBOX_PITCH, 
             mapboxBearing: VIEWS[table].MAPBOX_BEARING,
             mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
-            mapLegendLayers: VIEWS[table].MAP_LEGEND_LAYERS
+            mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS
           };
 
           res.json(response);
@@ -151,7 +151,7 @@ if (!VIEWS_CONFIG) {
             mapboxPitch: VIEWS[table].MAPBOX_PITCH, 
             mapboxBearing: VIEWS[table].MAPBOX_BEARING,
             mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
-            mapLegendLayers: VIEWS[table].MAP_LEGEND_LAYERS
+            mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS
           };
 
           res.json(response);

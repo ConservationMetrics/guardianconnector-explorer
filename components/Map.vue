@@ -19,18 +19,21 @@
       @close="showSidebar = false"
     />
     <MapLegend 
-      v-if="mapLegendLayers"
-      :map-legend-layers="mapLegendLayers"
+      v-if="mapLegendContent && map"
+      :map-legend-content="mapLegendContent"
     />
   </div>
 </template>
 
 <script>
 import mapboxgl from "mapbox-gl";
+
 import DataFilter from "@/components/DataFilter.vue";
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
-import getFilePathsWithExtension from "@/src/utils.ts";
+
+import { getFilePathsWithExtension } from "@/src/utils.ts";
+import { prepareMapLegendLayers } from "@/src/mapFunctions.ts";
 
 export default {
   components: { DataFilter, Sidebar, MapLegend },
@@ -52,10 +55,12 @@ export default {
     "mapboxPitch",
     "mapboxBearing",
     "mapbox3d",
-    "mapLegendLayers"
+    "mapLegendLayerIds"
   ],
   data() {
     return {
+      map: null,
+      mapLegendContent: null,
       showSidebar: false,
       selectedFeature: null,
       processedData: [],
@@ -180,6 +185,15 @@ export default {
         });
       });
     },
+
+    prepareMapLegendContent() {
+      if (!this.mapLegendLayerIds) {
+        return;
+      }
+      this.map.once('idle', () => {
+        this.mapLegendContent = prepareMapLegendLayers(this.map, this.mapLegendLayerIds);
+      });      
+    },
   },
   mounted() {
     mapboxgl.accessToken = this.mapboxAccessToken;
@@ -210,10 +224,11 @@ export default {
       }
 
       this.addDataToMap();
+      this.prepareMapLegendContent();
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
-      this.map.addControl(nav, 'bottom-right');
+      this.map.addControl(nav, 'top-right');
 
       // Scale Control
       const scale = new mapboxgl.ScaleControl({
@@ -224,7 +239,7 @@ export default {
 
       // Fullscreen Control
       const fullscreenControl = new mapboxgl.FullscreenControl();
-      this.map.addControl(fullscreenControl, 'bottom-right')
+      this.map.addControl(fullscreenControl, 'top-right')
     });
   },
   beforeDestroy() {

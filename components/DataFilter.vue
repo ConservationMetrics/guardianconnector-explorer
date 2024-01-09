@@ -87,7 +87,7 @@ export default {
 .filter-modal {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 50px;
   min-width: 325px;
   max-width: 600px;
   background: #f5f5f5;
