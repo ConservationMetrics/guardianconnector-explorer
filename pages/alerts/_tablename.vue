@@ -6,6 +6,7 @@
       :statistics="statistics"
       :image-extensions="imageExtensions"
       :embed-media="embedMedia"
+      :logo-url="logoUrl"
       :media-base-path="mediaBasePath"
       :mapbox-access-token="mapboxAccessToken"
       :mapbox-style="mapboxStyle"
@@ -59,6 +60,7 @@ export default {
         statistics: response.statistics,
         imageExtensions: response.imageExtensions,
         embedMedia: response.embedMedia,
+        logoUrl: response.logoUrl,
         mediaBasePath: response.mediaBasePath,
         mapboxAccessToken: response.mapboxAccessToken,
         mapboxStyle: response.mapboxStyle,
