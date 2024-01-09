@@ -28,7 +28,7 @@
 <script>
 import Feature from "@/components/Feature.vue";
 import DataFilter from "@/components/DataFilter.vue";
-import getFilePathsWithExtension from "@/src/utils.ts";
+import { getFilePathsWithExtension } from "@/src/utils.ts";
 
 export default {
   components: { Feature, DataFilter },

@@ -20,17 +20,25 @@
       @close="handleSidebarClose"
       @date-range-changed="handleDateRangeChanged"
     />
+    <MapLegend 
+      v-if="mapLegendContent && map"
+      :map-legend-content="mapLegendContent"
+    />
   </div>
 </template>
   
 <script>
 import mapboxgl from "mapbox-gl";
 import bbox from '@turf/bbox';
-import Sidebar from "./Sidebar.vue";
+
+import Sidebar from "@/components/Sidebar.vue";
+import MapLegend from "@/components/MapLegend.vue";
+
+import { prepareMapLegendLayers } from "@/src/mapFunctions.ts";
 
 export default {
   components: { 
-    Sidebar
+    Sidebar, MapLegend
   },
   props: [
     "data",
@@ -46,10 +54,13 @@ export default {
     "mapboxPitch",
     "mapboxBearing",
     "mapbox3d",
+    "mapLegendLayerIds",  
     "statistics"
   ],
   data() {
     return {
+      map: null,
+      mapLegendContent: null,
       showSidebar: true,
       showIntroPanel: true,
       showSlider: false,
@@ -97,7 +108,7 @@ export default {
           features: filterFeatures(this.data.otherAlerts.features)
         }
       };
-    }
+    },
   },
   methods: {
     addDataToMap() {
@@ -309,6 +320,15 @@ export default {
         return `${avgLat}, ${avgLng}`;
     },
 
+    prepareMapLegendContent() {
+      if (!this.mapLegendLayerIds) {
+        return;
+      }
+      this.map.once('idle', () => {
+        this.mapLegendContent = prepareMapLegendLayers(this.map, this.mapLegendLayerIds);
+      });      
+    },
+
     addPulsingCircles() {
       if (document.querySelector('.pulsing-dot')) {
         return;
@@ -492,6 +512,7 @@ export default {
 
       this.addDataToMap();
       this.addPulsingCircles();
+      this.prepareMapLegendContent();
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();

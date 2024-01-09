@@ -76,7 +76,7 @@ _Gallery view using sample KoboToolbox data._
 ### **Alerts (change detection)**
 
 ![GuardianConnector Alerts with change detection data](docs/GuardianConnector-Alerts.jpg)
-_No data shown on map for proprietary reasons._
+_Alerts dashboard view with fake alerts data._
 
 ## How it works
 
