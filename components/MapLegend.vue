@@ -3,7 +3,7 @@
     <h2 class="text-2xl font-semibold mb-2">Map Legend</h2>
     <div v-for="item in mapLegendContent" :key="item.id" class="legend-item">
       <div :class="['color-box', getTypeClass(item)]" :style="{ backgroundColor: item.color }"></div>
-      <span>{{ formatId(item.id) }}</span>
+      <span>{{ item.id }}</span>
     </div>
   </div>
 </template>
@@ -14,10 +14,6 @@ export default {
   methods: {
     getTypeClass(item) {
       return `${item.type}-box`;
-    },
-    formatId(id) {
-      return id.replace(/-/g, ' ')
-               .replace(/(^\w|\s\w)/g, m => m.toUpperCase());
     }
   }
 };

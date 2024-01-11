@@ -36,8 +36,13 @@ export function prepareMapLegendLayers(map: mapboxgl.Map, mapLegendLayerIds: str
       const layerId = layer.id;
       const layerType = layer.type;
       const layerColor = map.getPaintProperty(layerId, `${layerType}-color`);
+
+      const formattedId = layerId
+        .replace(/-/g, ' ')
+        .replace(/^\w/, m => m.toUpperCase());
+
       return {
-        id: layerId,
+        id: formattedId,
         type: layerType,
         color: layerColor
       };
