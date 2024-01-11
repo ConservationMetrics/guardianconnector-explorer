@@ -1,5 +1,6 @@
 <template>
-  <div id="map">
+  <div>
+    <div id="map"></div>
     <DataFilter
       v-if="filterData === true"
       :data="data"
