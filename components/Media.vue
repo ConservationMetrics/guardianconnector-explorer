@@ -13,8 +13,13 @@
           class="w-full h-auto rounded-lg"
           loading="lazy"
         />
-        <span v-if="imageCaption !== false "><center><em>{{ imageCaption }}</em></center></span>
       </a>
+      <div v-if="linkToAlertResources">
+        <center>
+          <span v-if="filePath.includes('t0.jpg')" class="italic">Before</span>
+          <span v-else-if="filePath.includes('t1.jpg')" class="italic">After</span>
+        </center>
+      </div>
     </div>
     <div v-if="isAudio" class="mb-4">
       <audio controls class="w-full" preload="none">
@@ -42,7 +47,7 @@ export default {
   props: [
     "mediaBasePath",
     "filePath",
-    "imageCaption",
+    "linkToAlertResources",
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",
@@ -74,4 +79,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

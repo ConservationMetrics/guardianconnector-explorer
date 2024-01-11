@@ -14,11 +14,10 @@
     <Feature
       v-if="feature"
       :embed-media="embedMedia"
-      :preview-map-link="previewMapLink"
-      :mediaBasePath="mediaBasePath"
-      :filePaths="filePaths"
+      :media-base-path="mediaBasePath"
+      :file-paths="filePaths"
       :feature="filteredFeature"
-      :image-caption="imageCaption"
+      :alert-resources="alertResources"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
@@ -40,17 +39,16 @@ export default {
   components: { AlertsIntroPanel, Feature, Download },
   props: [
     "embedMedia",
-    "previewMapLink",
     "mediaBasePath",
     "filePaths",
     "feature",
     "featureGeojson",
-    "imageCaption",
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",
     "showSidebar",
     "downloadAlert",
+    "alertResources",
     "logoUrl",
     "showIntroPanel",
     "showSlider",

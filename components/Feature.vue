@@ -1,17 +1,19 @@
 <template>
   <div class="feature p-4 rounded-lg shadow-lg">
     <!-- Conditional rendering depending on file extension -->
+    <div v-if="alertResources" :class="{ 'flex-container': alertResources }">
     <Media
-      v-if="embedMedia === true"
+      v-if="embedMedia"
       v-for="filePath in filePaths"
       :key="filePath"
       :mediaBasePath="mediaBasePath"
       :filePath="filePath"
-      :image-caption="imageCaption"
+      :link-to-alert-resources="alertResources"
       :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
     />
+    </div>
     <div class="mt-4">
       <div
         v-for="(value, key) in sortedFeature"
@@ -33,14 +35,6 @@
         <a :href="'https://www.google.com/maps/search/?api=1&query=' + value" target="_blank">(view on Google maps)</a>
       </span>
       </div>
-      <span v-if="previewMapLink">
-            <a
-              class="text-blue-500 hover:text-blue-700"
-              :href="mediaBasePath + '/' + previewMapLink + '?inline=true'"
-              target="_blank"
-              >Preview Map (not working yet)</a
-            >
-          </span>
     </div>
   </div>
 </template>
@@ -62,11 +56,10 @@ export default {
   },
   props: [
     "embedMedia",
-    "previewMapLink",
     "mediaBasePath",
     "filePaths",
     "feature",
-    "imageCaption",
+    "alertResources",
     "imageExtensions",
     "audioExtensions",
     "videoExtensions",
@@ -76,7 +69,16 @@ export default {
 </script>
 
 <style scoped>
-a {
-  text-decoration: underline;
-}
+  a {
+    text-decoration: underline;
+  }
+  .flex-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .flex-container > img {
+    flex: 1 0 45%;
+    max-width: calc(50% - 10px);
+  }
 </style>
