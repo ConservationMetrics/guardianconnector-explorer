@@ -69,20 +69,20 @@
 </template>
 
 <script>
-import Download from "@/components/Download.vue";
-import AlertsSlider from "@/components/AlertsSlider.vue";
 import AlertsChart from "@/components/AlertsChart.vue";
+import AlertsSlider from "@/components/AlertsSlider.vue";
+import Download from "@/components/Download.vue";
 
 export default {
   name: "AlertsIntroPanel",
   props: [
+    "dateOptions", 
+    "geojsonSelection",
     "logoUrl",
     "showSlider",
     "statistics", 
-    "dateOptions", 
-    "geojsonSelection"
   ],
-  components: { Download, AlertsChart, AlertsSlider },
+  components: { AlertsChart, AlertsSlider, Download },
 };
 </script>
 

@@ -13,34 +13,34 @@
     </div>
     <Feature
       v-for="(feature, index) in paginatedData"
-      :key="index"
-      :embed-media="embedMedia"
-      :file-paths="getFilePathsWithExtension(feature, allExtensions)"
-      :feature="feature"
-      :media-base-path="mediaBasePath"
-      :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
+      :embed-media="embedMedia"
+      :feature="feature"
+      :file-paths="getFilePathsWithExtension(feature, allExtensions)"
+      :image-extensions="imageExtensions"
+      :key="index"
+      :media-base-path="mediaBasePath"
       :video-extensions="videoExtensions"
     />
   </div>
 </template>
 
 <script>
-import Feature from "@/components/Feature.vue";
 import DataFilter from "@/components/DataFilter.vue";
+import Feature from "@/components/Feature.vue";
 import { getFilePathsWithExtension } from "@/src/utils.ts";
 
 export default {
-  components: { Feature, DataFilter },
+  components: { DataFilter, Feature },
   props: [
+    "audioExtensions",
     "data",
+    "embedMedia",
     "filterData",
     "filterField",
     "imageExtensions",
-    "audioExtensions",
-    "videoExtensions",
-    "embedMedia",
     "mediaBasePath",
+    "videoExtensions",
   ],
   data() {
     return {

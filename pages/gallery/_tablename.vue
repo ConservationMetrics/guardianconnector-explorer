@@ -2,14 +2,14 @@
   <div>
     <Gallery 
       v-if="embedMedia && dataFetched"
+      :audio-extensions="audioExtensions"
       :data="galleryData"
+      :embed-media="embedMedia"
       :filter-data="filterData"
       :filter-field="filterField"
       :image-extensions="imageExtensions"
-      :audio-extensions="audioExtensions"
-      :video-extensions="videoExtensions"
-      :embed-media="embedMedia"
       :media-base-path="mediaBasePath"
+      :video-extensions="videoExtensions"
     />
     <h3 v-if="!embedMedia && dataFetched">
       GuardianConnector Views Gallery is not available. Please activate media embedding.
@@ -50,15 +50,15 @@ export default {
 
       // Return the data to be merged with the component's data
       return {
+        audioExtensions: response.audioExtensions,
         dataFetched: true,
-        galleryData: response.data,
+        embedMedia: response.embedMedia,
         filterData: response.filterData,
         filterField: response.filterField,
+        galleryData: response.data,
         imageExtensions: response.imageExtensions,
-        audioExtensions: response.audioExtensions,
-        videoExtensions: response.videoExtensions,
-        embedMedia: response.embedMedia,
-        mediaBasePath: response.mediaBasePath
+        mediaBasePath: response.mediaBasePath,
+        videoExtensions: response.videoExtensions
       };
     } catch (error) {
       // Handle errors as appropriate

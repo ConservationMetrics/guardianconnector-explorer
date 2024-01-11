@@ -41,8 +41,8 @@ export default {
   props: ["data", "filterField", "showColoredDot"],
   data() {
     return {
-      selectedValue: [],
       defaultColor: "#ffffff",
+      selectedValue: [],
     };
   },
   computed: {

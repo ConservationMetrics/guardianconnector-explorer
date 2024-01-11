@@ -87,25 +87,25 @@ if (!VIEWS_CONFIG) {
           const processedGeoData = prepareMapData(transformedData, VIEWS[table].FRONT_END_FILTER_FIELD);
 
           const response = {
+            audioExtensions: audioExtensions, 
             data: processedGeoData, 
-            table: table,
+            embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
             filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
             filterField: VIEWS[table].FRONT_END_FILTER_FIELD,
             imageExtensions: imageExtensions, 
-            audioExtensions: audioExtensions, 
-            videoExtensions: videoExtensions, 
-            embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
-            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH, 
+            mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
+            mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
             mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
-            mapboxStyle: VIEWS[table].MAPBOX_STYLE, 
-            mapboxProjection: VIEWS[table].MAPBOX_PROJECTION, 
+            mapboxBearing: VIEWS[table].MAPBOX_BEARING,
             mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE, 
             mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE, 
-            mapboxZoom: VIEWS[table].MAPBOX_ZOOM, 
             mapboxPitch: VIEWS[table].MAPBOX_PITCH, 
-            mapboxBearing: VIEWS[table].MAPBOX_BEARING,
-            mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
-            mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS
+            mapboxProjection: VIEWS[table].MAPBOX_PROJECTION, 
+            mapboxStyle: VIEWS[table].MAPBOX_STYLE, 
+            mapboxZoom: VIEWS[table].MAPBOX_ZOOM, 
+            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH, 
+            table: table,
+            videoExtensions: videoExtensions
           };
 
           res.json(response);
@@ -136,24 +136,24 @@ if (!VIEWS_CONFIG) {
           };
 
           const response = {
+            alertResources: VIEWS[table].ALERT_RESOURCES === "YES",
             data: geojsonData, 
-            statistics: statistics,
-            table: table,
             embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
             imageExtensions: imageExtensions, 
-            alertResources: VIEWS[table].ALERT_RESOURCES === "YES",
             logoUrl: VIEWS[table].LOGO_URL,
-            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+            mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
+            mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
             mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
-            mapboxStyle: VIEWS[table].MAPBOX_STYLE, 
-            mapboxProjection: VIEWS[table].MAPBOX_PROJECTION, 
+            mapboxBearing: VIEWS[table].MAPBOX_BEARING,
             mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE, 
             mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE, 
-            mapboxZoom: VIEWS[table].MAPBOX_ZOOM, 
             mapboxPitch: VIEWS[table].MAPBOX_PITCH, 
-            mapboxBearing: VIEWS[table].MAPBOX_BEARING,
-            mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
-            mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS
+            mapboxProjection: VIEWS[table].MAPBOX_PROJECTION, 
+            mapboxStyle: VIEWS[table].MAPBOX_STYLE, 
+            mapboxZoom: VIEWS[table].MAPBOX_ZOOM, 
+            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+            statistics: statistics,
+            table: table
           };
 
           res.json(response);
@@ -178,15 +178,15 @@ if (!VIEWS_CONFIG) {
           const transformedData = transformSurveyData(dataWithFilesOnly)
 
           const response = {
+            audioExtensions: audioExtensions, 
             data: transformedData, 
-            table: table,
+            embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
             filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
             filterField: VIEWS[table].FRONT_END_FILTER_FIELD,
             imageExtensions: imageExtensions, 
-            audioExtensions: audioExtensions, 
-            videoExtensions: videoExtensions, 
-            embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
-            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH
+            mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+            table: table,
+            videoExtensions: videoExtensions
           };
 
           res.json(response);

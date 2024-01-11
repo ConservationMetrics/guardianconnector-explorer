@@ -61,6 +61,7 @@ const transformSurveyData = (
   return transformedData;
 };
 
+// Prepare data for the map view
 const prepareMapData = (
   transformedData: Array<Record<string, any>>,
   filterField: string | undefined
@@ -140,6 +141,7 @@ const prepareMapData = (
   return processedGeoData;
 };
 
+// Prepare data for the alerts view
 const prepareAlertData = (
   data: Array<Record<string, any>>,
   embedMedia: boolean
@@ -253,6 +255,7 @@ const prepareAlertData = (
   return { mostRecentAlerts, otherAlerts };
 };
 
+// Prepare statistics for the alerts view intro panel
 const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
   const territory =
     data[0].territory_name.charAt(0).toUpperCase() +
@@ -403,6 +406,7 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
   };
 };
 
+// Transform data to GeoJSON format
 const transformToGeojson = (
   inputArray: Array<{ [key: string]: any }>
 ): {

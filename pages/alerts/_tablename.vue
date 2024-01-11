@@ -2,23 +2,23 @@
   <div>
     <AlertsDashboard 
       v-if="dataFetched"
-      :data="alertsData"
-      :statistics="statistics"
-      :image-extensions="imageExtensions"
-      :embed-media="embedMedia"
       :alert-resources="alertResources"
+      :data="alertsData"
+      :embed-media="embedMedia"
+      :image-extensions="imageExtensions"
       :logo-url="logoUrl"
-      :media-base-path="mediaBasePath"
+      :map-legend-layer-ids="mapLegendLayerIds"
       :mapbox-access-token="mapboxAccessToken"
-      :mapbox-style="mapboxStyle"
-      :mapbox-projection="mapboxProjection"
+      :mapbox-bearing="mapboxBearing"
       :mapbox-latitude="mapboxLatitude"
       :mapbox-longitude="mapboxLongitude"
-      :mapbox-zoom="mapboxZoom"
       :mapbox-pitch="mapboxPitch"
-      :mapbox-bearing="mapboxBearing"
+      :mapbox-projection="mapboxProjection"
+      :mapbox-style="mapboxStyle"
+      :mapbox-zoom="mapboxZoom"
       :mapbox3d="mapbox3d"
-      :map-legend-layer-ids="mapLegendLayerIds"
+      :media-base-path="mediaBasePath"
+      :statistics="statistics"
     />
   </div>
 </template>
@@ -56,24 +56,24 @@ export default {
 
       // Return the data to be merged with the component's data
       return {
-        dataFetched: true,
-        alertsData: response.data,
-        statistics: response.statistics,
-        imageExtensions: response.imageExtensions,
-        embedMedia: response.embedMedia,
         alertResources: response.alertResources,
+        alertsData: response.data,
+        dataFetched: true,
+        embedMedia: response.embedMedia,
+        imageExtensions: response.imageExtensions,
         logoUrl: response.logoUrl,
-        mediaBasePath: response.mediaBasePath,
+        mapLegendLayerIds: response.mapLegendLayerIds,
+        mapbox3d: response.mapbox3d,
         mapboxAccessToken: response.mapboxAccessToken,
-        mapboxStyle: response.mapboxStyle,
-        mapboxProjection: response.mapboxProjection,
+        mapboxBearing: response.mapboxBearing,
         mapboxLatitude: response.mapboxLatitude,
         mapboxLongitude: response.mapboxLongitude,
-        mapboxZoom: response.mapboxZoom,
         mapboxPitch: response.mapboxPitch,
-        mapboxBearing: response.mapboxBearing,
-        mapbox3d: response.mapbox3d,
-        mapLegendLayerIds: response.mapLegendLayerIds
+        mapboxProjection: response.mapboxProjection,
+        mapboxStyle: response.mapboxStyle,
+        mapboxZoom: response.mapboxZoom,
+        mediaBasePath: response.mediaBasePath,
+        statistics: response.statistics
       };
     } catch (error) {
       // Handle errors as appropriate

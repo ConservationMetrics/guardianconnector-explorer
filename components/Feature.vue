@@ -5,12 +5,12 @@
     <Media
       v-if="embedMedia"
       v-for="filePath in filePaths"
+      :alert-resources="alertResources"
+      :audio-extensions="audioExtensions"
+      :filePath="filePath"
+      :image-extensions="imageExtensions"
       :key="filePath"
       :mediaBasePath="mediaBasePath"
-      :filePath="filePath"
-      :link-to-alert-resources="alertResources"
-      :image-extensions="imageExtensions"
-      :audio-extensions="audioExtensions"
       :video-extensions="videoExtensions"
     />
     </div>
@@ -55,13 +55,13 @@ export default {
     },
   },
   props: [
-    "embedMedia",
-    "mediaBasePath",
-    "filePaths",
-    "feature",
     "alertResources",
-    "imageExtensions",
     "audioExtensions",
+    "embedMedia",
+    "feature",
+    "filePaths",
+    "imageExtensions",
+    "mediaBasePath",
     "videoExtensions",
   ],
   methods: {},

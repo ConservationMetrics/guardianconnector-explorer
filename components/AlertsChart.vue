@@ -25,12 +25,12 @@ export default {
         labels: Object.keys(this.statistics.hectaresPerMonth),
         datasets: [
           {
-            label: "Hectares affected",
-            data: Object.values(this.statistics.hectaresPerMonth),
-            borderColor: "#f87979",
             backgroundColor: 'rgba(0, 0, 0, 0)',
-            pointBackgroundColor: "#f87979",
-            fill: false
+            borderColor: "#f87979",
+            data: Object.values(this.statistics.hectaresPerMonth),
+            fill: false,
+            label: "Hectares affected",
+            pointBackgroundColor: "#f87979"
           },
         ],
       };

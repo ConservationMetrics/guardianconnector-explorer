@@ -2,21 +2,21 @@
   <div id="map">
     <button v-if="!showSidebar" @click="resetToInitialState" class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2">Reset Dashboard</button>
     <Sidebar
-      :embed-media="embedMedia"
-      :feature="selectedFeature"
-      :feature-geojson="selectedFeatureGeojson"
-      :file-paths="imageUrl"
-      :image-extensions="imageExtensions"
       :alert-resources="alertResources"
+      :date-options="dateOptions"
+      :download-alert="downloadAlert"
+      :embed-media="embedMedia"
+      :feature-geojson="selectedFeatureGeojson"
+      :feature="selectedFeature"
+      :file-paths="imageUrl"
+      :geojson-selection="filteredData"
+      :image-extensions="imageExtensions"
       :logo-url="logoUrl"
       :media-base-path="mediaBasePath"      
+      :show-intro-panel="showIntroPanel"
       :show-sidebar="showSidebar"
       :show-slider="showSlider"
-      :show-intro-panel="showIntroPanel"
-      :download-alert="downloadAlert"
       :statistics="statistics"
-      :date-options="dateOptions"
-      :geojson-selection="filteredData"
       @close="handleSidebarClose"
       @date-range-changed="handleDateRangeChanged"
     />
@@ -41,39 +41,39 @@ export default {
     Sidebar, MapLegend
   },
   props: [
+    "alertResources",
     "data",
     "embedMedia",
     "imageExtensions",
-    "alertResources",
     "logoUrl",
-    "mediaBasePath",
+    "mapLegendLayerIds",  
+    "mapbox3d",
     "mapboxAccessToken",
-    "mapboxStyle",
-    "mapboxProjection",
+    "mapboxBearing",
     "mapboxLatitude",
     "mapboxLongitude",
-    "mapboxZoom",
     "mapboxPitch",
-    "mapboxBearing",
-    "mapbox3d",
-    "mapLegendLayerIds",  
+    "mapboxProjection",
+    "mapboxStyle",
+    "mapboxZoom",
+    "mediaBasePath",
     "statistics"
   ],
   data() {
     return {
-      map: null,
-      mapLegendContent: null,
-      showSidebar: true,
-      showIntroPanel: true,
-      showSlider: false,
       dateOptions: [],
       downloadAlert: false,
+      imageUrl: [],
+      map: null,
+      mapLegendContent: null,
       selectedDateRange: null,
       selectedFeature: null,
       selectedFeatureGeojson: null,
       selectedFeatureId: null,
       selectedFeatureSource: null,
-      imageUrl: []
+      showIntroPanel: true,
+      showSidebar: true,
+      showSlider: false,
     };
   },
   computed: {
@@ -249,65 +249,6 @@ export default {
       });
     },
 
-    resetToInitialState() {
-      this.resetSelectedFeature();
-      this.showSidebar = true;
-      this.showIntroPanel = true;
-      this.downloadAlert = false;
-      this.imageUrl = [];
-      this.imageCaption = null;
-      this.selectedDateRange = null;
-
-      // Reset the filters for the 'recent-alerts' and 'alerts' layers
-      ['recent-alerts', 'alerts', 'recent-alerts-stroke', 'alerts-stroke'].forEach(layerId => {
-        this.map.setFilter(layerId, null);
-      });
-
-      // Fly to the initial position
-      this.map.flyTo({
-        center: [this.mapboxLongitude || 0, this.mapboxLatitude || -15],
-        zoom: this.mapboxZoom || 2.5,
-        pitch: this.mapboxPitch || 0,
-        bearing: this.mapboxBearing || 0,
-      });
-
-      // Add pulsing circles after the map has finished flying 
-      // to the initial position. This is for reasons of user experience,
-      // as well as the fact that queryRenderedFeatures() will only return
-      // features that are visible in the browser viewport.)
-      this.map.once('idle', () => {
-        this.addPulsingCircles();
-      });
-    },
-
-    handleSidebarClose() {
-      this.showSidebar = false;
-      this.resetSelectedFeature();
-    },
-
-    resetSelectedFeature() {
-      if (!this.selectedFeatureId || !this.selectedFeatureSource) {
-        return
-      }
-      this.map.setFeatureState(
-        { source: this.selectedFeatureSource, id: this.selectedFeatureId },
-        { selected: false }
-      );
-      this.selectedFeature = null;
-      this.selectedFeatureGeojson = null;
-      this.selectedFeatureId = null;
-      this.selectedFeatureSource = null;
-    },
-
-    prepareMapLegendContent() {
-      if (!this.mapLegendLayerIds) {
-        return;
-      }
-      this.map.once('idle', () => {
-        this.mapLegendContent = prepareMapLegendLayers(this.map, this.mapLegendLayerIds);
-      });      
-    },
-
     addPulsingCircles() {
       if (document.querySelector('.pulsing-dot')) {
         return;
@@ -376,24 +317,6 @@ export default {
       });
     },
 
-    removePulsingCircles() {
-      document.querySelectorAll('.pulsing-dot').forEach(el => el.remove());
-    },
-
-    getDateOptions() {
-      let dates = this.statistics.allDates;
-
-      // Check if there are more than 12 dates
-      // Replace any earlier dates with "Earlier"
-      if (dates.length > 12) {
-        const last12Dates = dates.slice(-12);
-        
-        dates = ["Earlier", ...last12Dates];
-      }
-      
-      return dates;
-    },
-
     convertDates(start, end) {
       // Convert "MM-YYYY" to "YYYYMM" for comparison
       const convertToDate = (dateStr) => {
@@ -415,6 +338,20 @@ export default {
 
       return [startDate, endDate];
     },
+
+    getDateOptions() {
+      let dates = this.statistics.allDates;
+
+      // Check if there are more than 12 dates
+      // Replace any earlier dates with "Earlier"
+      if (dates.length > 12) {
+        const last12Dates = dates.slice(-12);
+        
+        dates = ["Earlier", ...last12Dates];
+      }
+      
+      return dates;
+    },    
 
     handleDateRangeChanged(newRange) {
       // Extract start and end dates from newRange
@@ -462,7 +399,70 @@ export default {
         // Update the selected date range
         this.selectedDateRange = newRange;
       });
+    },  
+
+    handleSidebarClose() {
+      this.showSidebar = false;
+      this.resetSelectedFeature();
     },
+
+    prepareMapLegendContent() {
+      if (!this.mapLegendLayerIds) {
+        return;
+      }
+      this.map.once('idle', () => {
+        this.mapLegendContent = prepareMapLegendLayers(this.map, this.mapLegendLayerIds);
+      });      
+    },    
+
+    removePulsingCircles() {
+      document.querySelectorAll('.pulsing-dot').forEach(el => el.remove());
+    },
+    
+    resetSelectedFeature() {
+      if (!this.selectedFeatureId || !this.selectedFeatureSource) {
+        return
+      }
+      this.map.setFeatureState(
+        { source: this.selectedFeatureSource, id: this.selectedFeatureId },
+        { selected: false }
+      );
+      this.selectedFeature = null;
+      this.selectedFeatureGeojson = null;
+      this.selectedFeatureId = null;
+      this.selectedFeatureSource = null;
+    },
+
+    resetToInitialState() {
+      this.resetSelectedFeature();
+      this.showSidebar = true;
+      this.showIntroPanel = true;
+      this.downloadAlert = false;
+      this.imageUrl = [];
+      this.imageCaption = null;
+      this.selectedDateRange = null;
+
+      // Reset the filters for the 'recent-alerts' and 'alerts' layers
+      ['recent-alerts', 'alerts', 'recent-alerts-stroke', 'alerts-stroke'].forEach(layerId => {
+        this.map.setFilter(layerId, null);
+      });
+
+      // Fly to the initial position
+      this.map.flyTo({
+        center: [this.mapboxLongitude || 0, this.mapboxLatitude || -15],
+        zoom: this.mapboxZoom || 2.5,
+        pitch: this.mapboxPitch || 0,
+        bearing: this.mapboxBearing || 0,
+      });
+
+      // Add pulsing circles after the map has finished flying 
+      // to the initial position. This is for reasons of user experience,
+      // as well as the fact that queryRenderedFeatures() will only return
+      // features that are visible in the browser viewport.)
+      this.map.once('idle', () => {
+        this.addPulsingCircles();
+      });
+    }
   },
   mounted() {
     mapboxgl.accessToken = this.mapboxAccessToken;
@@ -549,5 +549,4 @@ body {
   left: 10px;
   z-index: 10;
 }
-
 </style>

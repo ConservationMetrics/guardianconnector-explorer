@@ -14,11 +14,9 @@
           loading="lazy"
         />
       </a>
-      <div v-if="linkToAlertResources">
-        <center>
+      <div v-if="alertResources" class="text-center">
           <span v-if="filePath.includes('t0.jpg')" class="italic">Before</span>
           <span v-else-if="filePath.includes('t1.jpg')" class="italic">After</span>
-        </center>
       </div>
     </div>
     <div v-if="isAudio" class="mb-4">
@@ -45,36 +43,34 @@
 <script>
 export default {
   props: [
-    "mediaBasePath",
-    "filePath",
-    "linkToAlertResources",
-    "imageExtensions",
     "audioExtensions",
+    "filePath",
+    "imageExtensions",
+    "alertResources",
+    "mediaBasePath",
     "videoExtensions",
   ],
   computed: {
-    isImage() {
-      return this.checkExtension(this.imageExtensions);
-
-    },
     isAudio() {
       return this.checkExtension(this.audioExtensions);
-
+    },    
+    isImage() {
+      return this.checkExtension(this.imageExtensions);
     },
     isVideo() {
       return this.checkExtension(this.videoExtensions);
-
     },
   },
   methods: {
-    getExtension(filePath) {
-      return filePath.split(".").pop().toLowerCase();
-    },
     checkExtension(extensions) {
       if (!extensions) return false;
       const extension = this.getExtension(this.filePath);
       return extensions.includes(extension);
+    },    
+    getExtension(filePath) {
+      return filePath.split(".").pop().toLowerCase();
     },
+
   },
 };
 </script>

@@ -5,11 +5,11 @@
       <vue-slider
         class="date-slider"
         v-model="selectedRange"
-        :data="dateOptions"
         :contained="true"
+        :data="dateOptions"
         :height="8"
-        :marks="true"
         :hide-label="true"
+        :marks="true"
         :tooltip="'always'"
         :tooltipPlacement="'bottom'"
         @drag-start="userInteracted = true"

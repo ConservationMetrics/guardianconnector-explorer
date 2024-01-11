@@ -5,16 +5,16 @@
       :data="data"
       :filter-field="filterField"
       :show-colored-dot="true"
-      @filter="filter"
+      @filter="filterValues"
     />
     <Sidebar
-      :embed-media="embedMedia"
-      :media-base-path="mediaBasePath"
-      :file-paths="getFilePathsWithExtension(selectedFeature, allExtensions)"
-      :feature="selectedFeature"
-      :show-sidebar="showSidebar"
       :audio-extensions="audioExtensions"
+      :embed-media="embedMedia"
+      :feature="selectedFeature"
+      :file-paths="getFilePathsWithExtension(selectedFeature, allExtensions)"
       :image-extensions="imageExtensions"
+      :media-base-path="mediaBasePath"
+      :show-sidebar="showSidebar"
       :video-extensions="videoExtensions"
       @close="showSidebar = false"
     />
@@ -29,43 +29,43 @@
 import mapboxgl from "mapbox-gl";
 
 import DataFilter from "@/components/DataFilter.vue";
-import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
+import Sidebar from "@/components/Sidebar.vue";
 
 import { getFilePathsWithExtension } from "@/src/utils.ts";
 import { prepareMapLegendLayers } from "@/src/mapFunctions.ts";
 
 export default {
-  components: { DataFilter, Sidebar, MapLegend },
+  components: { DataFilter, MapLegend, Sidebar },
   props: [
+    "audioExtensions",
     "data",
+    "embedMedia",
     "filterData",
     "filterField",
     "imageExtensions",
-    "audioExtensions",
-    "videoExtensions",
-    "embedMedia",
-    "mediaBasePath",
+    "mapLegendLayerIds",
+    "mapbox3d",
     "mapboxAccessToken",
-    "mapboxStyle",
-    "mapboxProjection",
+    "mapboxBearing",
     "mapboxLatitude",
     "mapboxLongitude",
-    "mapboxZoom",
     "mapboxPitch",
-    "mapboxBearing",
-    "mapbox3d",
-    "mapLegendLayerIds"
+    "mapboxProjection",
+    "mapboxStyle",
+    "mapboxZoom",
+    "mediaBasePath",
+    "videoExtensions",
   ],
   data() {
     return {
+      colorMap: new Map(),
+      filteredData: [],
       map: null,
       mapLegendContent: null,
-      showSidebar: false,
-      selectedFeature: null,
       processedData: [],
-      filteredData: [],
-      colorMap: new Map(),
+      selectedFeature: null,
+      showSidebar: false,
     };
   },
   computed: {
@@ -78,18 +78,6 @@ export default {
     },
   },
   methods: {
-    filter(values) {
-      if (values.includes("null")) {
-        this.filteredData = [...this.processedData];
-      } else {
-        this.filteredData = this.processedData.filter((item) =>
-          values.includes(item[this.filterField])
-        );
-      }
-      this.addDataToMap(); // Call this method to update the map data
-    },
-
-    getFilePathsWithExtension: getFilePathsWithExtension,
 
     addDataToMap() {
       // Remove existing data layers from the map
@@ -185,6 +173,19 @@ export default {
         });
       });
     },
+
+    filterValues(values) {
+      if (values.includes("null")) {
+        this.filteredData = [...this.processedData];
+      } else {
+        this.filteredData = this.processedData.filter((item) =>
+          values.includes(item[this.filterField])
+        );
+      }
+      this.addDataToMap(); // Call this method to update the map data
+    },
+
+    getFilePathsWithExtension: getFilePathsWithExtension,
 
     prepareMapLegendContent() {
       if (!this.mapLegendLayerIds) {

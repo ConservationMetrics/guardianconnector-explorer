@@ -4,22 +4,22 @@
    <button class="close-btn" @click="$emit('close')">X</button>
     <AlertsIntroPanel 
       v-if="showIntroPanel"
-      :statistics="statistics"
-      :show-slider="showSlider"
       :date-options="dateOptions"
       :geojson-selection="geojsonSelection"
       :logo-url="logoUrl"
+      :show-slider="showSlider"
+      :statistics="statistics"
       @date-range-changed="$emit('date-range-changed', $event)"
     />
     <Feature
       v-if="feature"
-      :embed-media="embedMedia"
-      :media-base-path="mediaBasePath"
-      :file-paths="filePaths"
-      :feature="filteredFeature"
       :alert-resources="alertResources"
-      :image-extensions="imageExtensions"
       :audio-extensions="audioExtensions"
+      :embed-media="embedMedia"
+      :feature="filteredFeature"
+      :file-paths="filePaths"
+      :image-extensions="imageExtensions"
+      :media-base-path="mediaBasePath"
       :video-extensions="videoExtensions"
     />
     <Download 
@@ -31,30 +31,30 @@
 </template>
 
 <script>
-import Feature from "@/components/Feature.vue";
 import Download from "@/components/Download.vue";
+import Feature from "@/components/Feature.vue";
 import AlertsIntroPanel from "@/components/AlertsIntroPanel.vue";
 
 export default {
-  components: { AlertsIntroPanel, Feature, Download },
+  components: { AlertsIntroPanel, Download, Feature },
   props: [
+    "alertResources",
+    "audioExtensions",
+    "dateOptions",
+    "downloadAlert",
     "embedMedia",
-    "mediaBasePath",
-    "filePaths",
     "feature",
     "featureGeojson",
+    "filePaths",
+    "geojsonSelection",
     "imageExtensions",
-    "audioExtensions",
-    "videoExtensions",
-    "showSidebar",
-    "downloadAlert",
-    "alertResources",
     "logoUrl",
+    "mediaBasePath",
     "showIntroPanel",
+    "showSidebar",
     "showSlider",
     "statistics",
-    "dateOptions",
-    "geojsonSelection",
+    "videoExtensions",
   ],
 
   data() {
