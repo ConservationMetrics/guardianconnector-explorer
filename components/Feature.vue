@@ -1,7 +1,7 @@
 <template>
   <div class="feature p-4 rounded-lg shadow-lg">
     <!-- Conditional rendering depending on file extension -->
-    <div :class="{ 'flex-container': alertResources }">
+    <div v-if="alertResources" :class="{ 'flex-container': alertResources }">
     <Media
       v-if="embedMedia"
       v-for="filePath in filePaths"
