@@ -1,5 +1,5 @@
 import { AlertRecord } from "./types";
-import { capitalizeFirstLetter, getRandomColor } from "./helpers";
+import { capitalizeFirstLetter, getRandomColor, calculateCentroid } from "./helpers";
 
 // Transform survey data keys and values
 const transformSurveyData = (
@@ -193,6 +193,7 @@ const prepareAlertData = (
       typeof item.area_alert_ha === "number"
         ? item.area_alert_ha.toFixed(2)
         : item.area_alert_ha;
+    transformedItem["Geographic centroid"] = calculateCentroid(item.g__coordinates);
     transformedItem["Satellite used for detection"] =
       satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
 

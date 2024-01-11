@@ -206,7 +206,6 @@ export default {
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = e.features[0].properties;
-          featureObject["Geographic centroid"] = this.calculateCentroid(e.features[0].geometry.coordinates[0]);
 
           const featureGeojson = (({ type, geometry, properties }) => ({ type, geometry, properties }))(e.features[0]);
           const featureId = e.features[0].id;
@@ -304,22 +303,6 @@ export default {
       this.selectedFeatureGeojson = null;
       this.selectedFeatureId = null;
       this.selectedFeatureSource = null;
-    },
-
-    calculateCentroid(coords) {
-        let totalLat = 0;
-        let totalLng = 0;
-        const numCoords = coords.length;
-
-        coords.forEach(coord => {
-            totalLng += coord[0];
-            totalLat += coord[1];
-        });
-
-        const avgLng = (totalLng / numCoords).toFixed(6);
-        const avgLat = (totalLat / numCoords).toFixed(6);
-
-        return `${avgLat}, ${avgLng}`;
     },
 
     prepareMapLegendContent() {

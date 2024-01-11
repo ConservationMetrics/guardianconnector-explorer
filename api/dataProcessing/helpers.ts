@@ -42,3 +42,34 @@ export const hasValidCoordinates = (obj: Record<string, any>): boolean => {
     return false;
   });
 };
+
+export const calculateCentroid = (coords: string): string => {
+  let totalLat = 0;
+  let totalLng = 0;
+  let numCoords = 0;
+
+  const allCoords: any = JSON.parse(coords);
+
+  const processCoord = (coord: number[]) => {
+    totalLng += coord[0];
+    totalLat += coord[1];
+    numCoords++;
+  };
+
+  // Check if it's a MultiPolygon (array of array of array)
+  if (Array.isArray(allCoords[0]) && Array.isArray(allCoords[0][0]) && Array.isArray(allCoords[0][0][0])) {
+    allCoords.forEach((polygon: number[][][]) => {
+      polygon.flat().forEach((coord: number[]) => processCoord(coord));
+    });
+  } else if (Array.isArray(allCoords[0]) && Array.isArray(allCoords[0][0])) { // It's a Polygon (array of array)
+    allCoords.flat().forEach((coord: number[]) => processCoord(coord));
+  } else {
+    console.error('Invalid input format');
+    return '';
+  }
+
+  const avgLng = (totalLng / numCoords).toFixed(6);
+  const avgLat = (totalLat / numCoords).toFixed(6);
+
+  return `${avgLat}, ${avgLng}`;
+}
