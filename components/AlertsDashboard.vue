@@ -6,9 +6,8 @@
       :feature="selectedFeature"
       :feature-geojson="selectedFeatureGeojson"
       :file-paths="imageUrl"
-      :image-caption="imageCaption"
       :image-extensions="imageExtensions"
-      :preview-map-link="previewMapLink"
+      :alert-resources="alertResources"
       :logo-url="logoUrl"
       :media-base-path="mediaBasePath"      
       :show-sidebar="showSidebar"
@@ -45,6 +44,7 @@ export default {
     "data",
     "embedMedia",
     "imageExtensions",
+    "alertResources",
     "logoUrl",
     "mediaBasePath",
     "mapboxAccessToken",
@@ -73,9 +73,7 @@ export default {
       selectedFeatureGeojson: null,
       selectedFeatureId: null,
       selectedFeatureSource: null,
-      imageUrl: [],
-      imageCaption: null,
-      previewMapLink: null
+      imageUrl: []
     };
   },
   computed: {
@@ -236,13 +234,10 @@ export default {
           this.downloadAlert = true;
 
           // Fields that may or may not exist, depending on views config
-          let imageUrl = featureObject.image_url;
-          imageUrl && (this.imageUrl = [imageUrl]);
-          let imageCaption = featureObject.image_caption;
-          imageCaption && (this.imageCaption = "Preview imagery source: " + imageCaption);
-          let previewMapLink = featureObject.preview_link;
-          previewMapLink && (this.previewMapLink = previewMapLink);
-          delete featureObject["image_url"], delete featureObject["image_caption"], delete featureObject["preview_link"];
+          this.imageUrl = [];
+          featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
+          featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
+          delete featureObject["t0_url"], delete featureObject["t1_url"];
 
           // Update component state
           this.selectedFeatureId = featureId;
@@ -261,7 +256,6 @@ export default {
       this.downloadAlert = false;
       this.imageUrl = [];
       this.imageCaption = null;
-      this.previewMapLink = null;
       this.selectedDateRange = null;
 
       // Reset the filters for the 'recent-alerts' and 'alerts' layers

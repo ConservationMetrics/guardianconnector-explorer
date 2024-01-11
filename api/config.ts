@@ -9,17 +9,17 @@ interface EnvVars {
   MAPBOX_ACCESS_TOKEN: string;
   NUXT_ENV_AUTH_STRATEGY: string;
   NUXT_ENV_VIEWS_CONFIG: string;
-  SQLITE_DB_PATH: string;
-  PORT: string;
   PASSWORD: string;
+  PORT: string;
   SECRET_JWT_KEY: string;
+  SQLITE_DB_PATH: string;
   VUE_APP_API_KEY: string;
 }
 
 interface ViewConfig {
   VIEWS: string;
+  ALERT_RESOURCES: string;
   EMBED_MEDIA: string;
-  MEDIA_BASE_PATH: string;
   FRONT_END_FILTERING: string;
   FRONT_END_FILTER_FIELD: string;
   MAPBOX_STYLE: string;
@@ -31,7 +31,7 @@ interface ViewConfig {
   MAPBOX_BEARING: string;
   MAPBOX_3D: string;
   MAP_LEGEND_LAYER_IDS: string;
-  LINK_TO_GCCD_RESOURCES: string;
+  MEDIA_BASE_PATH: string;
   LOGO_URL: string;
   UNWANTED_COLUMNS?: string;
   UNWANTED_SUBSTRINGS?: string;
@@ -59,6 +59,7 @@ const getEnvVar = (
   return result;
 };
 
+const API_KEY = getEnvVar("VUE_APP_API_KEY");
 const AUTH_STRATEGY = getEnvVar("NUXT_ENV_AUTH_STRATEGY", "none");
 const DATABASE = getEnvVar("DATABASE");
 const DB_HOST = getEnvVar("DB_HOST");
@@ -69,14 +70,14 @@ const DB_SSL = getEnvVar("DB_SSL", "YES") as string;
 const IS_SQLITE = getEnvVar("IS_SQLITE", "NO", (val) =>
   val.toUpperCase() === "YES" ? "YES" : "NO"
 ) as string;
-const SQLITE_DB_PATH = getEnvVar("SQLITE_DB_PATH");
-const PASSWORD = getEnvVar("PASSWORD");
 const MAPBOX_ACCESS_TOKEN = getEnvVar("MAPBOX_ACCESS_TOKEN", "pk.ey") as string;
+const PASSWORD = getEnvVar("PASSWORD");
 const SECRET_JWT_KEY = getEnvVar("SECRET_JWT_KEY", "secret-jwt-key") as string;
-const API_KEY = getEnvVar("VUE_APP_API_KEY");
+const SQLITE_DB_PATH = getEnvVar("SQLITE_DB_PATH");
 const VIEWS_CONFIG = process.env.NUXT_ENV_VIEWS_CONFIG;
 
 export {
+  API_KEY,
   AUTH_STRATEGY,
   DATABASE,
   DB_HOST,
@@ -85,11 +86,10 @@ export {
   DB_PORT,
   DB_SSL,
   IS_SQLITE,
-  SQLITE_DB_PATH,
-  PASSWORD,
   MAPBOX_ACCESS_TOKEN,
+  PASSWORD,
   SECRET_JWT_KEY,
-  API_KEY,
+  SQLITE_DB_PATH,
   VIEWS_CONFIG,
   Views,
 };

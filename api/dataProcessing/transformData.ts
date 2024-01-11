@@ -142,8 +142,7 @@ const prepareMapData = (
 
 const prepareAlertData = (
   data: Array<Record<string, any>>,
-  embedMedia: boolean,
-  linkToGCCDResources: boolean
+  embedMedia: boolean
 ): {
   mostRecentAlerts: Array<Record<string, any>>;
   otherAlerts: Array<Record<string, any>>;
@@ -152,7 +151,6 @@ const prepareAlertData = (
     item: Record<string, any>,
     formattedMonth: string,
     embedMedia: boolean,
-    linkToGCCDResources: boolean
   ): Record<string, any> => {
     const transformedItem: Record<string, any> = {};
 
@@ -199,15 +197,13 @@ const prepareAlertData = (
 
     if (embedMedia) {
       transformedItem[
-        "image_url"
-      ] = `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/resources/output_t1.jpg`;
-      transformedItem["image_caption"] =
-        satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
-    }
-    if (linkToGCCDResources) {
+        "t0_url"
+      ] = `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/resources/output_t0.jpg`;
       transformedItem[
-        "preview_link"
-      ] = `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/output.html`;
+        "t1_url"
+      ] = `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/resources/output_t1.jpg`;
+      transformedItem["Preview imagery source"] =
+        satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
     }
 
     return transformedItem;
@@ -243,8 +239,7 @@ const prepareAlertData = (
     const transformedItem = transformChangeDetectionItem(
       item,
       formattedMonth,
-      embedMedia,
-      linkToGCCDResources
+      embedMedia
     );
 
     // Segregate data based on the latest month detected
@@ -274,7 +269,7 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
   // Create Date objects for sorting and comparisons
   const formattedDates = data.map((item) => ({
     date: new Date(
-      `${item.year_detec}-${item.month_detec.padStart(2, "0")}-01`
+      `${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`
     ),
     dateString: `${item.month_detec.padStart(2, "0")}-${item.year_detec}`,
   }));
@@ -282,8 +277,10 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
   // Sort dates to find the earliest and latest
   formattedDates.sort((a, b) => a.date.getTime() - b.date.getTime());
   const latestDate = formattedDates[formattedDates.length - 1].date;
+  latestDate.setDate(28);
   const latestDateStr = formattedDates[formattedDates.length - 1].dateString;
   const earliestDate = formattedDates[0].date;
+  earliestDate.setDate(1)
   const earliestDateStr = formattedDates[0].dateString;
 
   // Create an array of all dates
@@ -321,7 +318,7 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
     const months = [];
     
     // We have to use UTC here to avoid issues with local time settings
-    const currentDate = new Date(Date.UTC(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 1));
+    const currentDate = new Date(Date.UTC(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 15));
 
     for (let i = 0; i < 12; i++) {
       // Decrement the month in currentDate, after the first iteration (latestDate). 
@@ -336,7 +333,6 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
       const month = String(currentDate.getUTCMonth() + 1).padStart(2, "0");
       const year = currentDate.getUTCFullYear();
       const monthYear = `${month}-${year}`;
-
 
       // Check if this currentDate falls within the range of earliestDate and latestDate.
       // If it does, add the monthYear string to the months array.

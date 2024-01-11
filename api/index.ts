@@ -124,7 +124,7 @@ if (!VIEWS_CONFIG) {
           const { mainData } = await fetchData(db, table, IS_SQLITE);
 
           // Prepare alerts data for the alerts view
-          const changeDetectionData = prepareAlertData(mainData, VIEWS[table].EMBED_MEDIA === "YES", VIEWS[table].LINK_TO_GCCD_RESOURCES === "YES");
+          const changeDetectionData = prepareAlertData(mainData, VIEWS[table].EMBED_MEDIA === "YES");
           
           // Prepare statistics data for the alerts view
           const statistics = prepareAlertStatistics(mainData);
@@ -141,6 +141,7 @@ if (!VIEWS_CONFIG) {
             table: table,
             embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
             imageExtensions: imageExtensions, 
+            alertResources: VIEWS[table].ALERT_RESOURCES === "YES",
             logoUrl: VIEWS[table].LOGO_URL,
             mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
             mapboxAccessToken: MAPBOX_ACCESS_TOKEN, 
