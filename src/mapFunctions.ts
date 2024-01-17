@@ -37,6 +37,10 @@ export function prepareMapLegendLayers(map: mapboxgl.Map, mapLegendLayerIds: str
       const layerType = layer.type;
       const layerColor = map.getPaintProperty(layerId, `${layerType}-color`);
 
+      if (!layerColor) {
+        return;
+      }
+
       const formattedId = layerId
         .replace(/-/g, ' ')
         .replace(/^\w/, m => m.toUpperCase());
@@ -46,7 +50,7 @@ export function prepareMapLegendLayers(map: mapboxgl.Map, mapLegendLayerIds: str
         type: layerType,
         color: layerColor
       };
-    });
+    }).filter(Boolean);
 
     if (mapLegendContent.length === 0) {
       return;
