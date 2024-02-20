@@ -23,17 +23,17 @@ To get started, copy `.env.example` to `.env` and add your database and table in
 
 ```bash
 # install dependencies
-$ yarn install
+$ npm install
 
 # serve with hot reload at localhost:8080
-$ yarn dev
+$ npm dev
 
 # build for production and launch server
-$ yarn build
-$ yarn start
+$ npm build
+$ npm start
 
 # generate static project
-$ yarn generate
+$ npm generate
 ```
 
 Add `--hostname 0.0.0.0` if you want the app to be accessible across your local network.

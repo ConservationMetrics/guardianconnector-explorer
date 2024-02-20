@@ -7,17 +7,17 @@ RUN apt-get update && apt-get install -y iputils-ping
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json or yarn.lock into the container
-COPY package*.json yarn.lock ./
+# Copy package.json and package-lock.json into the container
+COPY package*.json  ./
 
 # Install dependencies
-RUN yarn install
+RUN npm install
 
 # Copy the application files into the container
 COPY . .
 
 # Build the application
-RUN yarn run build
+RUN npm run build
 
 RUN touch .env
 
@@ -30,4 +30,4 @@ ENV NUXT_HOST=0.0.0.0
 ENV NUXT_PORT=8080
 
 # Run the application
-CMD ["yarn", "start"]
+CMD ["npm", "start"]
