@@ -13,7 +13,7 @@ const setupDatabaseConnection = (
   user: string | undefined,
   password: string | undefined,
   port: string,
-  ssl: string | undefined
+  ssl: string | undefined,
 ): DatabaseConnection => {
   console.log("Setting up database connection...");
 
@@ -32,7 +32,7 @@ const setupDatabaseConnection = (
         } else {
           console.log("Connected to the SQLite database");
         }
-      }
+      },
     );
   } else {
     const dbConnection = {
@@ -53,7 +53,7 @@ const setupDatabaseConnection = (
         db = null;
         if (error.message.includes("self signed certificate")) {
           console.error(
-            "Error connecting to the PostgreSQL database: Self-signed certificate issue."
+            "Error connecting to the PostgreSQL database: Self-signed certificate issue.",
           );
         } else {
           console.error("Error connecting to the PostgreSQL database:", error);

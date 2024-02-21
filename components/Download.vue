@@ -2,14 +2,18 @@
   <div class="button-container">
     <button
       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
-      @click="typeOfData === 'alert' ? downloadAlertCSV() : downloadCSVSelection()"
+      @click="
+        typeOfData === 'alert' ? downloadAlertCSV() : downloadCSVSelection()
+      "
     >
       Download CSV
     </button>
     <button
       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
       @click="
-        typeOfData === 'alert' ? downloadAlertGeoJSON() : downloadGeoJSONSelection()
+        typeOfData === 'alert'
+          ? downloadAlertGeoJSON()
+          : downloadGeoJSONSelection()
       "
     >
       Download GeoJSON
@@ -25,7 +29,7 @@ export default {
       // Convert featureObject to CSV and download
       if (!this.geojson) {
         console.error(
-          "No GeoJSON data available to download and convert to CSV."
+          "No GeoJSON data available to download and convert to CSV.",
         );
         return;
       }
@@ -35,9 +39,8 @@ export default {
       let flattened = { ...properties }; // Start with properties
 
       // Ensure that all coordinate properties render well in CSV
-      flattened[
-        "Geographic centroid"
-      ] = `[${properties["Geographic centroid"]}]`;
+      flattened["Geographic centroid"] =
+        `[${properties["Geographic centroid"]}]`;
       const coordinates = JSON.stringify(geometry.coordinates);
       delete flattened["coordinates"];
       delete flattened["YYYYMM"];
@@ -47,7 +50,7 @@ export default {
       const csvData = Object.values(flattened).map((value) =>
         typeof value === "string" && value.includes(",")
           ? `"${value.replace(/"/g, '""')}"`
-          : value
+          : value,
       );
 
       // Remove top level GeoJSON "type" property
@@ -108,7 +111,7 @@ export default {
       if (
         !this.geojson ||
         (this.geojson.mostRecentAlerts.features.length <= 0 &&
-        this.geojson.otherAlerts.features.length <= 0)
+          this.geojson.otherAlerts.features.length <= 0)
       ) {
         console.warn("No complete GeoJSON data available to download as CSV.");
         return;
@@ -129,9 +132,9 @@ export default {
 
         // Flatten the object
         let flattened = { ...properties };
-        delete flattened['image_url'];
-        delete flattened['image_caption'];
-        delete flattened['preview_link'];
+        delete flattened["image_url"];
+        delete flattened["image_caption"];
+        delete flattened["preview_link"];
         delete flattened["YYYYMM"];
 
         // Handle coordinates and other properties that need special formatting
@@ -143,7 +146,7 @@ export default {
         const csvData = Object.values(flattened).map((value) =>
           typeof value === "string" && value.includes(",")
             ? `"${value.replace(/"/g, '""')}"`
-            : value
+            : value,
         );
 
         // Append geometry type at the end
@@ -179,7 +182,7 @@ export default {
       if (
         !this.geojson ||
         (this.geojson.mostRecentAlerts.features.length <= 0 &&
-        this.geojson.otherAlerts.features.length <= 0)
+          this.geojson.otherAlerts.features.length <= 0)
       ) {
         console.warn("No complete GeoJSON data available to download.");
         return;
@@ -187,14 +190,14 @@ export default {
 
       // Combine features from mostRecentAlerts and otherAlerts
       const combinedFeatures = [
-      ...this.geojson.otherAlerts.features,
-      ...this.geojson.mostRecentAlerts.features,
+        ...this.geojson.otherAlerts.features,
+        ...this.geojson.mostRecentAlerts.features,
       ];
 
-      combinedFeatures.forEach(feature => {
-        delete feature.properties['image_url'];
-        delete feature.properties['image_caption'];
-        delete feature.properties['preview_link'];
+      combinedFeatures.forEach((feature) => {
+        delete feature.properties["image_url"];
+        delete feature.properties["image_caption"];
+        delete feature.properties["preview_link"];
         delete feature.properties["YYYYMM"];
       });
 

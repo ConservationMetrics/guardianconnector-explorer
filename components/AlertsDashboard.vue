@@ -1,7 +1,13 @@
 <template>
   <div>
     <div id="map"></div>
-    <button v-if="!showSidebar" @click="resetToInitialState" class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2">Reset Dashboard</button>
+    <button
+      v-if="!showSidebar"
+      @click="resetToInitialState"
+      class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
+    >
+      Reset Dashboard
+    </button>
     <Sidebar
       :alert-resources="alertResources"
       :date-options="dateOptions"
@@ -13,7 +19,7 @@
       :geojson-selection="filteredData"
       :image-extensions="imageExtensions"
       :logo-url="logoUrl"
-      :media-base-path="mediaBasePath"      
+      :media-base-path="mediaBasePath"
       :show-intro-panel="showIntroPanel"
       :show-sidebar="showSidebar"
       :show-slider="showSlider"
@@ -21,16 +27,16 @@
       @close="handleSidebarClose"
       @date-range-changed="handleDateRangeChanged"
     />
-    <MapLegend 
+    <MapLegend
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
     />
   </div>
 </template>
-  
+
 <script>
 import mapboxgl from "mapbox-gl";
-import bbox from '@turf/bbox';
+import bbox from "@turf/bbox";
 
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
@@ -38,8 +44,9 @@ import MapLegend from "@/components/MapLegend.vue";
 import { prepareMapLegendLayers } from "@/src/mapFunctions.ts";
 
 export default {
-  components: { 
-    Sidebar, MapLegend
+  components: {
+    Sidebar,
+    MapLegend,
   },
   props: [
     "alertResources",
@@ -47,7 +54,7 @@ export default {
     "embedMedia",
     "imageExtensions",
     "logoUrl",
-    "mapLegendLayerIds",  
+    "mapLegendLayerIds",
     "mapbox3d",
     "mapboxAccessToken",
     "mapboxBearing",
@@ -58,7 +65,7 @@ export default {
     "mapboxStyle",
     "mapboxZoom",
     "mediaBasePath",
-    "statistics"
+    "statistics",
   ],
   data() {
     return {
@@ -93,7 +100,7 @@ export default {
       const [startDate, endDate] = this.convertDates(start, end);
 
       const filterFeatures = (features) => {
-        return features.filter(feature => {
+        return features.filter((feature) => {
           const monthDetected = feature.properties["YYYYMM"];
           return monthDetected >= startDate && monthDetected <= endDate;
         });
@@ -102,12 +109,12 @@ export default {
       return {
         mostRecentAlerts: {
           ...this.data.mostRecentAlerts,
-          features: filterFeatures(this.data.mostRecentAlerts.features)
+          features: filterFeatures(this.data.mostRecentAlerts.features),
         },
         otherAlerts: {
           ...this.data.otherAlerts,
-          features: filterFeatures(this.data.otherAlerts.features)
-        }
+          features: filterFeatures(this.data.otherAlerts.features),
+        },
       };
     },
   },
@@ -135,15 +142,15 @@ export default {
         filter: ["==", "$type", "Polygon"],
         paint: {
           "fill-color": [
-            'case',
-              ['boolean', ['feature-state', 'selected'], false],
-              '#FFFF00',
-              '#EC00FF'
-            ],          
-            "fill-opacity": 0.5,
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#FFFF00",
+            "#EC00FF",
+          ],
+          "fill-opacity": 0.5,
         },
-      });     
-      
+      });
+
       // Add a stroke for most recent alerts
       this.map.addLayer({
         id: "recent-alerts-stroke",
@@ -152,14 +159,14 @@ export default {
         filter: ["==", "$type", "Polygon"],
         paint: {
           "line-color": [
-            'case',
-              ['boolean', ['feature-state', 'selected'], false],
-              '#FFFF00',
-              '#EC00FF'
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#FFFF00",
+            "#EC00FF",
           ],
           "line-width": 2,
         },
-      });   
+      });
 
       // Add a layer for other alerts
       this.map.addLayer({
@@ -169,15 +176,15 @@ export default {
         filter: ["==", "$type", "Polygon"],
         paint: {
           "fill-color": [
-            'case',
-              ['boolean', ['feature-state', 'selected'], false],
-              '#FFFF00',
-              '#FF0000'
-          ],   
-            "fill-opacity": 0.5,
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#FFFF00",
+            "#FF0000",
+          ],
+          "fill-opacity": 0.5,
         },
-      });     
-      
+      });
+
       // Add a stroke for other alerts
       this.map.addLayer({
         id: "alerts-stroke",
@@ -186,15 +193,15 @@ export default {
         filter: ["==", "$type", "Polygon"],
         paint: {
           "line-color": [
-            'case',
-              ['boolean', ['feature-state', 'selected'], false],
-              '#FFFF00',
-              '#FF0000'
-          ],  
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#FFFF00",
+            "#FF0000",
+          ],
           "line-width": 2,
         },
-      });   
-      
+      });
+
       // Add event listeners
       ["recent-alerts", "alerts"].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
@@ -206,21 +213,28 @@ export default {
         this.map.on("click", layerId, (e) => {
           let featureObject = e.features[0].properties;
 
-          const featureGeojson = (({ type, geometry, properties }) => ({ type, geometry, properties }))(e.features[0]);
+          const featureGeojson = (({ type, geometry, properties }) => ({
+            type,
+            geometry,
+            properties,
+          }))(e.features[0]);
           const featureId = e.features[0].id;
 
           // Reset the previously selected feature
           if (this.selectedFeatureId && this.selectedFeatureSource) {
             this.map.setFeatureState(
-              { source: this.selectedFeatureSource, id: this.selectedFeatureId },
-              { selected: false }
+              {
+                source: this.selectedFeatureSource,
+                id: this.selectedFeatureId,
+              },
+              { selected: false },
             );
           }
 
           // Set new feature state
           this.map.setFeatureState(
             { source: layerId, id: featureId },
-            { selected: true }
+            { selected: true },
           );
 
           delete featureObject["YYYYMM"];
@@ -251,21 +265,21 @@ export default {
     },
 
     addPulsingCircles() {
-      if (document.querySelector('.pulsing-dot')) {
+      if (document.querySelector(".pulsing-dot")) {
         return;
       }
 
       // Wait until the map has loaded recent-alerts
-      if (!this.map.isSourceLoaded('recent-alerts')) {
-        this.map.once('idle', () => {
+      if (!this.map.isSourceLoaded("recent-alerts")) {
+        this.map.once("idle", () => {
           this.addPulsingCircles();
         });
         return;
       }
       // Define the pulsing dot CSS
-      const pulsingDot = document.createElement('div');
-      pulsingDot.className = 'pulsing-dot';
-     
+      const pulsingDot = document.createElement("div");
+      pulsingDot.className = "pulsing-dot";
+
       // Add the CSS for the pulsing effect
       const styles = `
         @keyframes pulse {
@@ -293,19 +307,19 @@ export default {
           animation: pulse 2s infinite;
         }
       `;
-      const styleSheet = document.createElement('style');
-      styleSheet.type = 'text/css';
+      const styleSheet = document.createElement("style");
+      styleSheet.type = "text/css";
       styleSheet.innerText = styles;
       document.head.appendChild(styleSheet);
 
-      const features = this.map.querySourceFeatures('recent-alerts');
+      const features = this.map.querySourceFeatures("recent-alerts");
 
       features.forEach((feature) => {
         const bounds = bbox(feature);
 
         // Create a new marker element for this feature
         const pulsingMarker = pulsingDot.cloneNode();
-        
+
         // Calculate the center of the bounding box
         const lng = (bounds[0] + bounds[2]) / 2;
         const lat = (bounds[1] + bounds[3]) / 2;
@@ -314,16 +328,15 @@ export default {
         const marker = new mapboxgl.Marker(pulsingMarker)
           .setLngLat([parseFloat(lng), parseFloat(lat)])
           .addTo(this.map);
-
       });
     },
 
     convertDates(start, end) {
       // Convert "MM-YYYY" to "YYYYMM" for comparison
       const convertToDate = (dateStr) => {
-        const [month, year] = dateStr.split('-').map(Number);
-        return (year * 100 + month).toString()
-         // Converts to YYYYMM format
+        const [month, year] = dateStr.split("-").map(Number);
+        return (year * 100 + month).toString();
+        // Converts to YYYYMM format
       };
 
       if (start === "Earlier") {
@@ -347,12 +360,12 @@ export default {
       // Replace any earlier dates with "Earlier"
       if (dates.length > 12) {
         const last12Dates = dates.slice(-12);
-        
+
         dates = ["Earlier", ...last12Dates];
       }
-      
+
       return dates;
-    },    
+    },
 
     handleDateRangeChanged(newRange) {
       // Extract start and end dates from newRange
@@ -370,37 +383,44 @@ export default {
 
       // Update the 'recent-alerts' and 'alerts' layers to only show features within the selected date range
       this.$nextTick(() => {
-        ['recent-alerts', 'alerts', 'recent-alerts-stroke', 'alerts-stroke'].forEach(layerId => {
+        [
+          "recent-alerts",
+          "alerts",
+          "recent-alerts-stroke",
+          "alerts-stroke",
+        ].forEach((layerId) => {
           this.map.setFilter(layerId, [
-            'all',
-            ['>=', ['get', 'YYYYMM'], startDate],
-            ['<=', ['get', 'YYYYMM'], endDate]
+            "all",
+            [">=", ["get", "YYYYMM"], startDate],
+            ["<=", ["get", "YYYYMM"], endDate],
           ]);
         });
 
-      // If 'recent-alerts' layer is empty, remove the pulsing circles. If not, add them.
-      const recentAlertsFeatures = this.map.querySourceFeatures('recent-alerts', {
-        sourceLayer: 'recent-alerts',
-        filter: [
-          'all',
-          ['>=', ['get', 'YYYYMM'], startDate],
-          ['<=', ['get', 'YYYYMM'], endDate]
-        ]
-      });
+        // If 'recent-alerts' layer is empty, remove the pulsing circles. If not, add them.
+        const recentAlertsFeatures = this.map.querySourceFeatures(
+          "recent-alerts",
+          {
+            sourceLayer: "recent-alerts",
+            filter: [
+              "all",
+              [">=", ["get", "YYYYMM"], startDate],
+              ["<=", ["get", "YYYYMM"], endDate],
+            ],
+          },
+        );
 
-      if (recentAlertsFeatures.length > 0) {
-        this.map.once('idle', () => {
-          this.addPulsingCircles();
-        });
-      } else {
-        this.removePulsingCircles();
-      }
-
+        if (recentAlertsFeatures.length > 0) {
+          this.map.once("idle", () => {
+            this.addPulsingCircles();
+          });
+        } else {
+          this.removePulsingCircles();
+        }
 
         // Update the selected date range
         this.selectedDateRange = newRange;
       });
-    },  
+    },
 
     handleSidebarClose() {
       this.showSidebar = false;
@@ -411,22 +431,25 @@ export default {
       if (!this.mapLegendLayerIds) {
         return;
       }
-      this.map.once('idle', () => {
-        this.mapLegendContent = prepareMapLegendLayers(this.map, this.mapLegendLayerIds);
-      });      
-    },    
+      this.map.once("idle", () => {
+        this.mapLegendContent = prepareMapLegendLayers(
+          this.map,
+          this.mapLegendLayerIds,
+        );
+      });
+    },
 
     removePulsingCircles() {
-      document.querySelectorAll('.pulsing-dot').forEach(el => el.remove());
+      document.querySelectorAll(".pulsing-dot").forEach((el) => el.remove());
     },
-    
+
     resetSelectedFeature() {
       if (!this.selectedFeatureId || !this.selectedFeatureSource) {
-        return
+        return;
       }
       this.map.setFeatureState(
         { source: this.selectedFeatureSource, id: this.selectedFeatureId },
-        { selected: false }
+        { selected: false },
       );
       this.selectedFeature = null;
       this.selectedFeatureGeojson = null;
@@ -444,7 +467,12 @@ export default {
       this.selectedDateRange = null;
 
       // Reset the filters for the 'recent-alerts' and 'alerts' layers
-      ['recent-alerts', 'alerts', 'recent-alerts-stroke', 'alerts-stroke'].forEach(layerId => {
+      [
+        "recent-alerts",
+        "alerts",
+        "recent-alerts-stroke",
+        "alerts-stroke",
+      ].forEach((layerId) => {
         this.map.setFilter(layerId, null);
       });
 
@@ -456,14 +484,14 @@ export default {
         bearing: this.mapboxBearing || 0,
       });
 
-      // Add pulsing circles after the map has finished flying 
+      // Add pulsing circles after the map has finished flying
       // to the initial position. This is for reasons of user experience,
       // as well as the fact that queryRenderedFeatures() will only return
       // features that are visible in the browser viewport.)
-      this.map.once('idle', () => {
+      this.map.once("idle", () => {
         this.addPulsingCircles();
       });
-    }
+    },
   },
   mounted() {
     mapboxgl.accessToken = this.mapboxAccessToken;
@@ -496,18 +524,18 @@ export default {
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
-      this.map.addControl(nav, 'top-right');
+      this.map.addControl(nav, "top-right");
 
       // Scale Control
       const scale = new mapboxgl.ScaleControl({
         maxWidth: 80,
-        unit: 'metric'
+        unit: "metric",
       });
-      this.map.addControl(scale, 'bottom-left');
+      this.map.addControl(scale, "bottom-left");
 
       // Fullscreen Control
       const fullscreenControl = new mapboxgl.FullscreenControl();
-      this.map.addControl(fullscreenControl, 'top-right');
+      this.map.addControl(fullscreenControl, "top-right");
     });
 
     this.dateOptions = this.getDateOptions();

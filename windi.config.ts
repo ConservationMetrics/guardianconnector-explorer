@@ -1,4 +1,4 @@
-import { defineConfig } from '@windicss/plugin-utils'
+import { defineConfig } from "@windicss/plugin-utils";
 
 export default defineConfig({
   /**
@@ -6,4 +6,4 @@ export default defineConfig({
    * @see https://windicss.org/features/attributify.html
    */
   attributify: true,
-})
+});

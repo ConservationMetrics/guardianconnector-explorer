@@ -10,4 +10,4 @@ export type AlertRecord = {
   year_detec: string;
   area_alert_ha: string;
   _topic: string;
-}
+};

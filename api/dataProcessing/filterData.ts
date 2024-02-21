@@ -7,19 +7,19 @@ export const filterUnwantedKeys = (
   data: any[],
   columns: Column[] | null,
   unwantedColumnsList: string | undefined,
-  unwantedSubstringsList: string | undefined
+  unwantedSubstringsList: string | undefined,
 ): any[] => {
   const filterColumns = (
     originalColumns: Set<string>,
     unwantedColumns: string[],
-    unwantedSubstrings: string[]
+    unwantedSubstrings: string[],
   ): Set<string> => {
     return new Set(
       [...originalColumns].filter((column) => {
         if (unwantedColumns.includes(column)) return true;
         if (unwantedSubstrings.some((sub) => column.includes(sub))) return true;
         return false;
-      })
+      }),
     );
   };
 
@@ -42,24 +42,24 @@ export const filterUnwantedKeys = (
     });
 
     const originalColumnsSet = new Set(
-      columns.map((column) => column.original_column)
+      columns.map((column) => column.original_column),
     );
     const unwantedColumnsSet = filterColumns(
       originalColumnsSet,
       unwantedColumns,
-      unwantedSubstrings
+      unwantedSubstrings,
     );
 
     // Map the unwanted original_column entries to sql_column entries
     const unwantedSqlColumns = new Set(
-      [...unwantedColumnsSet].map((column) => columnMapping[column])
+      [...unwantedColumnsSet].map((column) => columnMapping[column]),
     );
 
     // Filter out the unwanted sql_column entries
     filteredSqlColumns = new Set(
       Object.values(columnMapping).filter(
-        (sqlColumn) => !unwantedSqlColumns.has(sqlColumn)
-      )
+        (sqlColumn) => !unwantedSqlColumns.has(sqlColumn),
+      ),
     );
   } else {
     // If there is no __columns table, then filter based on Object keys of one data entry
@@ -68,8 +68,8 @@ export const filterUnwantedKeys = (
         .filter(
           (key) =>
             !unwantedColumns.includes(key) &&
-            !unwantedSubstrings.some((sub) => key.includes(sub))
-        )
+            !unwantedSubstrings.some((sub) => key.includes(sub)),
+        ),
     );
   }
 
@@ -80,7 +80,7 @@ export const filterUnwantedKeys = (
       .reduce((obj: any, key) => {
         obj[key] = item[key];
         return obj;
-      }, {})
+      }, {}),
   );
 
   return filteredData;
@@ -88,7 +88,7 @@ export const filterUnwantedKeys = (
 
 // Filter out data without fields that have valid coordinates
 export const filterGeoData = (
-  data: Array<Record<string, any>>
+  data: Array<Record<string, any>>,
 ): Array<Record<string, any>> => {
   const geoData = data.filter((feature) => hasValidCoordinates(feature));
 
@@ -98,14 +98,14 @@ export const filterGeoData = (
 // Filter out data without any fields with file extensions
 export const filterDataByExtension = (
   data: Array<Record<string, any>>,
-  extensions: string[]
+  extensions: string[],
 ): Array<Record<string, any>> => {
   return data.filter((entry) => {
     return Object.values(entry).some((value) =>
       extensions.some(
         (extension) =>
-          typeof value === "string" && value.toLowerCase().includes(extension)
-      )
+          typeof value === "string" && value.toLowerCase().includes(extension),
+      ),
     );
   });
 };

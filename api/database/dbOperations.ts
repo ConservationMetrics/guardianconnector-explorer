@@ -1,4 +1,8 @@
-const checkTableExists = (db: any, table: string | undefined, isSQLite: string | undefined): Promise<boolean> => {
+const checkTableExists = (
+  db: any,
+  table: string | undefined,
+  isSQLite: string | undefined,
+): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     let query: string;
     if (isSQLite === "YES") {
@@ -17,14 +21,21 @@ const checkTableExists = (db: any, table: string | undefined, isSQLite: string |
   });
 };
 
-const fetchDataFromTable = async (db: any, table: string | undefined, isSQLite: string | undefined): Promise<any[]> => {
+const fetchDataFromTable = async (
+  db: any,
+  table: string | undefined,
+  isSQLite: string | undefined,
+): Promise<any[]> => {
   let query: string;
   if (isSQLite === "YES") {
     query = `SELECT * FROM ${table}`;
     return new Promise((resolve, reject) => {
       db.all(query, (err: Error, rows: any[]) => {
         if (err) reject(err);
-        if (rows.length > 0 && Object.keys(rows[0]).some((key) => isNaN(Number(key)))) {
+        if (
+          rows.length > 0 &&
+          Object.keys(rows[0]).some((key) => isNaN(Number(key)))
+        ) {
           rows.shift();
         }
         resolve(rows);
@@ -41,7 +52,11 @@ const fetchDataFromTable = async (db: any, table: string | undefined, isSQLite: 
   }
 };
 
-const fetchData = async (db: any, table: string | undefined, isSQLite: string | undefined): Promise<{ mainData: any[]; columnsData: any[] | null }> => {
+const fetchData = async (
+  db: any,
+  table: string | undefined,
+  isSQLite: string | undefined,
+): Promise<{ mainData: any[]; columnsData: any[] | null }> => {
   console.log("Fetching data from", table, "...");
   // Fetch data
   const mainDataExists = await checkTableExists(db, table, isSQLite);
@@ -56,7 +71,7 @@ const fetchData = async (db: any, table: string | undefined, isSQLite: string | 
   const columnsTableExists = await checkTableExists(
     db,
     `${table}__columns`,
-    isSQLite
+    isSQLite,
   );
   let columnsData = null;
   if (columnsTableExists) {

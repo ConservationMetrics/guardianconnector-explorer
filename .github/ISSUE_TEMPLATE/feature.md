@@ -11,7 +11,7 @@ labels: 'Type: Feature'
 ### User Stories & Acceptance Criteria
 
 
-### UI Sketch (or Screenshot from Auditor 1)
+### UI Sketch (or Screenshot)
 
 
 

@@ -19,7 +19,7 @@
       :video-extensions="videoExtensions"
       @close="showSidebar = false"
     />
-    <MapLegend 
+    <MapLegend
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
     />
@@ -79,7 +79,6 @@ export default {
     },
   },
   methods: {
-
     addDataToMap() {
       // Remove existing data layers from the map
       if (this.map) {
@@ -180,7 +179,7 @@ export default {
         this.filteredData = [...this.processedData];
       } else {
         this.filteredData = this.processedData.filter((item) =>
-          values.includes(item[this.filterField])
+          values.includes(item[this.filterField]),
         );
       }
       this.addDataToMap(); // Call this method to update the map data
@@ -192,9 +191,12 @@ export default {
       if (!this.mapLegendLayerIds) {
         return;
       }
-      this.map.once('idle', () => {
-        this.mapLegendContent = prepareMapLegendLayers(this.map, this.mapLegendLayerIds);
-      });      
+      this.map.once("idle", () => {
+        this.mapLegendContent = prepareMapLegendLayers(
+          this.map,
+          this.mapLegendLayerIds,
+        );
+      });
     },
   },
   mounted() {
@@ -230,18 +232,18 @@ export default {
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
-      this.map.addControl(nav, 'top-right');
+      this.map.addControl(nav, "top-right");
 
       // Scale Control
       const scale = new mapboxgl.ScaleControl({
         maxWidth: 80,
-        unit: 'metric'
+        unit: "metric",
       });
-      this.map.addControl(scale, 'bottom-left');
+      this.map.addControl(scale, "bottom-left");
 
       // Fullscreen Control
       const fullscreenControl = new mapboxgl.FullscreenControl();
-      this.map.addControl(fullscreenControl, 'top-right')
+      this.map.addControl(fullscreenControl, "top-right");
     });
   },
   beforeDestroy() {

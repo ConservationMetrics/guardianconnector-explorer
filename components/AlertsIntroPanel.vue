@@ -49,15 +49,15 @@
     </div>
     <!-- Slider -->
     <div v-if="showSlider" class="feature p-4 rounded-lg shadow-lg">
-      <AlertsSlider 
-        :date-options="dateOptions"     
+      <AlertsSlider
+        :date-options="dateOptions"
         @date-range-changed="$emit('date-range-changed', $event)"
-      />      
+      />
       <div v-if="geojsonSelection">
         <!-- Download -->
-        <Download 
-          :geojson="geojsonSelection" 
-          :type-of-data="'multiple-alerts'" 
+        <Download
+          :geojson="geojsonSelection"
+          :type-of-data="'multiple-alerts'"
         />
       </div>
     </div>
@@ -76,11 +76,11 @@ import Download from "@/components/Download.vue";
 export default {
   name: "AlertsIntroPanel",
   props: [
-    "dateOptions", 
+    "dateOptions",
     "geojsonSelection",
     "logoUrl",
     "showSlider",
-    "statistics", 
+    "statistics",
   ],
   components: { AlertsChart, AlertsSlider, Download },
 };

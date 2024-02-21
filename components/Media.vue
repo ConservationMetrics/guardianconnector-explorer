@@ -15,8 +15,10 @@
         />
       </a>
       <div v-if="alertResources" class="text-center">
-          <span v-if="filePath.includes('t0.jpg')" class="italic">Before</span>
-          <span v-else-if="filePath.includes('t1.jpg')" class="italic">After</span>
+        <span v-if="filePath.includes('t0.jpg')" class="italic">Before</span>
+        <span v-else-if="filePath.includes('t1.jpg')" class="italic"
+          >After</span
+        >
       </div>
     </div>
     <div v-if="isAudio" class="mb-4">
@@ -53,7 +55,7 @@ export default {
   computed: {
     isAudio() {
       return this.checkExtension(this.audioExtensions);
-    },    
+    },
     isImage() {
       return this.checkExtension(this.imageExtensions);
     },
@@ -66,15 +68,12 @@ export default {
       if (!extensions) return false;
       const extension = this.getExtension(this.filePath);
       return extensions.includes(extension);
-    },    
+    },
     getExtension(filePath) {
       return filePath.split(".").pop().toLowerCase();
     },
-
   },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

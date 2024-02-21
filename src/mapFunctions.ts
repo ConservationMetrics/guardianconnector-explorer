@@ -2,7 +2,7 @@ import mapboxgl from "mapbox-gl";
 
 function getMapboxLayersForLegend(
   map: mapboxgl.Map,
-  mapLegendLayerIds: string
+  mapLegendLayerIds: string,
 ): mapboxgl.Layer[] {
   const layerIds = mapLegendLayerIds.split(",");
   const matchingLayers: mapboxgl.Layer[] = [];
@@ -24,15 +24,22 @@ function getMapboxLayersForLegend(
   return matchingLayers;
 }
 
-export function prepareMapLegendLayers(map: mapboxgl.Map, mapLegendLayerIds: string | null): any[] | undefined {
-    if (!mapLegendLayerIds || !map.isStyleLoaded()) {
-        return;
-    }
-  
-    const mapboxLayersForLegend = getMapboxLayersForLegend(map, mapLegendLayerIds);  
-  
-    // Prepare object with type, id, and color for each layer in the map legend
-    const mapLegendContent = mapboxLayersForLegend.map(layer => {
+export function prepareMapLegendLayers(
+  map: mapboxgl.Map,
+  mapLegendLayerIds: string | null,
+): any[] | undefined {
+  if (!mapLegendLayerIds || !map.isStyleLoaded()) {
+    return;
+  }
+
+  const mapboxLayersForLegend = getMapboxLayersForLegend(
+    map,
+    mapLegendLayerIds,
+  );
+
+  // Prepare object with type, id, and color for each layer in the map legend
+  const mapLegendContent = mapboxLayersForLegend
+    .map((layer) => {
       const layerId = layer.id;
       const layerType = layer.type;
       const layerColor = map.getPaintProperty(layerId, `${layerType}-color`);
@@ -42,19 +49,20 @@ export function prepareMapLegendLayers(map: mapboxgl.Map, mapLegendLayerIds: str
       }
 
       const formattedId = layerId
-        .replace(/-/g, ' ')
-        .replace(/^\w/, m => m.toUpperCase());
+        .replace(/-/g, " ")
+        .replace(/^\w/, (m) => m.toUpperCase());
 
       return {
         id: formattedId,
         type: layerType,
-        color: layerColor
+        color: layerColor,
       };
-    }).filter(Boolean);
+    })
+    .filter(Boolean);
 
-    if (mapLegendContent.length === 0) {
-      return;
-    }
-
-    return mapLegendContent;
+  if (mapLegendContent.length === 0) {
+    return;
   }
+
+  return mapLegendContent;
+}

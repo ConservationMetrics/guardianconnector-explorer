@@ -46,7 +46,7 @@ export default {
   watch: {
     selectedRange(newRange) {
       if (this.userInteracted) {
-        this.$emit('date-range-changed', newRange);
+        this.$emit("date-range-changed", newRange);
       }
     },
   },

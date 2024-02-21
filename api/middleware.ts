@@ -7,7 +7,7 @@ import { API_KEY, AUTH_STRATEGY, SECRET_JWT_KEY } from "./config";
 export const checkAuthStrategy = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const apiKey = req.headers["x-api-key"];
   if (apiKey !== API_KEY) {

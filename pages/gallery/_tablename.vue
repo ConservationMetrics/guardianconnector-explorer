@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Gallery 
+    <Gallery
       v-if="embedMedia && dataFetched"
       :audio-extensions="audioExtensions"
       :data="galleryData"
@@ -12,7 +12,8 @@
       :video-extensions="videoExtensions"
     />
     <h3 v-if="!embedMedia && dataFetched">
-      GuardianConnector Views Gallery is not available. Please activate media embedding.
+      GuardianConnector Views Gallery is not available. Please activate media
+      embedding.
     </h3>
   </div>
 </template>
@@ -23,25 +24,24 @@ import Gallery from "~/components/Gallery.vue";
 export default {
   head() {
     return {
-      title: 'GuardianConnector Views: Gallery'
-    }
+      title: "GuardianConnector Views: Gallery",
+    };
   },
   components: { Gallery },
   async asyncData({ params, $axios, app, redirect }) {
-
     // Get the current table name from the route parameters
     const table = params.tablename;
 
     // Set up the headers for the request
     let headers = {
-      'x-api-key': app.$config.apiKey.replace(/['"]+/g, ''),
-      'x-auth-strategy': app.$auth.strategy.name
+      "x-api-key": app.$config.apiKey.replace(/['"]+/g, ""),
+      "x-auth-strategy": app.$auth.strategy.name,
     };
 
     // If the authentication strategy is 'local', include the token in the headers
-    if (app.$auth.strategy.name === 'local') {
+    if (app.$auth.strategy.name === "local") {
       const token = app.$auth.strategy.token.get();
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     try {
@@ -58,15 +58,15 @@ export default {
         galleryData: response.data,
         imageExtensions: response.imageExtensions,
         mediaBasePath: response.mediaBasePath,
-        videoExtensions: response.videoExtensions
+        videoExtensions: response.videoExtensions,
       };
     } catch (error) {
       // Handle errors as appropriate
-      console.error('Error fetching gallery data:', error);
-      redirect('/');
+      console.error("Error fetching gallery data:", error);
+      redirect("/");
       // Return default data
       return {
-        dataFetched: false
+        dataFetched: false,
       };
     }
   },

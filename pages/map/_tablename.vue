@@ -30,25 +30,24 @@ import Map from "~/components/Map.vue";
 export default {
   head() {
     return {
-      title: 'GuardianConnector Views: Map'
-    }
+      title: "GuardianConnector Views: Map",
+    };
   },
   components: { Map },
   async asyncData({ params, $axios, app, redirect }) {
-    
     // Get the current table name from the route parameters
     const table = params.tablename;
 
     // Set up the headers for the request
     let headers = {
-      'x-api-key': app.$config.apiKey.replace(/['"]+/g, ''),
-      'x-auth-strategy': app.$auth.strategy.name
+      "x-api-key": app.$config.apiKey.replace(/['"]+/g, ""),
+      "x-auth-strategy": app.$auth.strategy.name,
     };
 
     // If the authentication strategy is 'local', include the token in the headers
-    if (app.$auth.strategy.name === 'local') {
+    if (app.$auth.strategy.name === "local") {
       const token = app.$auth.strategy.token.get();
-      headers['Authorization'] = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
 
     try {
@@ -75,15 +74,15 @@ export default {
         mapboxStyle: response.mapboxStyle,
         mapboxZoom: response.mapboxZoom,
         mediaBasePath: response.mediaBasePath,
-        videoExtensions: response.videoExtensions
+        videoExtensions: response.videoExtensions,
       };
     } catch (error) {
       // Handle errors as appropriate
-      console.error('Error fetching map data:', error);
-      redirect('/');
+      console.error("Error fetching map data:", error);
+      redirect("/");
       // Return default data
       return {
-        dataFetched: false
+        dataFetched: false,
       };
     }
   },

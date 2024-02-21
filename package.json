@@ -8,7 +8,9 @@
     "dev": "./node_modules/.bin/nuxt",
     "build": "./node_modules/.bin/nuxt build",
     "start": "./node_modules/.bin/nuxt start",
-    "generate": "./node_modules/.bin/nuxt generate"
+    "generate": "./node_modules/.bin/nuxt generate",
+    "lint": "prettier --write ./ --ignore-path .prettierignore",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@nuxtjs/auth-next": "5.0.0-1667386184.dfbbb54",
@@ -39,8 +41,25 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/mapbox-gl": "^2.7.19",
     "@types/pg": "^8.10.9",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
     "nuxt-windicss": "^2",
+    "prettier": "^3.2.5",
     "typescript": "^5.3.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css}": [
+      "prettier --write ./src",
+      "git add"
+    ]
+  },
+  "engines": {
+    "node": "18.17.0"
   },
   "author": "Conservation Metrics",
   "license": "MIT"

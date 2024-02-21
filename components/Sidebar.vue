@@ -1,8 +1,8 @@
 <template>
   <div v-if="showSidebar" class="sidebar" @scroll="handleScroll">
-   <div class="scroll-indicator" v-if="!scrolled">&#x2193;</div> 
-   <button class="close-btn" @click="$emit('close')">X</button>
-    <AlertsIntroPanel 
+    <div class="scroll-indicator" v-if="!scrolled">&#x2193;</div>
+    <button class="close-btn" @click="$emit('close')">X</button>
+    <AlertsIntroPanel
       v-if="showIntroPanel"
       :date-options="dateOptions"
       :geojson-selection="geojsonSelection"
@@ -22,10 +22,10 @@
       :media-base-path="mediaBasePath"
       :video-extensions="videoExtensions"
     />
-    <Download 
-      v-if="downloadAlert" 
-      :geojson="featureGeojson" 
-      :type-of-data="'alert'" 
+    <Download
+      v-if="downloadAlert"
+      :geojson="featureGeojson"
+      :type-of-data="'alert'"
     />
   </div>
 </template>
@@ -88,8 +88,8 @@ export default {
       if (newValue) {
         this.scrolled = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -116,7 +116,7 @@ export default {
   }
 
   .scroll-indicator {
-    display: block!important;
+    display: block !important;
   }
 }
 

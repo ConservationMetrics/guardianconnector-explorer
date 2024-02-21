@@ -1,48 +1,47 @@
-import { NuxtConfig } from '@nuxt/types'
+import { NuxtConfig } from "@nuxt/types";
 
-const authStrategy: string = process.env.NUXT_ENV_AUTH_STRATEGY?.replace(/['"]+/g, '') || 'none';
-const auth0Domain: string = process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g, '') || '';
-const auth0ClientId: string = process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, '') || '';
-const auth0Audience: string = process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, '') || '';
+const authStrategy: string =
+  process.env.NUXT_ENV_AUTH_STRATEGY?.replace(/['"]+/g, "") || "none";
+const auth0Domain: string =
+  process.env.NUXT_ENV_AUTH0_DOMAIN?.replace(/['"]+/g, "") || "";
+const auth0ClientId: string =
+  process.env.NUXT_ENV_AUTH0_CLIENT_ID?.replace(/['"]+/g, "") || "";
+const auth0Audience: string =
+  process.env.NUXT_ENV_AUTH0_AUDIENCE?.replace(/['"]+/g, "") || "";
 
 let tablesConfig = {};
 try {
-    // Parse NUXT_ENV_VIEWS_CONFIG environment variable into a JSON object
-    tablesConfig = JSON.parse(process.env.NUXT_ENV_VIEWS_CONFIG?.replace(/'/g, '') || '{}');
+  // Parse NUXT_ENV_VIEWS_CONFIG environment variable into a JSON object
+  tablesConfig = JSON.parse(
+    process.env.NUXT_ENV_VIEWS_CONFIG?.replace(/'/g, "") || "{}",
+  );
 } catch (e) {
-    console.error("Failed to parse NUXT_ENV_VIEWS_CONFIG:", e);
-    tablesConfig = {}; 
+  console.error("Failed to parse NUXT_ENV_VIEWS_CONFIG:", e);
+  tablesConfig = {};
 }
 
 const config: NuxtConfig = {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'GuardianConnector Views',
-    script: [
-      { src: '/lightbox/lightbox-plus-jquery.js', body: true }    ],
+    title: "GuardianConnector Views",
+    script: [{ src: "/lightbox/lightbox-plus-jquery.js", body: true }],
     htmlAttrs: {
-      lang: 'en'
+      lang: "en",
     },
     meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { charset: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { hid: "description", name: "description", content: "" },
+      { name: "format-detection", content: "telephone=no" },
     ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [
-    'mapbox-gl/dist/mapbox-gl.css',
-    'static/lightbox/lightbox.min.css'
-  ],
+  css: ["mapbox-gl/dist/mapbox-gl.css", "static/lightbox/lightbox.min.css"],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [
-  ],
+  plugins: [],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -50,61 +49,57 @@ const config: NuxtConfig = {
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
   buildModules: [
     // https://go.nuxtjs.dev/typescript
-    '@nuxt/typescript-build',
-    'nuxt-windicss',
-    ['@nuxtjs/dotenv', {path: './'}],
-    '@nuxtjs/auth-next',
+    "@nuxt/typescript-build",
+    "nuxt-windicss",
+    ["@nuxtjs/dotenv", { path: "./" }],
+    "@nuxtjs/auth-next",
   ],
 
-  serverMiddleware: [
-    { path: "/api", handler: "~/api/index.ts" },
-  ],
+  serverMiddleware: [{ path: "/api", handler: "~/api/index.ts" }],
 
   router: {
-    middleware: ['authMiddleware'],
+    middleware: ["authMiddleware"],
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: [
-    '@nuxtjs/axios'
-  ],
+  modules: ["@nuxtjs/axios"],
 
   auth: {
     strategies: {
       none: {
-        scheme: 'local',
+        scheme: "local",
         tokenRequired: false,
-        tokenType: false
+        tokenType: false,
       },
       auth0: {
-        scheme: '~src/runtimeConfigurableScheme.ts'
+        scheme: "~src/runtimeConfigurableScheme.ts",
       },
       password: {
-        scheme: 'local',
+        scheme: "local",
         token: {
-          property: 'token',
+          property: "token",
           required: true,
-          type: 'Bearer',
-          maxAge: 1800
+          type: "Bearer",
+          maxAge: 1800,
         },
         endpoints: {
-          login: { url: '/api/login', method: 'post', propertyName: 'token' },
+          login: { url: "/api/login", method: "post", propertyName: "token" },
           logout: false,
-          user: false
-        }
-      }
+          user: false,
+        },
+      },
     },
     redirect: {
-      login: '/login',
-      logout: '/login',
-      callback: '/login',
-      home: '/'
-    }
+      login: "/login",
+      logout: "/login",
+      callback: "/login",
+      home: "/",
+    },
   },
 
   axios: {
-    baseURL: 'http://127.0.0.1:8080',
-    browserBaseURL: '/',  
+    baseURL: "http://127.0.0.1:8080",
+    browserBaseURL: "/",
   },
 
   publicRuntimeConfig: {
@@ -116,9 +111,9 @@ const config: NuxtConfig = {
           endpoints: {
             authorization: `https://${auth0Domain}/authorize`,
           },
-          ...(auth0Audience !== "" ? { auth0Audience } : {})
-        }
-      }
+          ...(auth0Audience !== "" ? { auth0Audience } : {}),
+        },
+      },
     },
     apiKey: process.env.VUE_APP_API_KEY,
     authStrategy,
@@ -127,12 +122,15 @@ const config: NuxtConfig = {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    transpile: [(context) => context.isLegacy ? 'axios' : undefined, 'defu', 'chart.js', 'vue-chartjs']
-
+    transpile: [
+      (context) => (context.isLegacy ? "axios" : undefined),
+      "defu",
+      "chart.js",
+      "vue-chartjs",
+    ],
   },
 
-  server: {
-  },
-}
+  server: {},
+};
 
-export default config
+export default config;

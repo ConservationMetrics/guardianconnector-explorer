@@ -24,4 +24,3 @@
   "include": ["**/*.ts", "**/*.vue", "node_modules/@types/**/*.d.ts"],
   "exclude": ["node_modules", ".nuxt", "dist"]
 }
-

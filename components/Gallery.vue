@@ -81,7 +81,7 @@ export default {
         this.filteredData = this.data;
       } else {
         this.filteredData = this.data.filter((item) =>
-          values.includes(item[this.filterField])
+          values.includes(item[this.filterField]),
         );
       }
     },

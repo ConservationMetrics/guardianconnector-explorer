@@ -2,7 +2,10 @@
   <div class="map-legend feature p-4 rounded-lg shadow-lg">
     <h2 class="text-2xl font-semibold mb-2">Map Legend</h2>
     <div v-for="item in mapLegendContent" :key="item.id" class="legend-item">
-      <div :class="['color-box', getTypeClass(item)]" :style="{ backgroundColor: item.color }"></div>
+      <div
+        :class="['color-box', getTypeClass(item)]"
+        :style="{ backgroundColor: item.color }"
+      ></div>
       <span>{{ item.id }}</span>
     </div>
   </div>
@@ -14,8 +17,8 @@ export default {
   methods: {
     getTypeClass(item) {
       return `${item.type}-box`;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -46,8 +49,8 @@ export default {
 
 .line-box {
   display: inline-block;
-  width: 20px; 
-  height: 3px!important; 
+  width: 20px;
+  height: 3px !important;
   transform: translateY(-50%);
 }
 

@@ -21,7 +21,7 @@ export default {
     } catch (error) {
       console.error(
         "Error fetching authStrategy config on client side:",
-        error
+        error,
       );
     }
   },

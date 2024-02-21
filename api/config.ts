@@ -49,7 +49,7 @@ const env = process.env as unknown as EnvVars;
 const getEnvVar = (
   key: keyof EnvVars,
   defaultValue?: string,
-  transform?: (val: string) => any
+  transform?: (val: string) => any,
 ) => {
   const value = env[key];
   let result = value !== undefined ? value.replace(/['"]+/g, "") : defaultValue;
@@ -68,7 +68,7 @@ const DB_PASSWORD = getEnvVar("DB_PASSWORD");
 const DB_PORT = getEnvVar("DB_PORT", "5432") as string;
 const DB_SSL = getEnvVar("DB_SSL", "YES") as string;
 const IS_SQLITE = getEnvVar("IS_SQLITE", "NO", (val) =>
-  val.toUpperCase() === "YES" ? "YES" : "NO"
+  val.toUpperCase() === "YES" ? "YES" : "NO",
 ) as string;
 const MAPBOX_ACCESS_TOKEN = getEnvVar("MAPBOX_ACCESS_TOKEN", "pk.ey") as string;
 const PASSWORD = getEnvVar("PASSWORD");

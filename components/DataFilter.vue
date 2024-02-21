@@ -57,12 +57,15 @@ export default {
         }))
         .filter(
           (item) =>
-            item.value !== null && item.value !== "" && item.value !== undefined
+            item.value !== null &&
+            item.value !== "" &&
+            item.value !== undefined,
         );
 
       // Filter out the selected values
       const filteredValues = values.filter(
-        (value) => !this.selectedValue.map((v) => v.value).includes(value.value)
+        (value) =>
+          !this.selectedValue.map((v) => v.value).includes(value.value),
       );
 
       return [
