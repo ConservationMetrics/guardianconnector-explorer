@@ -41,7 +41,7 @@
           <span class="font-bold">Total number of alerts:</span>
           {{ statistics.alertsTotal }}
         </div>
-        <div class="mb-2">
+        <div v-if="calculateHectares" class="mb-2">
           <span class="font-bold">Total number of hectares affected:</span>
           {{ statistics.hectaresTotal }}
         </div>
@@ -62,7 +62,7 @@
       </div>
     </div>
     <!-- Chart -->
-    <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
+    <div v-if="statistics && calculateHectares" class="feature p-4 rounded-lg shadow-lg">
       <AlertsChart :statistics="statistics" />
     </div>
   </div>
@@ -76,6 +76,7 @@ import Download from "@/components/Download.vue";
 export default {
   name: "AlertsIntroPanel",
   props: [
+    "calculateHectares",
     "dateOptions",
     "geojsonSelection",
     "logoUrl",

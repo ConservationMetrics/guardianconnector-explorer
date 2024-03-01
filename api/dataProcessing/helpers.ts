@@ -68,6 +68,9 @@ export const calculateCentroid = (coords: string): string => {
   } else if (Array.isArray(allCoords[0]) && Array.isArray(allCoords[0][0])) {
     // It's a Polygon (array of array)
     allCoords.flat().forEach((coord: number[]) => processCoord(coord));
+  } else if (Array.isArray(allCoords)) {
+    // It's a LineString (array of coordinates)
+    allCoords.forEach((coord: number[]) => processCoord(coord));
   } else {
     console.error("Invalid input format");
     return "";

@@ -4,6 +4,7 @@
     <button class="close-btn" @click="$emit('close')">X</button>
     <AlertsIntroPanel
       v-if="showIntroPanel"
+      :calculate-hectares="calculateHectares"
       :date-options="dateOptions"
       :geojson-selection="geojsonSelection"
       :logo-url="logoUrl"
@@ -40,6 +41,7 @@ export default {
   props: [
     "alertResources",
     "audioExtensions",
+    "calculateHectares",
     "dateOptions",
     "downloadAlert",
     "embedMedia",
