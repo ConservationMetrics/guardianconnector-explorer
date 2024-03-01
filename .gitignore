@@ -90,6 +90,7 @@ sw.*
 *.swp
 
 # GuardianConnector Views specific
-.env
+.env*
+!.env.example
 .env.docker
 *.db
