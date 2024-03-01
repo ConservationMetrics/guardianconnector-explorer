@@ -32,19 +32,23 @@ Chart.register(
 
 export default {
   name: "AlertsChart",
-  props: ["statistics"],
+  props: ["statistics", "calculateHectares"],
   components: { LineChart },
   computed: {
     chartData() {
+      // Determine which dataset to use based on the calculateHectares prop
+      const dataKey = this.calculateHectares ? 'hectaresPerMonth' : 'alertsPerMonth';
+      const label = this.calculateHectares ? 'Hectares affected' : 'Number of alerts';
+
       return {
-        labels: Object.keys(this.statistics.hectaresPerMonth),
+        labels: Object.keys(this.statistics[dataKey]),
         datasets: [
           {
             backgroundColor: "rgba(0, 0, 0, 0)",
             borderColor: "#f87979",
-            data: Object.values(this.statistics.hectaresPerMonth),
+            data: Object.values(this.statistics[dataKey]),
             fill: false,
-            label: "Hectares affected",
+            label: label,
             pointBackgroundColor: "#f87979",
           },
         ],
@@ -53,5 +57,3 @@ export default {
   },
 };
 </script>
-
-<style scoped></style>

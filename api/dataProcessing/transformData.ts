@@ -352,6 +352,21 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
     return months;
   };
 
+  // Initialize alertsPerMonth with last 12 months
+  type AlertsPerMonth = Record<string, number>;
+  const alertsPerMonth: AlertsPerMonth = {};
+  getUpTo12MonthsForChart().forEach((monthYear) => {
+    alertsPerMonth[monthYear] = 0;
+  });
+
+  // Populate alertsPerMonth
+  last12MonthsData.forEach((item) => {
+    const monthYear: string = `${item.month_detec.padStart(2, "0")}-${item.year_detec}`;
+    if (alertsPerMonth.hasOwnProperty(monthYear)) {
+      alertsPerMonth[monthYear]++;
+    }
+  });
+
   // Initialize hectaresPerMonth with last 12 months
   type HectaresPerMonth = Record<string, number>;
   const hectaresPerMonth: HectaresPerMonth = {};
@@ -359,7 +374,7 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
     hectaresPerMonth[monthYear] = 0;
   });
 
-  // Populate hectaresPerMonth with your data
+  // Populate hectaresPerMonth
   last12MonthsData.forEach((item) => {
     const monthYear: string = `${item.month_detec.padStart(2, "0")}-${
       item.year_detec
@@ -404,6 +419,7 @@ const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
     recentAlertsDate: recentAlertDate,
     recentAlertsNumber,
     alertsTotal,
+    alertsPerMonth,
     hectaresTotal,
     hectaresPerMonth,
     twelveMonthsBefore: twelveMonthsBeforeStr,

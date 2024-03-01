@@ -62,8 +62,8 @@
       </div>
     </div>
     <!-- Chart -->
-    <div v-if="statistics && calculateHectares" class="feature p-4 rounded-lg shadow-lg">
-      <AlertsChart :statistics="statistics" />
+    <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
+      <AlertsChart :statistics="statistics" :calculate-hectares="calculateHectares" />
     </div>
   </div>
 </template>
