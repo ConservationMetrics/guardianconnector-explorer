@@ -76,6 +76,7 @@ export default {
       calculateHectares: false,
       dateOptions: [],
       downloadAlert: false,
+      hasLineStrings: false,
       imageUrl: [],
       map: null,
       mapLegendContent: null,
@@ -309,7 +310,6 @@ export default {
       }
 
       // Add event listeners for layers that start with 'recent-alerts' and 'alerts'
-      // TODO: add a buffer for polylines
       this.map.getStyle().layers.forEach((layer) => {
         if (
           layer.id.startsWith("recent-alerts") ||
@@ -322,58 +322,21 @@ export default {
             this.map.getCanvas().style.cursor = "";
           });
           this.map.on("click", layer.id, (e) => {
-            let featureObject = e.features[0].properties;
-
-            const featureGeojson = (({ type, geometry, properties }) => ({
-              type,
-              geometry,
-              properties,
-            }))(e.features[0]);
-            const featureId = e.features[0].id;
-
-            // Reset the previously selected feature
-            if (this.selectedFeatureId && this.selectedFeatureSource) {
-              this.map.setFeatureState(
-                {
-                  source: this.selectedFeatureSource,
-                  id: this.selectedFeatureId,
-                },
-                { selected: false },
-              );
-            }
-
-            // Set new feature state
-            this.map.setFeatureState(
-              { source: layer.id, id: featureId },
-              { selected: true },
-            );
-
-            delete featureObject["YYYYMM"];
-
-            // Update component state
-            this.selectedFeature = featureObject;
-            this.selectedFeatureGeojson = featureGeojson;
-            this.selectedFeatureId = featureId;
-            this.selectedFeatureSource = layer.id;
-            this.showSidebar = true;
-            this.showIntroPanel = false;
-            this.downloadAlert = true;
-
-            // Fields that may or may not exist, depending on views config
-            this.imageUrl = [];
-            featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
-            featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
-            delete featureObject["t0_url"], delete featureObject["t1_url"];
-
-            // Update component state
-            this.selectedFeatureId = featureId;
-            this.selectedFeature = featureObject;
-            this.showSidebar = true;
-
-            this.removePulsingCircles();
+            this.selectFeature(e.features[0], layer.id);
           });
         }
       });
+
+      // Check mostRecentAlerts and otherAlerts for LineString features
+      // If found, set hasLineStrings state to true to activate methods
+      // relevant to lineStrings
+      this.hasLineStrings =
+        geoJsonSource.mostRecentAlerts.features.some(
+          (feature) => feature.geometry.type === "LineString",
+        ) ||
+        geoJsonSource.otherAlerts.features.some(
+          (feature) => feature.geometry.type === "LineString",
+        );
     },
 
     addPulsingCircles() {
@@ -445,8 +408,10 @@ export default {
           } else if (feature.geometry.type === "LineString") {
             // Use Turf to find the midpoint of the LineString
             const line = lineString(feature.geometry.coordinates);
-            const lineLength = length(line, {units: 'kilometers'});
-            const midpoint = along(line, lineLength / 2, {units: 'kilometers'});
+            const lineLength = length(line, { units: "kilometers" });
+            const midpoint = along(line, lineLength / 2, {
+              units: "kilometers",
+            });
             lng = midpoint.geometry.coordinates[0];
             lat = midpoint.geometry.coordinates[1];
           } else if (feature.geometry.type === "Point") {
@@ -498,6 +463,42 @@ export default {
       }
 
       return dates;
+    },
+
+    handleBufferClick(e) {
+      const pixelBuffer = 10;
+      const bbox = [
+        [e.point.x - pixelBuffer, e.point.y - pixelBuffer],
+        [e.point.x + pixelBuffer, e.point.y + pixelBuffer]
+      ];
+
+      const features = this.map.queryRenderedFeatures(bbox, {
+        layers: ['recent-alerts-linestring', 'alerts-linestring']
+      });
+
+      if (features.length > 0) {
+        const firstFeature = features[0];
+        const layerId = firstFeature.layer.id; 
+        this.selectFeature(firstFeature, layerId);      
+      }
+    },
+
+    handleBufferMouseEvent(e) {
+      const pixelBuffer = 10;
+      const bbox = [
+        [e.point.x - pixelBuffer, e.point.y - pixelBuffer],
+        [e.point.x + pixelBuffer, e.point.y + pixelBuffer],
+      ];
+
+      const features = this.map.queryRenderedFeatures(bbox, {
+        layers: ["recent-alerts-linestring", "alerts-linestring"],
+      });
+
+      if (features.length) {
+        this.map.getCanvas().style.cursor = "pointer";
+      } else {
+        this.map.getCanvas().style.cursor = "";
+      }
     },
 
     handleDateRangeChanged(newRange) {
@@ -638,6 +639,53 @@ export default {
         this.addPulsingCircles();
       });
     },
+
+    selectFeature(feature, layerId) {
+      let featureObject = feature.properties;
+
+      const featureGeojson = {
+        type: feature.type,
+        geometry: feature.geometry,
+        properties: feature.properties,
+      };
+      const featureId = feature.id;
+
+      // Reset the previously selected feature
+      if (this.selectedFeatureId && this.selectedFeatureSource) {
+        this.map.setFeatureState(
+          {
+            source: this.selectedFeatureSource,
+            id: this.selectedFeatureId,
+          },
+          { selected: false },
+        );
+      }
+
+      // Set new feature state
+      this.map.setFeatureState(
+        { source: layerId, id: featureId },
+        { selected: true },
+      );
+
+      delete featureObject["YYYYMM"];
+
+      // Update component state
+      this.selectedFeature = featureObject;
+      this.selectedFeatureGeojson = featureGeojson;
+      this.selectedFeatureId = featureId;
+      this.selectedFeatureSource = layerId;
+      this.showSidebar = true;
+      this.showIntroPanel = false;
+      this.downloadAlert = true;
+
+      // Fields that may or may not exist, depending on views config
+      this.imageUrl = [];
+      featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
+      featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
+      delete featureObject["t0_url"], delete featureObject["t1_url"];
+
+      this.removePulsingCircles();
+    }
   },
   mounted() {
     mapboxgl.accessToken = this.mapboxAccessToken;
@@ -667,6 +715,12 @@ export default {
       this.addDataToMap();
       this.addPulsingCircles();
       this.prepareMapLegendContent();
+
+      // Add buffer for LineStrings to make them easier to select
+      if (this.hasLineStrings) {
+        this.map.on("mousemove", this.handleBufferMouseEvent);
+        this.map.on('click', this.handleBufferClick);
+      }
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
