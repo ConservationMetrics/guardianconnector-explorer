@@ -38,6 +38,9 @@
 <script>
 import mapboxgl from "mapbox-gl";
 import bbox from "@turf/bbox";
+import { lineString } from "@turf/helpers";
+import length from "@turf/length";
+import along from "@turf/along";
 
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
@@ -306,6 +309,7 @@ export default {
       }
 
       // Add event listeners for layers that start with 'recent-alerts' and 'alerts'
+      // TODO: add a buffer for polylines
       this.map.getStyle().layers.forEach((layer) => {
         if (
           layer.id.startsWith("recent-alerts") ||
@@ -383,31 +387,31 @@ export default {
 
       // Add the CSS for the pulsing effect
       const styles = `
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.5); opacity: 0; }
-    }
-    .pulsing-dot {
-      width: 30px;
-      height: 30px;
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none!important;
-    }
+        @keyframes pulse {
+          0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+          }
+          .pulsing-dot {
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none!important;
+          }
 
-    .pulsing-dot::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 5px solid #EC00FF;
-      border-radius: inherit;
-      box-shadow: 0 0 0 2px #EC00FF;
-      animation: pulse 2s infinite;
-    }
-  `;
+          .pulsing-dot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 5px solid #EC00FF;
+            border-radius: inherit;
+            box-shadow: 0 0 0 2px #EC00FF;
+            animation: pulse 2s infinite;
+          }
+        `;
       const styleSheet = document.createElement("style");
       styleSheet.type = "text/css";
       styleSheet.innerText = styles;
@@ -431,16 +435,28 @@ export default {
         const features = this.map.querySourceFeatures(sourceId);
 
         features.forEach((feature) => {
-          const bounds = bbox(feature);
+          let lng, lat;
 
-          // Create a new marker element for this feature
-          const pulsingMarker = pulsingDot.cloneNode();
-
-          // Calculate the center of the bounding box
-          const lng = (bounds[0] + bounds[2]) / 2;
-          const lat = (bounds[1] + bounds[3]) / 2;
+          if (feature.geometry.type === "Polygon") {
+            // Calculate the center of the bounding box
+            const bounds = bbox(feature);
+            lng = (bounds[0] + bounds[2]) / 2;
+            lat = (bounds[1] + bounds[3]) / 2;
+          } else if (feature.geometry.type === "LineString") {
+            // Use Turf to find the midpoint of the LineString
+            const line = lineString(feature.geometry.coordinates);
+            const lineLength = length(line, {units: 'kilometers'});
+            const midpoint = along(line, lineLength / 2, {units: 'kilometers'});
+            lng = midpoint.geometry.coordinates[0];
+            lat = midpoint.geometry.coordinates[1];
+          } else if (feature.geometry.type === "Point") {
+            [lng, lat] = feature.geometry.coordinates;
+          } else {
+            return;
+          }
 
           // Create a new marker and add it to the map
+          const pulsingMarker = pulsingDot.cloneNode();
           new mapboxgl.Marker(pulsingMarker)
             .setLngLat([parseFloat(lng), parseFloat(lat)])
             .addTo(this.map);
