@@ -75,7 +75,7 @@ const fetchData = async (
   );
   let columnsData = null;
   if (columnsTableExists) {
-    columnsData = await fetchDataFromTable(db, `${table}__columns`, isSQLite);
+    columnsData = await fetchDataFromTable(db, `${table}___columns`, isSQLite);
   }
 
   // Fetch metadata
@@ -86,7 +86,7 @@ const fetchData = async (
   );
   let metadata = null;
   if (metadataTableExists) {
-    metadata = await fetchDataFromTable(db, `${table}_metadata`, isSQLite);
+    metadata = await fetchDataFromTable(db, `${table}__metadata`, isSQLite);
   }
 
   console.log("Successfully fetched data from", table, "!");
