@@ -167,7 +167,7 @@ if (!VIEWS_CONFIG) {
         async (_req: express.Request, res: express.Response) => {
           try {
             // Fetch data
-            const { mainData } = await fetchData(db, table, IS_SQLITE);
+            const { mainData, metadata } = await fetchData(db, table, IS_SQLITE);
 
             // Prepare alerts data for the alerts view
             const changeDetectionData = prepareAlertData(
@@ -176,7 +176,7 @@ if (!VIEWS_CONFIG) {
             );
 
             // Prepare statistics data for the alerts view
-            const statistics = prepareAlertStatistics(mainData);
+            const statistics = prepareAlertStatistics(mainData, metadata);
 
             // Convert alert data to GeoJSON format
             const geojsonData = {

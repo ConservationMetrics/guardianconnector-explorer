@@ -1,4 +1,4 @@
-import { AlertRecord } from "./types";
+import { AlertRecord, Metadata } from "./types";
 import {
   capitalizeFirstLetter,
   getRandomColor,
@@ -258,7 +258,13 @@ const prepareAlertData = (
 };
 
 // Prepare statistics for the alerts view intro panel
-const prepareAlertStatistics = (data: AlertRecord[]): Record<string, any> => {
+const prepareAlertStatistics = (
+    data: AlertRecord[],
+    metadata: Metadata[] | null
+  ): Record<string, any> => {
+
+  console.log(metadata);
+
   const territory =
     data[0].territory_name.charAt(0).toUpperCase() +
     data[0].territory_name.slice(1);
