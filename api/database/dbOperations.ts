@@ -81,7 +81,7 @@ const fetchData = async (
   // Fetch metadata
   const metadataTableExists = await checkTableExists(
     db,
-    `${table}_metadata`,
+    `${table}__metadata`,
     isSQLite,
   );
   let metadata = null;
