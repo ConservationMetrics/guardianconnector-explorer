@@ -68,25 +68,27 @@ const fetchData = async (
   }
 
   // Fetch mapping columns
+  const columnsTable = `${table}__columns`;
   const columnsTableExists = await checkTableExists(
     db,
-    `${table}__columns`,
+    columnsTable,
     isSQLite,
   );
   let columnsData = null;
   if (columnsTableExists) {
-    columnsData = await fetchDataFromTable(db, `${table}___columns`, isSQLite);
+    columnsData = await fetchDataFromTable(db, columnsTable, isSQLite);
   }
 
   // Fetch metadata
+  const metadataTable = `${table}__metadata`;
   const metadataTableExists = await checkTableExists(
     db,
-    `${table}__metadata`,
+    metadataTable,
     isSQLite,
   );
   let metadata = null;
   if (metadataTableExists) {
-    metadata = await fetchDataFromTable(db, `${table}__metadata`, isSQLite);
+    metadata = await fetchDataFromTable(db, metadataTable, isSQLite);
   }
 
   console.log("Successfully fetched data from", table, "!");
