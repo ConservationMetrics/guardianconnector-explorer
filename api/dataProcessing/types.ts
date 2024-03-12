@@ -14,8 +14,8 @@ export type AlertRecord = {
 
 export type Metadata = {
   type_alert: string;
-  month: string;
-  year: string;
+  month: number;
+  year: number;
   total_alerts: string;
   description_alerts: string;
 };

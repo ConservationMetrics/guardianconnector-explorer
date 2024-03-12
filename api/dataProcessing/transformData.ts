@@ -263,8 +263,6 @@ const prepareAlertStatistics = (
     metadata: Metadata[] | null
   ): Record<string, any> => {
 
-  console.log(metadata);
-
   const territory =
     data[0].territory_name.charAt(0).toUpperCase() +
     data[0].territory_name.slice(1);
@@ -287,13 +285,39 @@ const prepareAlertStatistics = (
 
   // Sort dates to find the earliest and latest
   formattedDates.sort((a, b) => a.date.getTime() - b.date.getTime());
-  const latestDate = formattedDates[formattedDates.length - 1].date;
-  latestDate.setDate(28);
-  const latestDateStr = formattedDates[formattedDates.length - 1].dateString;
-  const earliestDate = formattedDates[0].date;
-  earliestDate.setDate(1);
-  const earliestDateStr = formattedDates[0].dateString;
+  
+  let earliestDateStr, latestDateStr;
+  let earliestDate: Date, latestDate: Date;
 
+  if (metadata && metadata.length > 0) {
+    // Find earliest and latest dates from metadata
+    metadata.sort((a, b) => (a.year === b.year ? a.month - b.month : a.year - b.year));
+    const earliestMetadata = metadata[0];
+    const latestMetadata = metadata[metadata.length - 1];
+
+    earliestDate = new Date(earliestMetadata.year, earliestMetadata.month - 1, 1);
+    latestDate = new Date(latestMetadata.year, latestMetadata.month - 1, 28);
+
+    earliestDateStr = `${String(earliestMetadata.month).padStart(2, '0')}-${earliestMetadata.year}`;
+    latestDateStr = `${String(latestMetadata.month).padStart(2, '0')}-${latestMetadata.year}`;
+  } else {
+    // If metadata is null, calculate earliest and latest dates from data
+    const formattedDates = data.map((item) => ({
+      date: new Date(`${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`),
+      dateString: `${item.month_detec.padStart(2, "0")}-${item.year_detec}`,
+    }));
+
+    formattedDates.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    earliestDate = formattedDates[0].date;
+    earliestDate.setDate(1);
+    earliestDateStr = formattedDates[0].dateString;
+
+    latestDate = formattedDates[formattedDates.length - 1].date;
+    latestDate.setDate(28);
+    latestDateStr = formattedDates[formattedDates.length - 1].dateString;
+  }
+  
   // Create an array of all dates
   const allDates = Array.from(
     new Set(formattedDates.map((item) => item.dateString)),
