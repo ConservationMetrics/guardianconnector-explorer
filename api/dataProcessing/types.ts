@@ -11,3 +11,11 @@ export type AlertRecord = {
   area_alert_ha: string;
   _topic: string;
 };
+
+export type Metadata = {
+  type_alert: string;
+  month: number;
+  year: number;
+  total_alerts: string;
+  description_alerts: string;
+};

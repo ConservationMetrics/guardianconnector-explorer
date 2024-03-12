@@ -56,7 +56,7 @@ const fetchData = async (
   db: any,
   table: string | undefined,
   isSQLite: string | undefined,
-): Promise<{ mainData: any[]; columnsData: any[] | null }> => {
+): Promise<{ mainData: any[]; columnsData: any[] | null; metadata: any[] | null ;}> => {
   console.log("Fetching data from", table, "...");
   // Fetch data
   const mainDataExists = await checkTableExists(db, table, isSQLite);
@@ -75,12 +75,23 @@ const fetchData = async (
   );
   let columnsData = null;
   if (columnsTableExists) {
-    columnsData = await fetchDataFromTable(db, `${table}__columns`, isSQLite);
+    columnsData = await fetchDataFromTable(db, `${table}___columns`, isSQLite);
+  }
+
+  // Fetch metadata
+  const metadataTableExists = await checkTableExists(
+    db,
+    `${table}_metadata`,
+    isSQLite,
+  );
+  let metadata = null;
+  if (metadataTableExists) {
+    metadata = await fetchDataFromTable(db, `${table}__metadata`, isSQLite);
   }
 
   console.log("Successfully fetched data from", table, "!");
 
-  return { mainData, columnsData };
+  return { mainData, columnsData, metadata };
 };
 
 export default fetchData;
