@@ -19,3 +19,5 @@ export type Metadata = {
   total_alerts: string;
   description_alerts: string;
 };
+
+export type AlertsPerMonth = Record<string, number>;
