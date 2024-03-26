@@ -1,4 +1,4 @@
-import { AlertRecord, Metadata } from "./types";
+import { AlertRecord, Metadata, AlertsPerMonth } from "./types";
 import {
   capitalizeFirstLetter,
   getRandomColor,
@@ -259,10 +259,9 @@ const prepareAlertData = (
 
 // Prepare statistics for the alerts view intro panel
 const prepareAlertStatistics = (
-    data: AlertRecord[],
-    metadata: Metadata[] | null
-  ): Record<string, any> => {
-
+  data: AlertRecord[],
+  metadata: Metadata[] | null,
+): Record<string, any> => {
   const territory =
     data[0].territory_name.charAt(0).toUpperCase() +
     data[0].territory_name.slice(1);
@@ -285,25 +284,33 @@ const prepareAlertStatistics = (
 
   // Sort dates to find the earliest and latest
   formattedDates.sort((a, b) => a.date.getTime() - b.date.getTime());
-  
+
   let earliestDateStr, latestDateStr;
   let earliestDate: Date, latestDate: Date;
 
   if (metadata && metadata.length > 0) {
     // Find earliest and latest dates from metadata
-    metadata.sort((a, b) => (a.year === b.year ? a.month - b.month : a.year - b.year));
+    metadata.sort((a, b) =>
+      a.year === b.year ? a.month - b.month : a.year - b.year,
+    );
     const earliestMetadata = metadata[0];
     const latestMetadata = metadata[metadata.length - 1];
 
-    earliestDate = new Date(earliestMetadata.year, earliestMetadata.month - 1, 1);
+    earliestDate = new Date(
+      earliestMetadata.year,
+      earliestMetadata.month - 1,
+      1,
+    );
     latestDate = new Date(latestMetadata.year, latestMetadata.month - 1, 28);
 
-    earliestDateStr = `${String(earliestMetadata.month).padStart(2, '0')}-${earliestMetadata.year}`;
-    latestDateStr = `${String(latestMetadata.month).padStart(2, '0')}-${latestMetadata.year}`;
+    earliestDateStr = `${String(earliestMetadata.month).padStart(2, "0")}-${earliestMetadata.year}`;
+    latestDateStr = `${String(latestMetadata.month).padStart(2, "0")}-${latestMetadata.year}`;
   } else {
     // If metadata is null, calculate earliest and latest dates from data
     const formattedDates = data.map((item) => ({
-      date: new Date(`${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`),
+      date: new Date(
+        `${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`,
+      ),
       dateString: `${item.month_detec.padStart(2, "0")}-${item.year_detec}`,
     }));
 
@@ -317,14 +324,14 @@ const prepareAlertStatistics = (
     latestDate.setDate(28);
     latestDateStr = formattedDates[formattedDates.length - 1].dateString;
   }
-  
+
   // Create an array of all dates
   const allDates = Array.from(
     new Set(formattedDates.map((item) => item.dateString)),
   );
 
   // Determine the date 12 months before the latest date
-  let twelveMonthsBefore = new Date(latestDate);
+  const twelveMonthsBefore = new Date(latestDate);
   twelveMonthsBefore.setFullYear(twelveMonthsBefore.getFullYear() - 1);
 
   // Filter and sort the data for the last 12 months
@@ -377,54 +384,62 @@ const prepareAlertStatistics = (
         months.push(monthYear);
       }
     }
+
     // Reverse the months array to have the dates in ascending order.
     months.reverse();
     return months;
   };
 
-  // Initialize alertsPerMonth with last 12 months
-  type AlertsPerMonth = Record<string, number>;
+  // Helper function to update months cumulatively
+  // Whether it be alerts or hectares
+  const updateCumulativeData = (
+    dataCollection: AlertRecord[],
+    accumulatorMap: Record<string, number>,
+    property: "alerts" | "hectares",
+  ) => {
+    let cumulativeValue = 0;
+    const months = Object.keys(accumulatorMap);
+
+    months.forEach((monthYear) => {
+      if (property === "alerts") {
+        const monthData = dataCollection.filter(
+          (item) =>
+            `${item.month_detec.padStart(2, "0")}-${item.year_detec}` ===
+            monthYear,
+        );
+        cumulativeValue += monthData.length;
+      } else if (property === "hectares") {
+        dataCollection.forEach((item) => {
+          const monthYearItem = `${item.month_detec.padStart(2, "0")}-${item.year_detec}`;
+          if (monthYearItem === monthYear) {
+            const hectares = parseFloat(item.area_alert_ha);
+            cumulativeValue += isNaN(hectares) ? 0 : hectares;
+          }
+        });
+      }
+      accumulatorMap[monthYear] = parseFloat(cumulativeValue.toFixed(2));
+    });
+  };
+
+  // Initialize alertsPerMonth and hectaresPerMonth
   const alertsPerMonth: AlertsPerMonth = {};
-  getUpTo12MonthsForChart().forEach((monthYear) => {
+  const hectaresPerMonth: AlertsPerMonth = {};
+  const months = getUpTo12MonthsForChart();
+
+  months.forEach((monthYear) => {
     alertsPerMonth[monthYear] = 0;
-  });
-
-  // Populate alertsPerMonth
-  last12MonthsData.forEach((item) => {
-    const monthYear: string = `${item.month_detec.padStart(2, "0")}-${item.year_detec}`;
-    if (alertsPerMonth.hasOwnProperty(monthYear)) {
-      alertsPerMonth[monthYear]++;
-    }
-  });
-
-  // Initialize hectaresPerMonth with last 12 months
-  type HectaresPerMonth = Record<string, number>;
-  const hectaresPerMonth: HectaresPerMonth = {};
-  getUpTo12MonthsForChart().forEach((monthYear) => {
     hectaresPerMonth[monthYear] = 0;
   });
 
-  // Populate hectaresPerMonth
-  last12MonthsData.forEach((item) => {
-    const monthYear: string = `${item.month_detec.padStart(2, "0")}-${
-      item.year_detec
-    }`;
-    if (hectaresPerMonth.hasOwnProperty(monthYear)) {
-      const hectares = parseFloat(item.area_alert_ha);
-      hectaresPerMonth[monthYear] += isNaN(hectares) ? 0 : hectares;
-      hectaresPerMonth[monthYear] = parseFloat(
-        hectaresPerMonth[monthYear].toFixed(2),
-      );
-    }
-  });
-
-  // Find the most recent alert date
-  const recentAlertDate = formattedDates.reduce(
-    (latest, current) => (current.date > latest.date ? current : latest),
-    formattedDates[0],
-  ).dateString;
+  // Populate alertsPerMonth and hectaresPerMonth using the helper function
+  updateCumulativeData(last12MonthsData, alertsPerMonth, "alerts");
+  updateCumulativeData(last12MonthsData, hectaresPerMonth, "hectares");
 
   // Count the number of alerts for the most recent date
+  const recentAlertDate =
+    last12MonthsData.length > 0
+    ? `${last12MonthsData[last12MonthsData.length - 1].month_detec.padStart(2, "0")}-${last12MonthsData[last12MonthsData.length - 1].year_detec}`
+    : 'N/A';
   const recentAlertsNumber = data.filter(
     (item) =>
       `${item.month_detec.padStart(2, "0")}-${item.year_detec}` ===
@@ -436,7 +451,7 @@ const prepareAlertStatistics = (
 
   // Calculate total hectares
   const hectaresTotal = data
-    .reduce((total, item) => total + parseFloat(item.area_alert_ha), 0)
+    .reduce((total, item) => total + parseFloat(item.area_alert_ha || "0"), 0)
     .toFixed(2);
 
   return {
