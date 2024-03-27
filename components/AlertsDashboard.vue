@@ -312,8 +312,8 @@ export default {
       // Add event listeners for layers that start with 'recent-alerts' and 'alerts'
       this.map.getStyle().layers.forEach((layer) => {
         if (
-          layer.id.startsWith("recent-alerts") ||
-          layer.id.startsWith("alerts")
+          layer.id.startsWith("recent-alerts") && !layer.id.includes("stroke") ||
+          layer.id.startsWith("alerts") && !layer.id.includes("stroke")
         ) {
           this.map.on("mouseenter", layer.id, () => {
             this.map.getCanvas().style.cursor = "pointer";
