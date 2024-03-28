@@ -150,7 +150,7 @@ const prepareAlertData = (
   embedMedia: boolean,
 ): {
   mostRecentAlerts: Array<Record<string, any>>;
-  otherAlerts: Array<Record<string, any>>;
+  previousAlerts: Array<Record<string, any>>;
 } => {
   const transformChangeDetectionItem = (
     item: Record<string, any>,
@@ -230,7 +230,7 @@ const prepareAlertData = (
   });
 
   const mostRecentAlerts: Array<Record<string, any>> = [];
-  const otherAlerts: Array<Record<string, any>> = [];
+  const previousAlerts: Array<Record<string, any>> = [];
 
   // Second pass to segregate the data
   data.forEach((item) => {
@@ -250,11 +250,11 @@ const prepareAlertData = (
     if (monthYearStr === latestMonthStr) {
       mostRecentAlerts.push(transformedItem);
     } else {
-      otherAlerts.push(transformedItem);
+      previousAlerts.push(transformedItem);
     }
   });
 
-  return { mostRecentAlerts, otherAlerts };
+  return { mostRecentAlerts, previousAlerts };
 };
 
 // Prepare statistics for the alerts view intro panel

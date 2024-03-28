@@ -117,9 +117,9 @@ export default {
           ...this.data.mostRecentAlerts,
           features: filterFeatures(this.data.mostRecentAlerts.features),
         },
-        otherAlerts: {
-          ...this.data.otherAlerts,
-          features: filterFeatures(this.data.otherAlerts.features),
+        previousAlerts: {
+          ...this.data.previousAlerts,
+          features: filterFeatures(this.data.previousAlerts.features),
         },
       };
     },
@@ -135,7 +135,7 @@ export default {
         )
       ) {
         // Add the most recent alerts source to the map as Polygons
-        this.map.addSource("recent-alerts-polygon", {
+        this.map.addSource("most-recent-alerts-polygon", {
           type: "geojson",
           data: {
             ...geoJsonSource.mostRecentAlerts,
@@ -147,15 +147,15 @@ export default {
 
         // Add a layer for most recent alerts Polygons
         this.map.addLayer({
-          id: "recent-alerts-polygon",
+          id: "most-recent-alerts-polygon",
           type: "fill",
-          source: "recent-alerts-polygon",
+          source: "most-recent-alerts-polygon",
           paint: {
             "fill-color": [
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#EC00FF",
+              "#FF0000",
             ],
             "fill-opacity": 0.5,
           },
@@ -163,15 +163,15 @@ export default {
 
         // Add a stroke for most recent alerts Polygons
         this.map.addLayer({
-          id: "recent-alerts-stroke-polygon",
+          id: "most-recent-alerts-stroke-polygon",
           type: "line",
-          source: "recent-alerts-polygon",
+          source: "most-recent-alerts-polygon",
           paint: {
             "line-color": [
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#EC00FF",
+              "#FF0000",
             ],
             "line-width": 2,
           },
@@ -185,7 +185,7 @@ export default {
         )
       ) {
         // Add the most recent alerts source to the map as LineStrings
-        this.map.addSource("recent-alerts-linestring", {
+        this.map.addSource("most-recent-alerts-linestring", {
           type: "geojson",
           data: {
             ...geoJsonSource.mostRecentAlerts,
@@ -197,15 +197,15 @@ export default {
 
         // Add a layer for most recent alerts LineStrings
         this.map.addLayer({
-          id: "recent-alerts-linestring",
+          id: "most-recent-alerts-linestring",
           type: "line",
-          source: "recent-alerts-linestring",
+          source: "most-recent-alerts-linestring",
           paint: {
             "line-color": [
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#EC00FF",
+              "#FF0000",
             ],
             "line-width": [
               "case",
@@ -218,85 +218,85 @@ export default {
         });
       }
 
-      // Check if the data contains Polygon features for other alerts
+      // Check if the data contains Polygon features for previous alerts
       if (
-        geoJsonSource.otherAlerts.features.some(
+        geoJsonSource.previousAlerts.features.some(
           (feature) => feature.geometry.type === "Polygon",
         )
       ) {
-        // Add the other alerts source to the map as Polygons
-        this.map.addSource("alerts-polygon", {
+        // Add the previous alerts source to the map as Polygons
+        this.map.addSource("previous-alerts-polygon", {
           type: "geojson",
           data: {
-            ...geoJsonSource.otherAlerts,
-            features: geoJsonSource.otherAlerts.features.filter(
+            ...geoJsonSource.previousAlerts,
+            features: geoJsonSource.previousAlerts.features.filter(
               (feature) => feature.geometry.type === "Polygon",
             ),
           },
         });
 
-        // Add a layer for other alerts Polygons
+        // Add a layer for previous alerts Polygons
         this.map.addLayer({
-          id: "alerts-polygon",
+          id: "previous-alerts-polygon",
           type: "fill",
-          source: "alerts-polygon",
+          source: "previous-alerts-polygon",
           paint: {
             "fill-color": [
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#FF0000",
+              "#FD8D3C",
             ],
             "fill-opacity": 0.5,
           },
         });
 
-        // Add a stroke for other alerts Polygons
+        // Add a stroke for previous alerts Polygons
         this.map.addLayer({
-          id: "alerts-stroke-polygon",
+          id: "previous-alerts-stroke-polygon",
           type: "line",
-          source: "alerts-polygon",
+          source: "previous-alerts-polygon",
           paint: {
             "line-color": [
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#FF0000",
+              "#FD8D3C",
             ],
             "line-width": 2,
           },
         });
       }
 
-      // Check if the data contains LineString features for other alerts
+      // Check if the data contains LineString features for previous alerts
       if (
-        geoJsonSource.otherAlerts.features.some(
+        geoJsonSource.previousAlerts.features.some(
           (feature) => feature.geometry.type === "LineString",
         )
       ) {
-        // Add the other alerts source to the map as LineStrings
-        this.map.addSource("alerts-linestring", {
+        // Add the previous alerts source to the map as LineStrings
+        this.map.addSource("previous-alerts-linestring", {
           type: "geojson",
           data: {
-            ...geoJsonSource.otherAlerts,
-            features: geoJsonSource.otherAlerts.features.filter(
+            ...geoJsonSource.previousAlerts,
+            features: geoJsonSource.previousAlerts.features.filter(
               (feature) => feature.geometry.type === "LineString",
             ),
           },
         });
 
-        // Add a layer for other alerts linestrings
+        // Add a layer for previous alerts linestrings
         this.map.addLayer({
-          id: "alerts-linestring",
+          id: "previous-alerts-linestring",
           type: "line",
-          source: "alerts-linestring",
+          source: "previous-alerts-linestring",
           filter: ["==", "$type", "LineString"],
           paint: {
             "line-color": [
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#FF0000",
+              "#FD8D3C",
             ],
             "line-width": [
               "case",
@@ -309,11 +309,11 @@ export default {
         });
       }
 
-      // Add event listeners for layers that start with 'recent-alerts' and 'alerts'
+      // Add event listeners for layers that start with 'most-recent-alerts' and 'alerts'
       this.map.getStyle().layers.forEach((layer) => {
         if (
-          layer.id.startsWith("recent-alerts") && !layer.id.includes("stroke") ||
-          layer.id.startsWith("alerts") && !layer.id.includes("stroke")
+          layer.id.startsWith("most-recent-alerts") && !layer.id.includes("stroke") ||
+          layer.id.startsWith("previous-alerts") && !layer.id.includes("stroke")
         ) {
           this.map.on("mouseenter", layer.id, () => {
             this.map.getCanvas().style.cursor = "pointer";
@@ -327,14 +327,14 @@ export default {
         }
       });
 
-      // Check mostRecentAlerts and otherAlerts for LineString features
+      // Check mostRecentAlerts and previousAlerts for LineString features
       // If found, set hasLineStrings state to true to activate methods
       // relevant to lineStrings
       this.hasLineStrings =
         geoJsonSource.mostRecentAlerts.features.some(
           (feature) => feature.geometry.type === "LineString",
         ) ||
-        geoJsonSource.otherAlerts.features.some(
+        geoJsonSource.previousAlerts.features.some(
           (feature) => feature.geometry.type === "LineString",
         );
     },
@@ -369,9 +369,9 @@ export default {
             left: 0;
             width: 100%;
             height: 100%;
-            border: 5px solid #EC00FF;
+            border: 5px solid #FF0000;
             border-radius: inherit;
-            box-shadow: 0 0 0 2px #EC00FF;
+            box-shadow: 0 0 0 2px #FF0000;
             animation: pulse 2s infinite;
           }
         `;
@@ -380,10 +380,10 @@ export default {
       styleSheet.innerText = styles;
       document.head.appendChild(styleSheet);
 
-      // Check for sources that start with 'recent-alerts'
+      // Check for sources that start with 'most-recent-alerts'
       const sources = this.map.getStyle().sources;
       const recentAlertsSources = Object.keys(sources).filter((source) =>
-        source.startsWith("recent-alerts"),
+        source.startsWith("most-recent-alerts"),
       );
 
       recentAlertsSources.forEach((sourceId) => {
@@ -473,7 +473,7 @@ export default {
       ];
 
       const features = this.map.queryRenderedFeatures(bbox, {
-        layers: ['recent-alerts-linestring', 'alerts-linestring']
+        layers: ['most-recent-alerts-linestring', 'previous-alerts-linestring']
       });
 
       if (features.length > 0) {
@@ -491,7 +491,7 @@ export default {
       ];
 
       const features = this.map.queryRenderedFeatures(bbox, {
-        layers: ["recent-alerts-linestring", "alerts-linestring"],
+        layers: ["most-recent-alerts-linestring", "previous-alerts-linestring"],
       });
 
       if (features.length) {
@@ -519,7 +519,7 @@ export default {
       this.$nextTick(() => {
         this.map.getStyle().layers.forEach((layer) => {
           if (
-            layer.id.startsWith("recent-alerts") ||
+            layer.id.startsWith("most-recent-alerts") ||
             layer.id.startsWith("alerts")
           ) {
             this.map.setFilter(layer.id, [
@@ -530,10 +530,10 @@ export default {
           }
         });
 
-        // If 'recent-alerts' layers are empty, remove the pulsing circles. If not, add them.
+        // If 'most-recent-alerts' layers are empty, remove the pulsing circles. If not, add them.
         const recentAlertsLayers = this.map
           .getStyle()
-          .layers.filter((layer) => layer.id.startsWith("recent-alerts"));
+          .layers.filter((layer) => layer.id.startsWith("most-recent-alerts"));
         let recentAlertsFeatures = [];
         recentAlertsLayers.forEach((layer) => {
           recentAlertsFeatures.push(
@@ -567,7 +567,7 @@ export default {
     isOnlyLineStringData() {
       const allFeatures = [
         ...this.data.mostRecentAlerts.features,
-        ...this.data.otherAlerts.features,
+        ...this.data.previousAlerts.features,
       ];
       return allFeatures.every(
         (feature) => feature.geometry.type === "LineString",
@@ -575,13 +575,18 @@ export default {
     },
 
     prepareMapLegendContent() {
-      if (!this.mapLegendLayerIds) {
-        return;
-      }
       this.map.once("idle", () => {
+        // Add most-recent-alerts & previous-alerts layers to mapLegendContent
+        let mapLegendLayerIds = this.mapLegendLayerIds;
+        if (this.hasLineStrings) {
+          mapLegendLayerIds = "most-recent-alerts-linestring,previous-alerts-linestring," + mapLegendLayerIds;
+        } else {
+          mapLegendLayerIds = "most-recent-alerts-polygon,previous-alerts-polygon," + mapLegendLayerIds;
+        }
+
         this.mapLegendContent = prepareMapLegendLayers(
           this.map,
-          this.mapLegendLayerIds,
+          mapLegendLayerIds,
         );
       });
     },
@@ -613,10 +618,10 @@ export default {
       this.imageCaption = null;
       this.selectedDateRange = null;
 
-      // Reset the filters for layers that start with 'recent-alerts' and 'alerts'
+      // Reset the filters for layers that start with 'most-recent-alerts' and 'alerts'
       this.map.getStyle().layers.forEach((layer) => {
         if (
-          layer.id.startsWith("recent-alerts") ||
+          layer.id.startsWith("most-recent-alerts") ||
           layer.id.startsWith("alerts")
         ) {
           this.map.setFilter(layer.id, null);

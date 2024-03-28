@@ -14,7 +14,7 @@
         </h2>
         <p class="text-l mb-2">
           Most recent alerts shown on map in
-          <span style="color: #ec00ff"><strong>purple</strong></span
+          <span style="color: #FF0000"><strong>red</strong></span
           >.
         </p>
         <div class="mb-2">
