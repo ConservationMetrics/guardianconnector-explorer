@@ -48,9 +48,12 @@ export function prepareMapLegendLayers(
         return;
       }
 
-      const formattedId = layerId
+      let formattedId = layerId
         .replace(/-/g, " ")
         .replace(/^\w/, (m) => m.toUpperCase());
+
+      // if formattedId ends with polygon or linestring, remove it
+      formattedId = formattedId.replace(/ polygon| linestring$/i, "");
 
       return {
         id: formattedId,

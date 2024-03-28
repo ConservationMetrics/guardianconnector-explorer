@@ -183,7 +183,7 @@ if (!VIEWS_CONFIG) {
               mostRecentAlerts: transformToGeojson(
                 changeDetectionData.mostRecentAlerts,
               ),
-              otherAlerts: transformToGeojson(changeDetectionData.otherAlerts),
+              previousAlerts: transformToGeojson(changeDetectionData.previousAlerts),
             };
 
             const response = {

@@ -45,6 +45,8 @@ export default {
 }
 
 .fill-box {
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70% !important;
+  transform: rotate(60deg);
 }
 
 .line-box {
@@ -55,7 +57,11 @@ export default {
 }
 
 .circle-box {
-  border-radius: 50%;
+  border-radius: 50%;  
+  width: 10px;
+  height: 10px;
+  margin: 5px;
+  margin-right: 15px;
 }
 
 .legend-item {
