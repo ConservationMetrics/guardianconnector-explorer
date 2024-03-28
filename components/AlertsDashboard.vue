@@ -155,7 +155,7 @@ export default {
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#EC00FF",
+              "#FF0000",
             ],
             "fill-opacity": 0.5,
           },
@@ -171,7 +171,7 @@ export default {
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#EC00FF",
+              "#FF0000",
             ],
             "line-width": 2,
           },
@@ -205,7 +205,7 @@ export default {
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#EC00FF",
+              "#FF0000",
             ],
             "line-width": [
               "case",
@@ -245,7 +245,7 @@ export default {
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#FF0000",
+              "#FD8D3C",
             ],
             "fill-opacity": 0.5,
           },
@@ -261,7 +261,7 @@ export default {
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#FF0000",
+              "#FD8D3C",
             ],
             "line-width": 2,
           },
@@ -296,7 +296,7 @@ export default {
               "case",
               ["boolean", ["feature-state", "selected"], false],
               "#FFFF00",
-              "#FF0000",
+              "#FD8D3C",
             ],
             "line-width": [
               "case",
@@ -369,9 +369,9 @@ export default {
             left: 0;
             width: 100%;
             height: 100%;
-            border: 5px solid #EC00FF;
+            border: 5px solid #FF0000;
             border-radius: inherit;
-            box-shadow: 0 0 0 2px #EC00FF;
+            box-shadow: 0 0 0 2px #FF0000;
             animation: pulse 2s infinite;
           }
         `;
