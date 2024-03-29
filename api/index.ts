@@ -179,40 +179,40 @@ if (!VIEWS_CONFIG) {
             const mapeoTable = VIEWS[table].MAPEO_TABLE;
             const mapeoCategoryIds = VIEWS[table].MAPEO_CATEGORY_IDS;
 
+            let mapeoData = null;
+
             if (mapeoTable && mapeoCategoryIds) {
-              // Fetch data from Mapeo API
-              const mapeoData = await fetchData(db, mapeoTable, IS_SQLITE);
+              // Fetch Mapeo data
+              const rawMapeoData = await fetchData(db, mapeoTable, IS_SQLITE);
 
               // Filter data to remove unwanted columns and substrings
               const filteredMapeoData = filterUnwantedKeys(
-                mapeoData.mainData,
-                mapeoData.columnsData,
+                rawMapeoData.mainData,
+                rawMapeoData.columnsData,
                 VIEWS[table].UNWANTED_COLUMNS,
                 VIEWS[table].UNWANTED_SUBSTRINGS,
               );
 
-              // Filter data to only show data where p__categoryid matches any values in mapeoCategoryIds (a comma-separated string of values)
+              // Filter Mapeo data to only show data where p__categoryid matches any values in mapeoCategoryIds (a comma-separated string of values)
               const filteredMapeoDataByCategory = filteredMapeoData.filter(
                 (row: any) => {
                   return mapeoCategoryIds.includes(row.p__categoryid);
                 },
               );
-
+              
               // Filter only data with valid geofields
               const filteredMapeoGeoData = filterGeoData(filteredMapeoDataByCategory);
-
               // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
               const transformedMapeoData = transformSurveyData(
                 filteredMapeoGeoData,
               );
-
               // Process geodata
               const processedMapeoData = prepareMapData(
                 transformedMapeoData,
                 VIEWS[table].FRONT_END_FILTER_FIELD,
               );
               
-              console.log("Mapeo data:", processedMapeoData);
+              mapeoData = processedMapeoData;
             }
 
             // Prepare statistics data for the alerts view
@@ -242,6 +242,7 @@ if (!VIEWS_CONFIG) {
               mapboxProjection: VIEWS[table].MAPBOX_PROJECTION,
               mapboxStyle: VIEWS[table].MAPBOX_STYLE,
               mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
+              mapeoData: mapeoData,
               mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
               statistics: statistics,
               table: table,

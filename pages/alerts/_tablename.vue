@@ -17,6 +17,7 @@
       :mapbox-style="mapboxStyle"
       :mapbox-zoom="mapboxZoom"
       :mapbox3d="mapbox3d"
+      :mapeo-data="mapeoData"
       :media-base-path="mediaBasePath"
       :statistics="statistics"
     />
@@ -71,6 +72,7 @@ export default {
         mapboxProjection: response.mapboxProjection,
         mapboxStyle: response.mapboxStyle,
         mapboxZoom: response.mapboxZoom,
+        mapeoData: response.mapeoData,
         mediaBasePath: response.mediaBasePath,
         statistics: response.statistics,
       };

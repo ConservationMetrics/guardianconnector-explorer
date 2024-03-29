@@ -68,6 +68,7 @@ export default {
     "mapboxProjection",
     "mapboxStyle",
     "mapboxZoom",
+    "mapeoData",
     "mediaBasePath",
     "statistics",
   ],
