@@ -30,6 +30,8 @@ interface ViewConfig {
   MAPBOX_PITCH: string;
   MAPBOX_BEARING: string;
   MAPBOX_3D: string;
+  MAPEO_TABLE: string;
+  MAPEO_CATEGORY_IDS: string;
   MAP_LEGEND_LAYER_IDS: string;
   MEDIA_BASE_PATH: string;
   LOGO_URL: string;

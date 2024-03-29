@@ -30,6 +30,7 @@ import {
   VIEWS_CONFIG,
   Views,
 } from "./config";
+import { filter } from "vue/types/umd";
 
 const app = express();
 
@@ -174,6 +175,45 @@ if (!VIEWS_CONFIG) {
               mainData,
               VIEWS[table].EMBED_MEDIA === "YES",
             );
+
+            const mapeoTable = VIEWS[table].MAPEO_TABLE;
+            const mapeoCategoryIds = VIEWS[table].MAPEO_CATEGORY_IDS;
+
+            if (mapeoTable && mapeoCategoryIds) {
+              // Fetch data from Mapeo API
+              const mapeoData = await fetchData(db, mapeoTable, IS_SQLITE);
+
+              // Filter data to remove unwanted columns and substrings
+              const filteredMapeoData = filterUnwantedKeys(
+                mapeoData.mainData,
+                mapeoData.columnsData,
+                VIEWS[table].UNWANTED_COLUMNS,
+                VIEWS[table].UNWANTED_SUBSTRINGS,
+              );
+
+              // Filter data to only show data where p__categoryid matches any values in mapeoCategoryIds (a comma-separated string of values)
+              const filteredMapeoDataByCategory = filteredMapeoData.filter(
+                (row: any) => {
+                  return mapeoCategoryIds.includes(row.p__categoryid);
+                },
+              );
+
+              // Filter only data with valid geofields
+              const filteredMapeoGeoData = filterGeoData(filteredMapeoDataByCategory);
+
+              // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
+              const transformedMapeoData = transformSurveyData(
+                filteredMapeoGeoData,
+              );
+
+              // Process geodata
+              const processedMapeoData = prepareMapData(
+                transformedMapeoData,
+                VIEWS[table].FRONT_END_FILTER_FIELD,
+              );
+              
+              console.log("Mapeo data:", processedMapeoData);
+            }
 
             // Prepare statistics data for the alerts view
             const statistics = prepareAlertStatistics(mainData, metadata);
