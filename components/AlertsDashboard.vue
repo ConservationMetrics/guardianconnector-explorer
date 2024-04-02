@@ -340,6 +340,61 @@ export default {
         );
     },
 
+    addMapeoData() {
+      // Create a GeoJSON source with all the features
+      const geoJsonSource = {
+        type: "FeatureCollection",
+        features: this.mapeoData.map((feature) => ({
+          type: "Feature",
+          geometry: {
+            type: feature.Geotype,
+            coordinates: feature.Geocoordinates,
+          },
+          properties: {
+            feature,
+          },
+        })),
+      };
+
+      // Add the source to the map
+      this.map.addSource("data-source", {
+        type: "geojson",
+        data: geoJsonSource,
+      });
+
+      // Add a layer for Point features
+      this.map.addLayer({
+        id: "data-layer-point",
+        type: "circle",
+        source: "data-source",
+        filter: ["==", "$type", "Point"],
+        paint: {
+          "circle-radius": 6,
+          "circle-color": ["get", "filter-color", ["get", "feature"]],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#fff",
+        },
+      });    
+      
+      // Add event listeners
+      [
+        "data-layer-point"
+      ].forEach((layerId) => {
+        this.map.on("mouseenter", layerId, () => {
+          this.map.getCanvas().style.cursor = "pointer";
+        });
+        this.map.on("mouseleave", layerId, () => {
+          this.map.getCanvas().style.cursor = "";
+        });
+        this.map.on("click", layerId, (e) => {
+          let featureObject = JSON.parse(e.features[0].properties.feature);
+          delete featureObject["filter-color"];
+          this.selectedFeature = featureObject;
+          this.showSidebar = true;
+        });
+      });
+    },
+
     addPulsingCircles() {
       if (document.querySelector(".pulsing-dot")) {
         return;
@@ -719,6 +774,7 @@ export default {
       }
 
       this.addDataToMap();
+      this.addMapeoData();
       this.addPulsingCircles();
       this.prepareMapLegendContent();
 

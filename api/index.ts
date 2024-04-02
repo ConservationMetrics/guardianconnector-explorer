@@ -30,7 +30,6 @@ import {
   VIEWS_CONFIG,
   Views,
 } from "./config";
-import { filter } from "vue/types/umd";
 
 const app = express();
 
