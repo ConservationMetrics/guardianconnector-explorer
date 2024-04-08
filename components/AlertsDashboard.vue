@@ -77,6 +77,7 @@ export default {
       calculateHectares: false,
       dateOptions: [],
       downloadAlert: false,
+      featuresUnderCursor: 0,
       hasLineStrings: false,
       imageUrl: [],
       map: null,
@@ -317,10 +318,14 @@ export default {
           layer.id.startsWith("previous-alerts") && !layer.id.includes("stroke")
         ) {
           this.map.on("mouseenter", layer.id, () => {
+            this.featuresUnderCursor++;
             this.map.getCanvas().style.cursor = "pointer";
           });
           this.map.on("mouseleave", layer.id, () => {
-            this.map.getCanvas().style.cursor = "";
+            this.featuresUnderCursor--;
+            if (this.featuresUnderCursor === 0) {
+              this.map.getCanvas().style.cursor = "";
+            }
           });
           this.map.on("click", layer.id, (e) => {
             this.selectFeature(e.features[0], layer.id);
@@ -381,10 +386,14 @@ export default {
         "data-layer-point"
       ].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
+          this.featuresUnderCursor++;
           this.map.getCanvas().style.cursor = "pointer";
         });
         this.map.on("mouseleave", layerId, () => {
-          this.map.getCanvas().style.cursor = "";
+          this.featuresUnderCursor--;
+            if (this.featuresUnderCursor === 0) {
+              this.map.getCanvas().style.cursor = "";
+            }
         });
         this.map.on("click", layerId, (e) => {
           let featureObject = JSON.parse(e.features[0].properties.feature);
