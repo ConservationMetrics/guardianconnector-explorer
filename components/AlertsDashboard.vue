@@ -350,32 +350,34 @@ export default {
       const geoJsonSource = {
         type: "FeatureCollection",
         features: this.mapeoData.map((feature) => ({
+          id: feature.Id,
           type: "Feature",
           geometry: {
             type: feature.Geotype,
             coordinates: feature.Geocoordinates,
           },
           properties: {
-            feature,
+            ...feature
           },
         })),
       };
 
       // Add the source to the map
-      this.map.addSource("data-source", {
+      this.map.addSource("mapeo-data", {
         type: "geojson",
         data: geoJsonSource,
+        generateId: true
       });
 
       // Add a layer for Point features
       this.map.addLayer({
-        id: "data-layer-point",
+        id: "mapeo-data",
         type: "circle",
-        source: "data-source",
+        source: "mapeo-data",
         filter: ["==", "$type", "Point"],
         paint: {
           "circle-radius": 6,
-          "circle-color": ["get", "filter-color", ["get", "feature"]],
+          "circle-color": ["get", "filter-color"],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#fff",
         },
@@ -383,7 +385,7 @@ export default {
       
       // Add event listeners
       [
-        "data-layer-point"
+        "mapeo-data"
       ].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
           this.featuresUnderCursor++;
@@ -396,10 +398,7 @@ export default {
             }
         });
         this.map.on("click", layerId, (e) => {
-          let featureObject = JSON.parse(e.features[0].properties.feature);
-          delete featureObject["filter-color"];
-          this.selectedFeature = featureObject;
-          this.showSidebar = true;
+          this.selectFeature(e.features[0], layerId);
         });
       });
     },
