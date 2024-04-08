@@ -28,7 +28,7 @@
       >
         <span class="font-bold">{{ key }}</span
         >:
-        <span v-if="key !== 'Geographic centroid'" class="break-words">{{ value }}</span>
+        <span v-if="key !== 'Geographic centroid' && key !== 'Geocoordinates'" class="break-words">{{ value }}</span>
         <span v-else>
           {{ value }}
           <!-- guide on Google search URL construction here: https://developers.google.com/maps/documentation/urls/get-started-->
