@@ -377,7 +377,13 @@ export default {
         filter: ["==", "$type", "Point"],
         paint: {
           "circle-radius": 6,
-          "circle-color": ["get", "filter-color"],
+          "circle-color": [
+            // Use filter-color for fallback if selected is false
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#FFFF00",
+            ["get", "filter-color"],
+          ],
           "circle-stroke-width": 2,
           "circle-stroke-color": "#fff",
         },
@@ -752,6 +758,7 @@ export default {
       featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
       featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
       delete featureObject["t0_url"], delete featureObject["t1_url"];
+      delete featureObject["filter-color"];
 
       this.removePulsingCircles();
     }

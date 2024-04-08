@@ -54,8 +54,6 @@ export default {
       // Use the table name in the API request
       const response = await $axios.$get(`/api/${table}/alerts`, { headers });
 
-      console.log(response.mapeoData);
-
       // Return the data to be merged with the component's data
       return {
         alertResources: response.alertResources,
