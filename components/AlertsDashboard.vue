@@ -726,7 +726,7 @@ export default {
       const featureId = feature.id;
 
       // Reset the previously selected feature
-      if (this.selectedFeatureId && this.selectedFeatureSource) {
+      if (this.selectedFeatureId != null && this.selectedFeatureSource) {
         this.map.setFeatureState(
           {
             source: this.selectedFeatureSource,
