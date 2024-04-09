@@ -3,7 +3,7 @@
     <AlertsDashboard
       v-if="dataFetched"
       :alert-resources="alertResources"
-      :data="alertsData"
+      :alertsData="alertsData"
       :embed-media="embedMedia"
       :image-extensions="imageExtensions"
       :logo-url="logoUrl"
@@ -57,7 +57,7 @@ export default {
       // Return the data to be merged with the component's data
       return {
         alertResources: response.alertResources,
-        alertsData: response.data,
+        alertsData: response.alertsData,
         dataFetched: true,
         embedMedia: response.embedMedia,
         imageExtensions: response.imageExtensions,

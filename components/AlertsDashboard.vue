@@ -54,7 +54,7 @@ export default {
   },
   props: [
     "alertResources",
-    "data",
+    "alertsData",
     "embedMedia",
     "imageExtensions",
     "logoUrl",
@@ -101,7 +101,7 @@ export default {
 
       // If no date range is selected, return the full data
       if (!this.selectedDateRange) {
-        return this.data;
+        return this.alertsData;
       }
 
       const [start, end] = this.selectedDateRange;
@@ -117,19 +117,19 @@ export default {
 
       return {
         mostRecentAlerts: {
-          ...this.data.mostRecentAlerts,
-          features: filterFeatures(this.data.mostRecentAlerts.features),
+          ...this.alertsData.mostRecentAlerts,
+          features: filterFeatures(this.alertsData.mostRecentAlerts.features),
         },
         previousAlerts: {
-          ...this.data.previousAlerts,
-          features: filterFeatures(this.data.previousAlerts.features),
+          ...this.alertsData.previousAlerts,
+          features: filterFeatures(this.alertsData.previousAlerts.features),
         },
       };
     },
   },
   methods: {
     addAlertsData() {
-      const geoJsonSource = this.data;
+      const geoJsonSource = this.alertsData;
 
       // Check if the data contains Polygon features for recent alerts
       if (
@@ -639,8 +639,8 @@ export default {
 
     isOnlyLineStringData() {
       const allFeatures = [
-        ...this.data.mostRecentAlerts.features,
-        ...this.data.previousAlerts.features,
+        ...this.alertsData.mostRecentAlerts.features,
+        ...this.alertsData.previousAlerts.features,
       ];
       return allFeatures.every(
         (feature) => feature.geometry.type === "LineString",
@@ -649,8 +649,10 @@ export default {
 
     prepareMapLegendContent() {
       this.map.once("idle", () => {
+        let mapLegendLayerIds;
+
         // Add most-recent-alerts & previous-alerts layers to mapLegendContent
-        let mapLegendLayerIds = this.mapLegendLayerIds;
+        mapLegendLayerIds = this.mapLegendLayerIds;
         if (this.hasLineStrings) {
           mapLegendLayerIds = "most-recent-alerts-linestring,previous-alerts-linestring," + mapLegendLayerIds;
         } else {
@@ -658,8 +660,15 @@ export default {
         }
 
         // Add mapeo-data layer to mapLegendContent
-        mapLegendLayerIds = "mapeo-data," + mapLegendLayerIds;
+        if (this.mapeoData) {
+          mapLegendLayerIds = "mapeo-data," + mapLegendLayerIds;
+        }
 
+        // if there are no layers to show in the legend, return
+        if (!mapLegendLayerIds) {
+          return;
+        }
+        
         this.mapLegendContent = prepareMapLegendLayers(
           this.map,
           mapLegendLayerIds,
@@ -800,8 +809,12 @@ export default {
         this.map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
       }
 
-      this.addAlertsData();
-      this.addMapeoData();
+      if (this.alertsData) {
+        this.addAlertsData();
+      }
+      if (this.mapeoData) {
+        this.addMapeoData();
+      }
       this.addPulsingCircles();
       this.prepareMapLegendContent();
 

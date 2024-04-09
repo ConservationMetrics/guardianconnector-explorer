@@ -227,7 +227,7 @@ if (!VIEWS_CONFIG) {
 
             const response = {
               alertResources: VIEWS[table].ALERT_RESOURCES === "YES",
-              data: geojsonData,
+              alertsData: geojsonData,
               embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
               imageExtensions: imageExtensions,
               logoUrl: VIEWS[table].LOGO_URL,

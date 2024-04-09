@@ -43,7 +43,7 @@ export function prepareMapLegendLayers(
     .map((layer) => {
       const layerId = layer.id;
       const layerType = layer.type;
-      const layerColor = map.getPaintProperty(layerId, `${layerType}-color`);
+      let layerColor = map.getPaintProperty(layerId, `${layerType}-color`);
 
       if (!layerColor) {
         return;
@@ -51,7 +51,7 @@ export function prepareMapLegendLayers(
 
       const layerColorField = layerColor[3];
       if (Array.isArray(layerColorField) && mapeoLegendColor) {
-        layerColor[3] = mapeoLegendColor;
+        layerColor = mapeoLegendColor;
       }
 
       let formattedId = layerId
