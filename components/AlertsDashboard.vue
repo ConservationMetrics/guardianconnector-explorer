@@ -773,6 +773,7 @@ export default {
       this.imageUrl = [];
       featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
       featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
+      featureObject["Photos"] && this.imageUrl.push(featureObject["Photos"]);
       delete featureObject["t0_url"], delete featureObject["t1_url"];
       delete featureObject["filter-color"];
 
