@@ -69,3 +69,19 @@ export function prepareMapLegendLayers(
 
   return mapLegendContent;
 }
+
+// Function to reverse [long, lat] coordinates and remove the brackets
+export function prepareCoordinatesForSelectedFeature(
+  coordinates: string,
+): string {
+  if (typeof coordinates === "object") {
+    coordinates = JSON.stringify(coordinates);
+  }
+
+  return coordinates
+    .replace("[", "")
+    .replace("]", "")
+    .split(",")
+    .reverse()
+    .join(",");
+}

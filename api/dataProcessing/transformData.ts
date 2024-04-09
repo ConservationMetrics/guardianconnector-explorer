@@ -125,6 +125,7 @@ const prepareMapData = (
           typeof coordinates[1] === "number"
         ) {
           item.Geotype = "Point";
+          item["Geocoordinates"] = "lolrudo";
         } else {
           item.Geotype = "Polygon";
         }
@@ -144,7 +145,6 @@ const prepareMapData = (
       }
     } else {
       // Handle the case when filterField is undefined
-      // For example, you might want to set a default color
       item["filter-color"] = "#FFA500"; // Fallback color of orange
     }
 

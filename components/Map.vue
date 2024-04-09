@@ -34,7 +34,7 @@ import MapLegend from "@/components/MapLegend.vue";
 import Sidebar from "@/components/Sidebar.vue";
 
 import { getFilePathsWithExtension } from "@/src/utils.ts";
-import { prepareMapLegendLayers } from "@/src/mapFunctions.ts";
+import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
 
 export default {
   components: { DataFilter, MapLegend, Sidebar },
@@ -168,6 +168,12 @@ export default {
         this.map.on("click", layerId, (e) => {
           let featureObject = JSON.parse(e.features[0].properties.feature);
           delete featureObject["filter-color"];
+
+          // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
+          if (featureObject.Geocoordinates) {
+            featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(featureObject.Geocoordinates);
+          }
+
           this.selectedFeature = featureObject;
           this.showSidebar = true;
         });

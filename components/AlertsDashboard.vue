@@ -45,7 +45,7 @@ import along from "@turf/along";
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
 
-import { prepareMapLegendLayers } from "@/src/mapFunctions.ts";
+import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
 
 export default {
   components: {
@@ -127,7 +127,7 @@ export default {
     },
   },
   methods: {
-    addDataToMap() {
+    addAlertsData() {
       const geoJsonSource = this.data;
 
       // Check if the data contains Polygon features for recent alerts
@@ -760,6 +760,11 @@ export default {
       delete featureObject["t0_url"], delete featureObject["t1_url"];
       delete featureObject["filter-color"];
 
+      // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
+      if (featureObject.Geocoordinates) {
+        featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(featureObject.Geocoordinates);
+      }
+      
       this.removePulsingCircles();
     }
   },
@@ -788,7 +793,7 @@ export default {
         this.map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
       }
 
-      this.addDataToMap();
+      this.addAlertsData();
       this.addMapeoData();
       this.addPulsingCircles();
       this.prepareMapLegendContent();
