@@ -4,7 +4,7 @@
     <div v-for="item in mapLegendContent" :key="item.id" class="legend-item">
       <div
         :class="['color-box', getTypeClass(item)]"
-        :style="{ backgroundColor: item.color }"
+        :style="{ backgroundColor: item.color[3] }"
       ></div>
       <span>{{ item.id }}</span>
     </div>

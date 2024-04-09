@@ -27,6 +27,7 @@ function getMapboxLayersForLegend(
 export function prepareMapLegendLayers(
   map: mapboxgl.Map,
   mapLegendLayerIds: string | null,
+  mapeoLegendColor: string | null,
 ): any[] | undefined {
   if (!mapLegendLayerIds || !map.isStyleLoaded()) {
     return;
@@ -46,6 +47,11 @@ export function prepareMapLegendLayers(
 
       if (!layerColor) {
         return;
+      }
+
+      const layerColorField = layerColor[3];
+      if (Array.isArray(layerColorField) && mapeoLegendColor) {
+        layerColor[3] = mapeoLegendColor;
       }
 
       let formattedId = layerId

@@ -81,6 +81,7 @@ export default {
       hasLineStrings: false,
       imageUrl: [],
       map: null,
+      mapeoDataColor: null,
       mapLegendContent: null,
       selectedDateRange: null,
       selectedFeature: null,
@@ -362,6 +363,8 @@ export default {
         })),
       };
 
+      this.mapeoDataColor = this.mapeoData[0]["filter-color"];
+
       // Add the source to the map
       this.map.addSource("mapeo-data", {
         type: "geojson",
@@ -376,7 +379,7 @@ export default {
         source: "mapeo-data",
         filter: ["==", "$type", "Point"],
         paint: {
-          "circle-radius": 6,
+          "circle-radius": 5,
           "circle-color": [
             // Use filter-color for fallback if selected is false
             "case",
@@ -654,9 +657,13 @@ export default {
           mapLegendLayerIds = "most-recent-alerts-polygon,previous-alerts-polygon," + mapLegendLayerIds;
         }
 
+        // Add mapeo-data layer to mapLegendContent
+        mapLegendLayerIds = "mapeo-data," + mapLegendLayerIds;
+
         this.mapLegendContent = prepareMapLegendLayers(
           this.map,
           mapLegendLayerIds,
+          this.mapeoDataColor,
         );
       });
     },

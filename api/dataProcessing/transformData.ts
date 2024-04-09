@@ -140,11 +140,12 @@ const prepareMapData = (
         }
         item["filter-color"] = colorMap.get(filterFieldValue);
       } else {
-        item["filter-color"] = "#FFA500"; // Fallback color of orange
+        item["filter-color"] = "#3333FF"; // Fallback color of blue
+
       }
     } else {
       // Handle the case when filterField is undefined
-      item["filter-color"] = "#FFA500"; // Fallback color of orange
+      item["filter-color"] = "#3333FF"; // Fallback color of blue
     }
 
     return processGeolocation(item);
