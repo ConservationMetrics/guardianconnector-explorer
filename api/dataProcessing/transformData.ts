@@ -125,7 +125,6 @@ const prepareMapData = (
           typeof coordinates[1] === "number"
         ) {
           item.Geotype = "Point";
-          item["Geocoordinates"] = "lolrudo";
         } else {
           item.Geotype = "Polygon";
         }
