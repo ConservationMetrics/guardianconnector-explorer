@@ -764,7 +764,7 @@ export default {
       if (featureObject.Geocoordinates) {
         featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(featureObject.Geocoordinates);
       }
-      
+
       this.removePulsingCircles();
     }
   },

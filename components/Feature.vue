@@ -1,5 +1,15 @@
 <template>
   <div class="feature p-4 rounded-lg shadow-lg">
+    <div
+      v-for="(value, key) in sortedFeature"
+      :key="key"
+      v-if="
+        key.toLowerCase().includes('data source')
+      "
+      class="mt-4"
+    >
+      <h1 class="text-2xl font-bold">{{ value }} data</h1>
+    </div>
     <div :class="{ 'flex-container': alertResources }">
       <Media
         v-if="embedMedia"
@@ -22,7 +32,8 @@
           value !== '' &&
           key.toLowerCase() !== 'uuid' &&
           !key.toLowerCase().includes('photo') &&
-          key.toLowerCase() !== 'audio'
+          key.toLowerCase() !== 'audio' &&
+          !key.toLowerCase().includes('data source')
         "
         class="mb-2"
       >
