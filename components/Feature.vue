@@ -10,7 +10,10 @@
     >
       <h1 class="text-2xl font-bold">{{ value }} data</h1>
     </div>
-    <div :class="{ 'flex-container': alertResources }">
+    <div 
+      v-if="embedMedia && (!isAlert || (isAlert && alertResources))"
+      :class="{ 'flex-container': alertResources }"
+    >
       <Media
         v-if="embedMedia"
         v-for="filePath in filePaths"
@@ -76,6 +79,7 @@ export default {
     "feature",
     "filePaths",
     "imageExtensions",
+    "isAlert",
     "mediaBasePath",
     "videoExtensions",
   ],

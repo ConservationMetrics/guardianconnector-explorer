@@ -19,6 +19,7 @@
       :file-paths="imageUrl"
       :geojson-selection="filteredData"
       :image-extensions="imageExtensions"
+      :is-alert="isAlert"
       :logo-url="logoUrl"
       :media-base-path="mediaBasePath"
       :show-intro-panel="showIntroPanel"
@@ -80,6 +81,7 @@ export default {
       featuresUnderCursor: 0,
       hasLineStrings: false,
       imageUrl: [],
+      isAlert: false,
       map: null,
       mapeoDataColor: null,
       mapLegendContent: null,
@@ -768,6 +770,10 @@ export default {
       this.showSidebar = true;
       this.showIntroPanel = false;
       this.downloadAlert = true;
+
+      if (featureObject["Alert ID"]) {
+        this.isAlert = true;
+      }
 
       // Fields that may or may not exist, depending on views config
       this.imageUrl = [];
