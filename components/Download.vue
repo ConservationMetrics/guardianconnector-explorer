@@ -128,15 +128,15 @@ export default {
       if (
         !this.geojson ||
         (this.geojson.mostRecentAlerts.features.length <= 0 &&
-          this.geojson.otherAlerts.features.length <= 0)
+          this.geojson.previousAlerts.features.length <= 0)
       ) {
         console.warn("No complete GeoJSON data available to download as CSV.");
         return;
       }
 
-      // Combine features from mostRecentAlerts and otherAlerts
+      // Combine features from mostRecentAlerts and previousAlerts
       const combinedFeatures = [
-        ...this.geojson.otherAlerts.features,
+        ...this.geojson.previousAlerts.features,
         ...this.geojson.mostRecentAlerts.features,
       ];
 
@@ -181,6 +181,7 @@ export default {
       });
 
       // Download CSV
+      const filename = `${combinedFeatures[0].properties["Territory"]}_alerts.csv`;
       const blob = new Blob([csvString], { type: "text/csv" });
 
       const link = document.createElement("a");
@@ -198,15 +199,15 @@ export default {
       if (
         !this.geojson ||
         (this.geojson.mostRecentAlerts.features.length <= 0 &&
-          this.geojson.otherAlerts.features.length <= 0)
+          this.geojson.previousAlerts.features.length <= 0)
       ) {
         console.warn("No complete GeoJSON data available to download.");
         return;
       }
 
-      // Combine features from mostRecentAlerts and otherAlerts
+      // Combine features from mostRecentAlerts and previousAlerts
       const combinedFeatures = [
-        ...this.geojson.otherAlerts.features,
+        ...this.geojson.previousAlerts.features,
         ...this.geojson.mostRecentAlerts.features,
       ];
 
