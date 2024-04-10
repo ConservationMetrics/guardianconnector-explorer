@@ -17,7 +17,7 @@ const transformSurveyData = (
     transformedKey = transformedKey.replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize first letter of each word
     if (transformedKey.toLowerCase() === "today") {
       transformedKey = "Data Collected On";
-    } else if (transformedKey.toLowerCase() === "categoryid") {
+    } else if (transformedKey.toLowerCase().includes("categoryid")) {
       transformedKey = "Category";
     }
     return transformedKey.trimStart();
@@ -32,8 +32,18 @@ const transformSurveyData = (
       transformedValue = transformedValue
         .replace(/_/g, " ")
         .replace(/;/g, ", ");
-      if (key.includes("Category")) {
+      if (key.toLowerCase().includes("category")) {
         transformedValue = transformedValue.replace(/-/g, " ");
+      }
+      if (key.toLowerCase().includes("created") || key.toLowerCase().includes("modified")) {
+        // First let's ensure the date is in the correct format
+        const dateRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).*/;
+        const dateMatch = transformedValue.match(dateRegex);
+        if (dateMatch) {
+          transformedValue = new Date(
+            `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T${dateMatch[4]}:${dateMatch[5]}:${dateMatch[6]}`,
+          ).toLocaleDateString();
+        }
       }
       transformedValue =
         transformedValue.charAt(0).toUpperCase() + transformedValue.slice(1);
@@ -130,12 +140,12 @@ const prepareMapData = (
         }
         item["filter-color"] = colorMap.get(filterFieldValue);
       } else {
-        item["filter-color"] = "#FFA500"; // Fallback color of orange
+        item["filter-color"] = "#3333FF"; // Fallback color of blue
+
       }
     } else {
       // Handle the case when filterField is undefined
-      // For example, you might want to set a default color
-      item["filter-color"] = "#FFA500"; // Fallback color of orange
+      item["filter-color"] = "#3333FF"; // Fallback color of blue
     }
 
     return processGeolocation(item);

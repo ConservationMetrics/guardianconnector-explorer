@@ -19,6 +19,7 @@
       :file-paths="imageUrl"
       :geojson-selection="filteredData"
       :image-extensions="imageExtensions"
+      :is-alert="isAlert"
       :logo-url="logoUrl"
       :media-base-path="mediaBasePath"
       :show-intro-panel="showIntroPanel"
@@ -45,7 +46,7 @@ import along from "@turf/along";
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
 
-import { prepareMapLegendLayers } from "@/src/mapFunctions.ts";
+import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
 
 export default {
   components: {
@@ -54,7 +55,7 @@ export default {
   },
   props: [
     "alertResources",
-    "data",
+    "alertsData",
     "embedMedia",
     "imageExtensions",
     "logoUrl",
@@ -68,6 +69,7 @@ export default {
     "mapboxProjection",
     "mapboxStyle",
     "mapboxZoom",
+    "mapeoData",
     "mediaBasePath",
     "statistics",
   ],
@@ -76,9 +78,12 @@ export default {
       calculateHectares: false,
       dateOptions: [],
       downloadAlert: false,
+      featuresUnderCursor: 0,
       hasLineStrings: false,
       imageUrl: [],
+      isAlert: false,
       map: null,
+      mapeoDataColor: null,
       mapLegendContent: null,
       selectedDateRange: null,
       selectedFeature: null,
@@ -98,7 +103,7 @@ export default {
 
       // If no date range is selected, return the full data
       if (!this.selectedDateRange) {
-        return this.data;
+        return this.alertsData;
       }
 
       const [start, end] = this.selectedDateRange;
@@ -114,19 +119,19 @@ export default {
 
       return {
         mostRecentAlerts: {
-          ...this.data.mostRecentAlerts,
-          features: filterFeatures(this.data.mostRecentAlerts.features),
+          ...this.alertsData.mostRecentAlerts,
+          features: filterFeatures(this.alertsData.mostRecentAlerts.features),
         },
         previousAlerts: {
-          ...this.data.previousAlerts,
-          features: filterFeatures(this.data.previousAlerts.features),
+          ...this.alertsData.previousAlerts,
+          features: filterFeatures(this.alertsData.previousAlerts.features),
         },
       };
     },
   },
   methods: {
-    addDataToMap() {
-      const geoJsonSource = this.data;
+    addAlertsData() {
+      const geoJsonSource = this.alertsData;
 
       // Check if the data contains Polygon features for recent alerts
       if (
@@ -316,10 +321,14 @@ export default {
           layer.id.startsWith("previous-alerts") && !layer.id.includes("stroke")
         ) {
           this.map.on("mouseenter", layer.id, () => {
+            this.featuresUnderCursor++;
             this.map.getCanvas().style.cursor = "pointer";
           });
           this.map.on("mouseleave", layer.id, () => {
-            this.map.getCanvas().style.cursor = "";
+            this.featuresUnderCursor--;
+            if (this.featuresUnderCursor === 0) {
+              this.map.getCanvas().style.cursor = "";
+            }
           });
           this.map.on("click", layer.id, (e) => {
             this.selectFeature(e.features[0], layer.id);
@@ -337,6 +346,72 @@ export default {
         geoJsonSource.previousAlerts.features.some(
           (feature) => feature.geometry.type === "LineString",
         );
+    },
+
+    addMapeoData() {
+      // Create a GeoJSON source with all the features
+      const geoJsonSource = {
+        type: "FeatureCollection",
+        features: this.mapeoData.map((feature) => ({
+          id: feature.Id,
+          type: "Feature",
+          geometry: {
+            type: feature.Geotype,
+            coordinates: feature.Geocoordinates,
+          },
+          properties: {
+            ...feature
+          },
+        })),
+      };
+
+      this.mapeoDataColor = this.mapeoData[0]["filter-color"];
+
+      // Add the source to the map
+      this.map.addSource("mapeo-data", {
+        type: "geojson",
+        data: geoJsonSource,
+        generateId: true
+      });
+
+      // Add a layer for Point features
+      this.map.addLayer({
+        id: "mapeo-data",
+        type: "circle",
+        source: "mapeo-data",
+        filter: ["==", "$type", "Point"],
+        paint: {
+          "circle-radius": 5,
+          "circle-color": [
+            // Use filter-color for fallback if selected is false
+            "case",
+            ["boolean", ["feature-state", "selected"], false],
+            "#FFFF00",
+            ["get", "filter-color"],
+          ],
+          "circle-stroke-width": 2,
+          "circle-stroke-color": "#fff",
+        },
+      });    
+      
+      // Add event listeners
+      [
+        "mapeo-data"
+      ].forEach((layerId) => {
+        this.map.on("mouseenter", layerId, () => {
+          this.featuresUnderCursor++;
+          this.map.getCanvas().style.cursor = "pointer";
+        });
+        this.map.on("mouseleave", layerId, () => {
+          this.featuresUnderCursor--;
+            if (this.featuresUnderCursor === 0) {
+              this.map.getCanvas().style.cursor = "";
+            }
+        });
+        this.map.on("click", layerId, (e) => {
+          this.selectFeature(e.features[0], layerId);
+        });
+      });
     },
 
     addPulsingCircles() {
@@ -566,8 +641,8 @@ export default {
 
     isOnlyLineStringData() {
       const allFeatures = [
-        ...this.data.mostRecentAlerts.features,
-        ...this.data.previousAlerts.features,
+        ...this.alertsData.mostRecentAlerts.features,
+        ...this.alertsData.previousAlerts.features,
       ];
       return allFeatures.every(
         (feature) => feature.geometry.type === "LineString",
@@ -576,17 +651,30 @@ export default {
 
     prepareMapLegendContent() {
       this.map.once("idle", () => {
+        let mapLegendLayerIds;
+
         // Add most-recent-alerts & previous-alerts layers to mapLegendContent
-        let mapLegendLayerIds = this.mapLegendLayerIds;
+        mapLegendLayerIds = this.mapLegendLayerIds;
         if (this.hasLineStrings) {
           mapLegendLayerIds = "most-recent-alerts-linestring,previous-alerts-linestring," + mapLegendLayerIds;
         } else {
           mapLegendLayerIds = "most-recent-alerts-polygon,previous-alerts-polygon," + mapLegendLayerIds;
         }
 
+        // Add mapeo-data layer to mapLegendContent
+        if (this.mapeoData) {
+          mapLegendLayerIds = "mapeo-data," + mapLegendLayerIds;
+        }
+
+        // if there are no layers to show in the legend, return
+        if (!mapLegendLayerIds) {
+          return;
+        }
+        
         this.mapLegendContent = prepareMapLegendLayers(
           this.map,
           mapLegendLayerIds,
+          this.mapeoDataColor,
         );
       });
     },
@@ -596,7 +684,7 @@ export default {
     },
 
     resetSelectedFeature() {
-      if (!this.selectedFeatureId || !this.selectedFeatureSource) {
+      if (this.selectedFeatureId === null || !this.selectedFeatureSource) {
         return;
       }
       this.map.setFeatureState(
@@ -656,7 +744,7 @@ export default {
       const featureId = feature.id;
 
       // Reset the previously selected feature
-      if (this.selectedFeatureId && this.selectedFeatureSource) {
+      if (this.selectedFeatureId !== null && this.selectedFeatureSource) {
         this.map.setFeatureState(
           {
             source: this.selectedFeatureSource,
@@ -683,11 +771,24 @@ export default {
       this.showIntroPanel = false;
       this.downloadAlert = true;
 
+      if (featureObject["Alert ID"]) {
+        this.isAlert = true;
+      } else {
+        this.isAlert = false;
+      }
+
       // Fields that may or may not exist, depending on views config
       this.imageUrl = [];
       featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
       featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
+      featureObject["Photos"] && this.imageUrl.push(featureObject["Photos"]);
       delete featureObject["t0_url"], delete featureObject["t1_url"];
+      delete featureObject["filter-color"];
+
+      // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
+      if (featureObject.Geocoordinates) {
+        featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(featureObject.Geocoordinates);
+      }
 
       this.removePulsingCircles();
     }
@@ -717,7 +818,12 @@ export default {
         this.map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
       }
 
-      this.addDataToMap();
+      if (this.alertsData) {
+        this.addAlertsData();
+      }
+      if (this.mapeoData) {
+        this.addMapeoData();
+      }
       this.addPulsingCircles();
       this.prepareMapLegendContent();
 

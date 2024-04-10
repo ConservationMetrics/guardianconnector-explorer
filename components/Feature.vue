@@ -1,6 +1,19 @@
 <template>
   <div class="feature p-4 rounded-lg shadow-lg">
-    <div :class="{ 'flex-container': alertResources }">
+    <div
+      v-for="(value, key) in sortedFeature"
+      :key="key"
+      v-if="
+        key.toLowerCase().includes('data source')
+      "
+      class="mt-4"
+    >
+      <h1 class="text-2xl font-bold">{{ value }} data</h1>
+    </div>
+    <div 
+      v-if="embedMedia && (!isAlert || (isAlert && alertResources))"
+      :class="{ 'flex-container': alertResources }"
+    >
       <Media
         v-if="embedMedia"
         v-for="filePath in filePaths"
@@ -22,13 +35,14 @@
           value !== '' &&
           key.toLowerCase() !== 'uuid' &&
           !key.toLowerCase().includes('photo') &&
-          key.toLowerCase() !== 'audio'
+          key.toLowerCase() !== 'audio' &&
+          !key.toLowerCase().includes('data source')
         "
         class="mb-2"
       >
         <span class="font-bold">{{ key }}</span
         >:
-        <span v-if="key !== 'Geographic centroid'">{{ value }}</span>
+        <span v-if="key !== 'Geographic centroid' && key !== 'Geocoordinates'" class="break-words">{{ value }}</span>
         <span v-else>
           {{ value }}
           <!-- guide on Google search URL construction here: https://developers.google.com/maps/documentation/urls/get-started-->
@@ -65,6 +79,7 @@ export default {
     "feature",
     "filePaths",
     "imageExtensions",
+    "isAlert",
     "mediaBasePath",
     "videoExtensions",
   ],

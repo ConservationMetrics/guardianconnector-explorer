@@ -20,6 +20,7 @@
       :feature="filteredFeature"
       :file-paths="filePaths"
       :image-extensions="imageExtensions"
+      :is-alert="isAlert"
       :media-base-path="mediaBasePath"
       :video-extensions="videoExtensions"
     />
@@ -50,6 +51,7 @@ export default {
     "filePaths",
     "geojsonSelection",
     "imageExtensions",
+    "isAlert",
     "logoUrl",
     "mediaBasePath",
     "showIntroPanel",

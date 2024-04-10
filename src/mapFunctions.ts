@@ -27,6 +27,7 @@ function getMapboxLayersForLegend(
 export function prepareMapLegendLayers(
   map: mapboxgl.Map,
   mapLegendLayerIds: string | null,
+  mapeoLegendColor: string | null,
 ): any[] | undefined {
   if (!mapLegendLayerIds || !map.isStyleLoaded()) {
     return;
@@ -42,10 +43,15 @@ export function prepareMapLegendLayers(
     .map((layer) => {
       const layerId = layer.id;
       const layerType = layer.type;
-      const layerColor = map.getPaintProperty(layerId, `${layerType}-color`);
+      let layerColor = map.getPaintProperty(layerId, `${layerType}-color`);
 
       if (!layerColor) {
         return;
+      }
+
+      const layerColorField = layerColor[3];
+      if (Array.isArray(layerColorField) && mapeoLegendColor) {
+        layerColor = mapeoLegendColor;
       }
 
       let formattedId = layerId
@@ -68,4 +74,20 @@ export function prepareMapLegendLayers(
   }
 
   return mapLegendContent;
+}
+
+// Function to reverse [long, lat] coordinates and remove the brackets
+export function prepareCoordinatesForSelectedFeature(
+  coordinates: string,
+): string {
+  if (typeof coordinates === "object") {
+    coordinates = JSON.stringify(coordinates);
+  }
+
+  return coordinates
+    .replace("[", "")
+    .replace("]", "")
+    .split(",")
+    .reverse()
+    .join(",");
 }

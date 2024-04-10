@@ -68,8 +68,16 @@ export default {
 
       const csvString = [csvColumns.join(","), csvData.join(",")].join("\n");
 
+      // Set filename
+      let filename;
+      if (this.geojson.properties["Alert ID"]) {
+        filename = `${this.geojson.properties["Alert ID"]}.csv`;
+      } else if (this.geojson.properties["Id"]) {
+        filename = `${this.geojson.properties["Id"]}.csv`;
+      } else {
+        filename = "data.csv";
+      }
       // Download CSV
-      const filename = `${this.geojson.properties["Alert ID"]}.csv`;
       const blob = new Blob([csvString], { type: "text/csv" });
 
       const link = document.createElement("a");
@@ -92,7 +100,16 @@ export default {
 
       delete this.geojson.properties["YYYYMM"];
 
-      const filename = `${this.geojson.properties["Alert ID"]}.geojson`;
+      // Set filename
+      let filename;
+      if (this.geojson.properties["Alert ID"]) {
+        filename = `${this.geojson.properties["Alert ID"]}.geojson`;
+      } else if (this.geojson.properties["Id"]) {
+        filename = `${this.geojson.properties["Id"]}.geojson`;
+      } else {
+        filename = "data.csv";
+      }
+      
       const jsonStr = JSON.stringify(this.geojson, null, 2);
       const blob = new Blob([jsonStr], { type: "application/json" });
 
@@ -164,7 +181,6 @@ export default {
       });
 
       // Download CSV
-      const filename = `${combinedFeatures[0].properties["Territory"]}_alerts.csv`;
       const blob = new Blob([csvString], { type: "text/csv" });
 
       const link = document.createElement("a");

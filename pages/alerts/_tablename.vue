@@ -3,7 +3,7 @@
     <AlertsDashboard
       v-if="dataFetched"
       :alert-resources="alertResources"
-      :data="alertsData"
+      :alertsData="alertsData"
       :embed-media="embedMedia"
       :image-extensions="imageExtensions"
       :logo-url="logoUrl"
@@ -17,6 +17,7 @@
       :mapbox-style="mapboxStyle"
       :mapbox-zoom="mapboxZoom"
       :mapbox3d="mapbox3d"
+      :mapeo-data="mapeoData"
       :media-base-path="mediaBasePath"
       :statistics="statistics"
     />
@@ -56,7 +57,7 @@ export default {
       // Return the data to be merged with the component's data
       return {
         alertResources: response.alertResources,
-        alertsData: response.data,
+        alertsData: response.alertsData,
         dataFetched: true,
         embedMedia: response.embedMedia,
         imageExtensions: response.imageExtensions,
@@ -71,6 +72,7 @@ export default {
         mapboxProjection: response.mapboxProjection,
         mapboxStyle: response.mapboxStyle,
         mapboxZoom: response.mapboxZoom,
+        mapeoData: response.mapeoData,
         mediaBasePath: response.mediaBasePath,
         statistics: response.statistics,
       };
