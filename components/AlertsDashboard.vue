@@ -773,6 +773,8 @@ export default {
 
       if (featureObject["Alert ID"]) {
         this.isAlert = true;
+      } else {
+        this.isAlert = false;
       }
 
       // Fields that may or may not exist, depending on views config
