@@ -595,7 +595,7 @@ export default {
         this.map.getStyle().layers.forEach((layer) => {
           if (
             layer.id.startsWith("most-recent-alerts") ||
-            layer.id.startsWith("alerts")
+            layer.id.startsWith("previous-alerts")
           ) {
             this.map.setFilter(layer.id, [
               "all",
