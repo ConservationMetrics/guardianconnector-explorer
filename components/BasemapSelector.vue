@@ -36,7 +36,7 @@
     data() {
         return {
             showModal: false,
-            selectedBasemap: this.mapboxStyle
+            selectedBasemap: { id: 'custom', style: this.mapboxStyle }
         };
     },
     methods: {
