@@ -24,8 +24,19 @@ function getMapboxLayersForLegend(
   return matchingLayers;
 }
 
-export function changeMapStyle(map: mapboxgl.Map, basemap: string) {
-  console.log(basemap);
+interface Basemap {
+  id: string;
+  style: string;
+}
+
+export function changeMapStyle(map: mapboxgl.Map, basemap: Basemap) {
+  if (basemap.style) {
+    map.setStyle(basemap.style);
+  } else if (basemap.id === "planet") {
+    console.log("Planet basemap selected");
+  } else {
+    console.warn("Basemap style not found");
+  }
 }
 
 export function prepareMapLegendLayers(

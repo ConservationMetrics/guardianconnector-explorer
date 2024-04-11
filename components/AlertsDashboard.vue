@@ -34,6 +34,7 @@
       :map-legend-content="mapLegendContent"
     />
     <BasemapSelector 
+      v-if="showBasemapSelector"
       :mapbox-style="mapboxStyle"
       :planet-api-key="planetApiKey"
       @basemapSelected="handleBasemapChange"
@@ -98,6 +99,7 @@ export default {
       selectedFeatureGeojson: null,
       selectedFeatureId: null,
       selectedFeatureSource: null,
+      showBasemapSelector: false,
       showIntroPanel: true,
       showSidebar: true,
       showSlider: false,
@@ -859,6 +861,9 @@ export default {
       // Fullscreen Control
       const fullscreenControl = new mapboxgl.FullscreenControl();
       this.map.addControl(fullscreenControl, "top-right");
+
+      this.showBasemapSelector = true;
+
     });
 
     this.dateOptions = this.getDateOptions();

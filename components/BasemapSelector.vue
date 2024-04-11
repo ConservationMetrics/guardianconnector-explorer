@@ -7,17 +7,21 @@
             <div class="modal-content">
                 <h3 class="font-semibold mb-2">Select Basemap</h3>
                 <label>
-                    <input type="radio" :value="mapboxStyle" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
+                    <input type="radio" :value="{ id: 'custom', style: mapboxStyle }" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
                     Your Mapbox Style (default)
                 </label>
                 <label>
-                    <input type="radio" value="mapbox://styles/mapbox/satellite-streets-v12" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
+                    <input type="radio" :value="{ id: 'satellite-streets', style: 'mapbox://styles/mapbox/satellite-streets-v12' }" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
                     Mapbox Satellite
+                </label>
+                <label>
+                    <input type="radio" :value="{ id: 'streets', style: 'mapbox://styles/mapbox/streets-v12' }" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
+                    Mapbox Streets
                 </label>
                 <label
                     v-if="planetApiKey"
                 >
-                    <input type="radio" value="planet" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
+                    <input type="radio" :value="{ id: 'planet'}" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
                     Planet Monthly Visual Basemap
                 </label>
             </div>
@@ -49,10 +53,10 @@
 <style scoped>
 .basemap-toggle {
   position: absolute;
-  top: 10px;
-  right: 50px;
+  top: 147px;
+  right: 10px;
   padding: 3px;
-  width: 35px;
+  width: 30px;
   background-color: #fff;
   z-index: 1000;
 
@@ -72,8 +76,8 @@
 
 .modal {
     position: absolute;
-    right: 95px;
-    top: 10px;
+    right: 50px;
+    top: 147px;
     background-color: #fff;
     border: 1px solid #ccc;
     z-index: 1001;
