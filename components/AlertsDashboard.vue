@@ -33,6 +33,9 @@
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
     />
+    <BasemapSelector 
+      :planet-api-key="planetApiKey"
+    />
   </div>
 </template>
 
@@ -43,6 +46,7 @@ import { lineString } from "@turf/helpers";
 import length from "@turf/length";
 import along from "@turf/along";
 
+import BasemapSelector from "@/components/BasemapSelector.vue";
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
 
@@ -50,6 +54,7 @@ import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/
 
 export default {
   components: {
+    BasemapSelector,
     Sidebar,
     MapLegend,
   },

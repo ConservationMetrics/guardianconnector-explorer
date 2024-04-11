@@ -23,12 +23,16 @@
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
     />
+    <BasemapSelector 
+      :planet-api-key="planetApiKey"
+    />
   </div>
 </template>
 
 <script>
 import mapboxgl from "mapbox-gl";
 
+import BasemapSelector from "@/components/BasemapSelector.vue";
 import DataFilter from "@/components/DataFilter.vue";
 import MapLegend from "@/components/MapLegend.vue";
 import Sidebar from "@/components/Sidebar.vue";
@@ -37,7 +41,7 @@ import { getFilePathsWithExtension } from "@/src/utils.ts";
 import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
 
 export default {
-  components: { DataFilter, MapLegend, Sidebar },
+  components: { BasemapSelector, DataFilter, MapLegend, Sidebar },
   props: [
     "audioExtensions",
     "data",
