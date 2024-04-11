@@ -1,5 +1,70 @@
 import mapboxgl from "mapbox-gl";
 
+interface Basemap {
+  id: string;
+  style?: string;
+  url?: string;
+}
+
+interface MapStyle {
+  name: string;
+  style?: {
+    version: number;
+    sources: any;
+    layers: any[];
+  };
+  url?: string;
+}
+
+export const mapStyles: Record<string, MapStyle> = {
+  planet: {
+    name: `Planet Monthly Visual Basemap`,
+    style: {
+      version: 8,
+      sources: {
+        planet: {
+          type: "raster",
+          tiles: [
+            `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_visual_2024-02_mosaic/gmap/{z}/{x}/{y}?api_key=`,
+          ],
+          tileSize: 256,
+        },
+      },
+      layers: [
+        {
+          id: "background",
+          type: "background",
+          paint: {
+            "background-color": "#f9f9f9",
+          },
+        },
+        {
+          id: "planet",
+          type: "raster",
+          source: "planet",
+          paint: {},
+        },
+      ],
+    },
+  },
+};
+
+export function changeMapStyle(
+  map: mapboxgl.Map,
+  basemap: Basemap,
+  planetApiKey: string,
+) {
+  if (basemap.style) {
+    map.setStyle(basemap.style);
+  } else if (basemap.id === "planet" && mapStyles.planet.style) {
+    const planetStyle = JSON.parse(JSON.stringify(mapStyles.planet.style));
+    planetStyle.sources.planet.tiles[0] += planetApiKey;
+    map.setStyle(planetStyle);
+  } else {
+    console.warn("Basemap style not found");
+  }
+}
+
 function getMapboxLayersForLegend(
   map: mapboxgl.Map,
   mapLegendLayerIds: string,

@@ -33,6 +33,12 @@
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
     />
+    <BasemapSelector 
+      v-if="showBasemapSelector"
+      :mapbox-style="mapboxStyle"
+      :planet-api-key="planetApiKey"
+      @basemapSelected="handleBasemapChange"
+    />
   </div>
 </template>
 
@@ -43,13 +49,15 @@ import { lineString } from "@turf/helpers";
 import length from "@turf/length";
 import along from "@turf/along";
 
+import BasemapSelector from "@/components/BasemapSelector.vue";
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
 
-import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
+import { changeMapStyle, prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
 
 export default {
   components: {
+    BasemapSelector,
     Sidebar,
     MapLegend,
   },
@@ -71,6 +79,7 @@ export default {
     "mapboxZoom",
     "mapeoData",
     "mediaBasePath",
+    "planetApiKey",
     "statistics",
   ],
   data() {
@@ -90,6 +99,7 @@ export default {
       selectedFeatureGeojson: null,
       selectedFeatureId: null,
       selectedFeatureSource: null,
+      showBasemapSelector: false,
       showIntroPanel: true,
       showSidebar: true,
       showSlider: false,
@@ -140,47 +150,53 @@ export default {
         )
       ) {
         // Add the most recent alerts source to the map as Polygons
-        this.map.addSource("most-recent-alerts-polygon", {
-          type: "geojson",
-          data: {
-            ...geoJsonSource.mostRecentAlerts,
-            features: geoJsonSource.mostRecentAlerts.features.filter(
-              (feature) => feature.geometry.type === "Polygon",
-            ),
-          },
-        });
+        if (!this.map.getSource("most-recent-alerts-polygon")) {
+          this.map.addSource("most-recent-alerts-polygon", {
+            type: "geojson",
+            data: {
+              ...geoJsonSource.mostRecentAlerts,
+              features: geoJsonSource.mostRecentAlerts.features.filter(
+                (feature) => feature.geometry.type === "Polygon",
+              ),
+            },
+          });
+        }
 
         // Add a layer for most recent alerts Polygons
-        this.map.addLayer({
-          id: "most-recent-alerts-polygon",
-          type: "fill",
-          source: "most-recent-alerts-polygon",
-          paint: {
-            "fill-color": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              "#FFFF00",
-              "#FF0000",
-            ],
-            "fill-opacity": 0.5,
-          },
-        });
+        if (!this.map.getLayer("most-recent-alerts-polygon")) {
+          this.map.addLayer({
+            id: "most-recent-alerts-polygon",
+            type: "fill",
+            source: "most-recent-alerts-polygon",
+            paint: {
+              "fill-color": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                "#FFFF00",
+                "#FF0000",
+              ],
+              "fill-opacity": 0.5,
+            },
+          });
+        }
 
         // Add a stroke for most recent alerts Polygons
-        this.map.addLayer({
-          id: "most-recent-alerts-stroke-polygon",
-          type: "line",
-          source: "most-recent-alerts-polygon",
-          paint: {
-            "line-color": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              "#FFFF00",
-              "#FF0000",
-            ],
-            "line-width": 2,
-          },
-        });
+        if (!this.map.getLayer("most-recent-alerts-stroke-polygon")) {
+          this.map.addLayer({
+            id: "most-recent-alerts-stroke-polygon",
+            type: "line",
+            source: "most-recent-alerts-polygon",
+            paint: {
+              "line-color": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                "#FFFF00",
+                "#FF0000",
+              ],
+              "line-width": 2,
+            },
+          });
+        }
       }
 
       // Check if the data contains LineString features for recent alerts
@@ -190,37 +206,41 @@ export default {
         )
       ) {
         // Add the most recent alerts source to the map as LineStrings
-        this.map.addSource("most-recent-alerts-linestring", {
-          type: "geojson",
-          data: {
-            ...geoJsonSource.mostRecentAlerts,
-            features: geoJsonSource.mostRecentAlerts.features.filter(
-              (feature) => feature.geometry.type === "LineString",
-            ),
-          },
-        });
+        if (!this.map.getSource("most-recent-alerts-linestring")) {
+          this.map.addSource("most-recent-alerts-linestring", {
+            type: "geojson",
+            data: {
+              ...geoJsonSource.mostRecentAlerts,
+              features: geoJsonSource.mostRecentAlerts.features.filter(
+                (feature) => feature.geometry.type === "LineString",
+              ),
+            },
+          });
+        }
 
         // Add a layer for most recent alerts LineStrings
-        this.map.addLayer({
-          id: "most-recent-alerts-linestring",
-          type: "line",
-          source: "most-recent-alerts-linestring",
-          paint: {
-            "line-color": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              "#FFFF00",
-              "#FF0000",
-            ],
-            "line-width": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              5,
-              3,
-            ],
-            "line-opacity": 0.8,
-          },
-        });
+        if (!this.map.getLayer("most-recent-alerts-linestring")) {
+          this.map.addLayer({
+            id: "most-recent-alerts-linestring",
+            type: "line",
+            source: "most-recent-alerts-linestring",
+            paint: {
+              "line-color": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                "#FFFF00",
+                "#FF0000",
+              ],
+              "line-width": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                5,
+                3,
+              ],
+              "line-opacity": 0.8,
+            },
+          });
+        }
       }
 
       // Check if the data contains Polygon features for previous alerts
@@ -230,47 +250,53 @@ export default {
         )
       ) {
         // Add the previous alerts source to the map as Polygons
-        this.map.addSource("previous-alerts-polygon", {
-          type: "geojson",
-          data: {
-            ...geoJsonSource.previousAlerts,
-            features: geoJsonSource.previousAlerts.features.filter(
-              (feature) => feature.geometry.type === "Polygon",
-            ),
-          },
-        });
+        if (!this.map.getSource("previous-alerts-polygon")) {
+          this.map.addSource("previous-alerts-polygon", {
+            type: "geojson",
+            data: {
+              ...geoJsonSource.previousAlerts,
+              features: geoJsonSource.previousAlerts.features.filter(
+                (feature) => feature.geometry.type === "Polygon",
+              ),
+            },
+          });
+        }
 
         // Add a layer for previous alerts Polygons
-        this.map.addLayer({
-          id: "previous-alerts-polygon",
-          type: "fill",
-          source: "previous-alerts-polygon",
-          paint: {
-            "fill-color": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              "#FFFF00",
-              "#FD8D3C",
-            ],
-            "fill-opacity": 0.5,
-          },
-        });
+        if (!this.map.getLayer("previous-alerts-polygon")) {
+          this.map.addLayer({
+            id: "previous-alerts-polygon",
+            type: "fill",
+            source: "previous-alerts-polygon",
+            paint: {
+              "fill-color": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                "#FFFF00",
+                "#FD8D3C",
+              ],
+              "fill-opacity": 0.5,
+            },
+          });
+        }
 
         // Add a stroke for previous alerts Polygons
-        this.map.addLayer({
-          id: "previous-alerts-stroke-polygon",
-          type: "line",
-          source: "previous-alerts-polygon",
-          paint: {
-            "line-color": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              "#FFFF00",
-              "#FD8D3C",
-            ],
-            "line-width": 2,
-          },
-        });
+        if (!this.map.getLayer("previous-alerts-stroke-polygon")) {
+          this.map.addLayer({
+            id: "previous-alerts-stroke-polygon",
+            type: "line",
+            source: "previous-alerts-polygon",
+            paint: {
+              "line-color": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                "#FFFF00",
+                "#FD8D3C",
+              ],
+              "line-width": 2,
+            },
+          });
+        }
       }
 
       // Check if the data contains LineString features for previous alerts
@@ -280,38 +306,42 @@ export default {
         )
       ) {
         // Add the previous alerts source to the map as LineStrings
-        this.map.addSource("previous-alerts-linestring", {
-          type: "geojson",
-          data: {
-            ...geoJsonSource.previousAlerts,
-            features: geoJsonSource.previousAlerts.features.filter(
-              (feature) => feature.geometry.type === "LineString",
-            ),
-          },
-        });
+        if (!this.map.getSource("previous-alerts-linestring")) {
+          this.map.addSource("previous-alerts-linestring", {
+            type: "geojson",
+            data: {
+              ...geoJsonSource.previousAlerts,
+              features: geoJsonSource.previousAlerts.features.filter(
+                (feature) => feature.geometry.type === "LineString",
+              ),
+            },
+          });
+        }
 
         // Add a layer for previous alerts linestrings
-        this.map.addLayer({
-          id: "previous-alerts-linestring",
-          type: "line",
-          source: "previous-alerts-linestring",
-          filter: ["==", "$type", "LineString"],
-          paint: {
-            "line-color": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              "#FFFF00",
-              "#FD8D3C",
-            ],
-            "line-width": [
-              "case",
-              ["boolean", ["feature-state", "selected"], false],
-              5,
-              3,
-            ],
-            "line-opacity": 0.8,
-          },
-        });
+        if (!this.map.getLayer("previous-alerts-linestring")) {
+          this.map.addLayer({
+            id: "previous-alerts-linestring",
+            type: "line",
+            source: "previous-alerts-linestring",
+            filter: ["==", "$type", "LineString"],
+            paint: {
+              "line-color": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                "#FFFF00",
+                "#FD8D3C",
+              ],
+              "line-width": [
+                "case",
+                ["boolean", ["feature-state", "selected"], false],
+                5,
+                3,
+              ],
+              "line-opacity": 0.8,
+            },
+          });
+        }
       }
 
       // Add event listeners for layers that start with 'most-recent-alerts' and 'alerts'
@@ -368,31 +398,35 @@ export default {
       this.mapeoDataColor = this.mapeoData[0]["filter-color"];
 
       // Add the source to the map
-      this.map.addSource("mapeo-data", {
-        type: "geojson",
-        data: geoJsonSource,
-        generateId: true
-      });
+      if (!this.map.getSource("mapeo-data")) {
+        this.map.addSource("mapeo-data", {
+          type: "geojson",
+          data: geoJsonSource,
+          generateId: true
+        });
+      }
 
       // Add a layer for Point features
-      this.map.addLayer({
-        id: "mapeo-data",
-        type: "circle",
-        source: "mapeo-data",
-        filter: ["==", "$type", "Point"],
-        paint: {
-          "circle-radius": 5,
-          "circle-color": [
-            // Use filter-color for fallback if selected is false
-            "case",
-            ["boolean", ["feature-state", "selected"], false],
-            "#FFFF00",
-            ["get", "filter-color"],
-          ],
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#fff",
-        },
-      });    
+      if (!this.map.getLayer("mapeo-data")) {
+        this.map.addLayer({
+          id: "mapeo-data",
+          type: "circle",
+          source: "mapeo-data",
+          filter: ["==", "$type", "Point"],
+          paint: {
+            "circle-radius": 5,
+            "circle-color": [
+              // Use filter-color for fallback if selected is false
+              "case",
+              ["boolean", ["feature-state", "selected"], false],
+              "#FFFF00",
+              ["get", "filter-color"],
+            ],
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "#fff",
+          },
+        });    
+      }
       
       // Add event listeners
       [
@@ -540,6 +574,16 @@ export default {
       return dates;
     },
 
+    handleBasemapChange(newBasemap) {
+      this.removePulsingCircles();
+      changeMapStyle(this.map, newBasemap, this.planetApiKey);
+
+      // Once map is idle, re-add sources, layers, and event listeners
+      this.map.once("idle", () => {
+        this.prepareMapCanvasContent();
+      });
+    },
+
     handleBufferClick(e) {
       const pixelBuffer = 10;
       const bbox = [
@@ -647,6 +691,23 @@ export default {
       return allFeatures.every(
         (feature) => feature.geometry.type === "LineString",
       );
+    },
+
+    prepareMapCanvasContent() {
+      if (this.alertsData) {
+        this.addAlertsData();
+      }
+      if (this.mapeoData) {
+        this.addMapeoData();
+      }
+      this.addPulsingCircles();
+      this.prepareMapLegendContent();
+
+      // Add buffer for LineStrings to make them easier to select
+      if (this.hasLineStrings) {
+        this.map.on("mousemove", this.handleBufferMouseEvent);
+        this.map.on('click', this.handleBufferClick);
+      }
     },
 
     prepareMapLegendContent() {
@@ -818,20 +879,7 @@ export default {
         this.map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
       }
 
-      if (this.alertsData) {
-        this.addAlertsData();
-      }
-      if (this.mapeoData) {
-        this.addMapeoData();
-      }
-      this.addPulsingCircles();
-      this.prepareMapLegendContent();
-
-      // Add buffer for LineStrings to make them easier to select
-      if (this.hasLineStrings) {
-        this.map.on("mousemove", this.handleBufferMouseEvent);
-        this.map.on('click', this.handleBufferClick);
-      }
+      this.prepareMapCanvasContent();
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
@@ -847,6 +895,9 @@ export default {
       // Fullscreen Control
       const fullscreenControl = new mapboxgl.FullscreenControl();
       this.map.addControl(fullscreenControl, "top-right");
+
+      this.showBasemapSelector = true;
+
     });
 
     this.dateOptions = this.getDateOptions();
