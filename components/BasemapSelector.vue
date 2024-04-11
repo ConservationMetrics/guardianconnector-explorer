@@ -7,17 +7,17 @@
             <div class="modal-content">
                 <h3 class="font-semibold mb-2">Select Basemap</h3>
                 <label>
-                    <input type="radio" value="custom" name="basemap" v-model="selectedBasemap">
-                    Mapbox Custom Map (default)
+                    <input type="radio" :value="mapboxStyle" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
+                    Your Mapbox Style (default)
                 </label>
                 <label>
-                    <input type="radio" value="satellite" name="basemap" v-model="selectedBasemap">
+                    <input type="radio" value="mapbox://styles/mapbox/satellite-streets-v12" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
                     Mapbox Satellite
                 </label>
                 <label
                     v-if="planetApiKey"
                 >
-                    <input type="radio" value="planet" name="basemap" v-model="selectedBasemap">
+                    <input type="radio" value="planet" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
                     Planet Monthly Visual Basemap
                 </label>
             </div>
@@ -28,16 +28,19 @@
   <script>
   export default {
     name: "BasemapSelector",
-    props: ["planetApiKey"],
+    props: ["mapboxStyle", "planetApiKey"],
     data() {
         return {
             showModal: false,
-            selectedBasemap: 'satellite'
+            selectedBasemap: this.mapboxStyle
         };
     },
     methods: {
         toggleModal() {
             this.showModal = !this.showModal;
+        },
+        emitBasemap() {
+            this.$emit('basemapSelected', this.selectedBasemap);
         }
     }
   };

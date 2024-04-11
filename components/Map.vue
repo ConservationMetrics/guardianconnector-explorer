@@ -24,7 +24,9 @@
       :map-legend-content="mapLegendContent"
     />
     <BasemapSelector 
+      :mapbox-style="mapboxStyle"
       :planet-api-key="planetApiKey"
+      @basemapSelected="handleBasemapChange"
     />
   </div>
 </template>
@@ -38,7 +40,7 @@ import MapLegend from "@/components/MapLegend.vue";
 import Sidebar from "@/components/Sidebar.vue";
 
 import { getFilePathsWithExtension } from "@/src/utils.ts";
-import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
+import { changeMapStyle, prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
 
 export default {
   components: { BasemapSelector, DataFilter, MapLegend, Sidebar },
@@ -198,6 +200,10 @@ export default {
 
     getFilePathsWithExtension: getFilePathsWithExtension,
 
+    handleBasemapChange(newBasemap) {
+      changeMapStyle(this.map, newBasemap);
+    },
+    
     prepareMapLegendContent() {
       if (!this.mapLegendLayerIds) {
         return;

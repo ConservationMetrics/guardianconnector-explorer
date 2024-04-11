@@ -24,6 +24,10 @@ function getMapboxLayersForLegend(
   return matchingLayers;
 }
 
+export function changeMapStyle(map: mapboxgl.Map, basemap: string) {
+  console.log(basemap);
+}
+
 export function prepareMapLegendLayers(
   map: mapboxgl.Map,
   mapLegendLayerIds: string | null,

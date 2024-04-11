@@ -34,7 +34,9 @@
       :map-legend-content="mapLegendContent"
     />
     <BasemapSelector 
+      :mapbox-style="mapboxStyle"
       :planet-api-key="planetApiKey"
+      @basemapSelected="handleBasemapChange"
     />
   </div>
 </template>
@@ -50,7 +52,7 @@ import BasemapSelector from "@/components/BasemapSelector.vue";
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
 
-import { prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
+import { changeMapStyle, prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
 
 export default {
   components: {
@@ -544,6 +546,10 @@ export default {
       }
 
       return dates;
+    },
+
+    handleBasemapChange(newBasemap) {
+      changeMapStyle(this.map, newBasemap);
     },
 
     handleBufferClick(e) {
