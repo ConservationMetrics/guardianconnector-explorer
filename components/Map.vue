@@ -119,48 +119,56 @@ export default {
       };
 
       // Add the source to the map
-      this.map.addSource("data-source", {
-        type: "geojson",
-        data: geoJsonSource,
-      });
+      if (!this.map.getSource("data-source")) {
+        this.map.addSource("data-source", {
+          type: "geojson",
+          data: geoJsonSource,
+        });
+      }
 
       // Add a layer for Point features
-      this.map.addLayer({
-        id: "data-layer-point",
-        type: "circle",
-        source: "data-source",
-        filter: ["==", "$type", "Point"],
-        paint: {
-          "circle-radius": 6,
-          "circle-color": ["get", "filter-color", ["get", "feature"]],
-          "circle-stroke-width": 2,
-          "circle-stroke-color": "#fff",
-        },
-      });
+      if (!this.map.getLayer("data-layer-point")) {
+        this.map.addLayer({
+          id: "data-layer-point",
+          type: "circle",
+          source: "data-source",
+          filter: ["==", "$type", "Point"],
+          paint: {
+            "circle-radius": 6,
+            "circle-color": ["get", "filter-color", ["get", "feature"]],
+            "circle-stroke-width": 2,
+            "circle-stroke-color": "#fff",
+          },
+        });
+      }
 
       // Add a layer for LineString features
-      this.map.addLayer({
-        id: "data-layer-linestring",
-        type: "line",
-        source: "data-source",
-        filter: ["==", "$type", "LineString"],
-        paint: {
-          "line-color": ["get", "filter-color", ["get", "feature"]],
-          "line-width": 2,
-        },
-      });
+      if (!this.map.getLayer("data-layer-linestring")) {
+        this.map.addLayer({
+          id: "data-layer-linestring",
+          type: "line",
+          source: "data-source",
+          filter: ["==", "$type", "LineString"],
+          paint: {
+            "line-color": ["get", "filter-color", ["get", "feature"]],
+            "line-width": 2,
+          },
+        });
+      }
 
       // Add a layer for Polygon features
-      this.map.addLayer({
-        id: "data-layer-polygon",
-        type: "fill",
-        source: "data-source",
-        filter: ["==", "$type", "Polygon"],
-        paint: {
-          "fill-color": ["get", "filter-color", ["get", "feature"]],
-          "fill-opacity": 0.5,
-        },
-      });
+      if (!this.map.getLayer("data-layer-polygon")) {
+        this.map.addLayer({
+          id: "data-layer-polygon",
+          type: "fill",
+          source: "data-source",
+          filter: ["==", "$type", "Polygon"],
+          paint: {
+            "fill-color": ["get", "filter-color", ["get", "feature"]],
+            "fill-opacity": 0.5,
+          },
+        });
+      }
 
       // Add event listeners
       [
@@ -203,7 +211,17 @@ export default {
     getFilePathsWithExtension: getFilePathsWithExtension,
 
     handleBasemapChange(newBasemap) {
-      changeMapStyle(this.map, newBasemap);
+      changeMapStyle(this.map, newBasemap, this.planetApiKey);
+
+      // Once map is idle, re-add sources, layers, and event listeners
+      this.map.once("idle", () => {
+        this.prepareMapCanvasContent();
+      });
+    },
+
+    prepareMapCanvasContent() {
+      this.addDataToMap();
+      this.prepareMapLegendContent();
     },
 
     prepareMapLegendContent() {
@@ -246,8 +264,7 @@ export default {
         this.map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
       }
 
-      this.addDataToMap();
-      this.prepareMapLegendContent();
+      this.prepareMapCanvasContent();
 
       // Navigation Control (zoom buttons and compass)
       const nav = new mapboxgl.NavigationControl();
