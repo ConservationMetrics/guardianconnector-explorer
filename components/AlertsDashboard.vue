@@ -71,6 +71,7 @@ export default {
     "mapboxZoom",
     "mapeoData",
     "mediaBasePath",
+    "planetApiKey",
     "statistics",
   ],
   data() {

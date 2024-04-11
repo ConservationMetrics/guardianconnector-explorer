@@ -35,6 +35,7 @@ interface ViewConfig {
   MAP_LEGEND_LAYER_IDS: string;
   MEDIA_BASE_PATH: string;
   LOGO_URL: string;
+  PLANET_API_KEY: string;
   UNWANTED_COLUMNS?: string;
   UNWANTED_SUBSTRINGS?: string;
 }

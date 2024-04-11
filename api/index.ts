@@ -147,6 +147,7 @@ if (!VIEWS_CONFIG) {
               mapboxStyle: VIEWS[table].MAPBOX_STYLE,
               mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
               mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+              planetApiKey: VIEWS[table].PLANET_API_KEY,
               table: table,
               videoExtensions: videoExtensions,
             };
@@ -243,6 +244,7 @@ if (!VIEWS_CONFIG) {
               mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
               mapeoData: mapeoData,
               mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+              planetApiKey: VIEWS[table].PLANET_API_KEY,
               statistics: statistics,
               table: table,
             };

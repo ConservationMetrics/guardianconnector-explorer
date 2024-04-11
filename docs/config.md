@@ -88,6 +88,10 @@ For showing Mapeo data on the Alerts Dashboard, provide a comma-separated list o
 
 A comma-separated list of Mapbox layer ids to be rendered in an optional map legend component. In the component, the layer `type` and `color` will be used to set the legend symbol style (currently supported: fill, line, circle), and the layer `id` will be set as the legend description. Note that we are currently only supporting adding layers to the legend where the color is directly set and not across zoom / data range or with data conditions.
 
+#### `PLANET_API_KEY` (optional)
+
+Provide a Planet NICFI Monthly Basemaps API key to enable the option to use the monthly basemaps as a style option in the basemap selector menu.
+
 #### `UNWANTED_COLUMNS` (optional) and `UNWANTED_SUBSTRINGS` (optional)
 
 List the exact column names (`UNWANTED_COLUMNS`) and/or columns containing specific substrings (`UNWANTED_SUBSTRINGS`) to be filtered out from data collection APIs. Useful for removing unnecessary metadata fields.

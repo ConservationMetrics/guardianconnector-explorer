@@ -56,6 +56,7 @@ export default {
     "mapboxStyle",
     "mapboxZoom",
     "mediaBasePath",
+    "planetApiKey",
     "videoExtensions",
   ],
   data() {

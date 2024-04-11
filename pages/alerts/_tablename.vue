@@ -19,6 +19,7 @@
       :mapbox3d="mapbox3d"
       :mapeo-data="mapeoData"
       :media-base-path="mediaBasePath"
+      :planet-api-key="planetApiKey"
       :statistics="statistics"
     />
   </div>
@@ -74,6 +75,7 @@ export default {
         mapboxZoom: response.mapboxZoom,
         mapeoData: response.mapeoData,
         mediaBasePath: response.mediaBasePath,
+        planetApiKey: response.planetApiKey,
         statistics: response.statistics,
       };
     } catch (error) {

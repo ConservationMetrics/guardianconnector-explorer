@@ -19,6 +19,7 @@
       :mapbox-zoom="mapboxZoom"
       :mapbox3d="mapbox3d"
       :media-base-path="mediaBasePath"
+      :planet-api-key="planetApiKey"
       :video-extensions="videoExtensions"
     />
   </div>
@@ -74,6 +75,7 @@ export default {
         mapboxStyle: response.mapboxStyle,
         mapboxZoom: response.mapboxZoom,
         mediaBasePath: response.mediaBasePath,
+        planetApiKey: response.planetApiKey,
         videoExtensions: response.videoExtensions,
       };
     } catch (error) {
