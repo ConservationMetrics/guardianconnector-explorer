@@ -4,6 +4,7 @@ interface Basemap {
   id: string;
   style?: string;
   url?: string;
+  monthYear?: string;
 }
 
 interface MapStyle {
@@ -25,7 +26,7 @@ export const mapStyles: Record<string, MapStyle> = {
         planet: {
           type: "raster",
           tiles: [
-            `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_visual_2024-02_mosaic/gmap/{z}/{x}/{y}?api_key=`,
+            `https://tiles.planet.com/basemaps/v1/planet-tiles/planet_medres_visual_monthYear_mosaic/gmap/{z}/{x}/{y}?api_key=`,
           ],
           tileSize: 256,
         },
@@ -58,6 +59,11 @@ export function changeMapStyle(
     map.setStyle(basemap.style);
   } else if (basemap.id === "planet" && mapStyles.planet.style) {
     const planetStyle = JSON.parse(JSON.stringify(mapStyles.planet.style));
+    planetStyle.sources.planet.tiles[0] =
+      planetStyle.sources.planet.tiles[0].replace(
+        "monthYear",
+        basemap.monthYear || "2024-01",
+      );
     planetStyle.sources.planet.tiles[0] += planetApiKey;
     map.setStyle(planetStyle);
   } else {
