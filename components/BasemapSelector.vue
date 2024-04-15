@@ -12,7 +12,7 @@
                 </label>
                 <label>
                     <input type="radio" :value="{ id: 'satellite-streets', style: 'mapbox://styles/mapbox/satellite-streets-v12' }" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
-                    Mapbox Satellite
+                    Mapbox Satellite (up to 2019)
                 </label>
                 <label>
                     <input type="radio" :value="{ id: 'streets', style: 'mapbox://styles/mapbox/streets-v12' }" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
