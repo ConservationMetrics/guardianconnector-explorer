@@ -54,14 +54,20 @@
     },
     computed: {
         maxMonth() { 
-            // Calculate one month ago
+            // If the current day is less than or equal to 15, maxMonth is two months ago.
+            // Otherwise, maxMonth is the previous  month.
+            // This is because Planet NICFI monthly basemaps for the previous month are published on the 15th of each month.
             const date = new Date();
-            date.setMonth(date.getMonth() - 1);
+            if (date.getDate() <= 15) {
+                date.setMonth(date.getMonth() - 2);
+            } else {
+                date.setMonth(date.getMonth() - 1);
+            }
             const year = date.getFullYear();
             let month = date.getMonth() + 1;
             month = month < 10 ? `0${month}` : month;
             return `${year}-${month}`;
-        }       
+        }    
     },
     methods: {
         toggleModal() {
