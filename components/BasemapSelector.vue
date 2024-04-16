@@ -25,7 +25,7 @@
                     Planet Monthly Visual Basemap
                 </label>
                 <label v-if="selectedBasemap.id === 'planet'">
-                    <input type="month" v-model="monthYear" @change="updatePlanetBasemap" @input="validateMonth" :min="minMonth" :max="maxMonth">
+                    <Datepicker v-model="monthYear" format="YYYY-MM" value-type="YYYY-MM" type="month" :default-value="maxMonth" :disabled-date="setPlanetDateRange" :clearable="false" @selected="updatePlanetBasemap"></Datepicker>
                 </label>
             </div>
 
@@ -34,19 +34,27 @@
   </template>
   
   <script>
+  // @ts-ignore
+  import Datepicker from 'vue2-datepicker';
+  import 'vue2-datepicker/index.css';
+
   export default {
     name: "BasemapSelector",
+    components: {
+        Datepicker
+    },
     props: ["mapboxStyle", "planetApiKey"],
     data() {
         return {
             monthYear: this.maxMonth,
-            minMonth: '2020-09',
+            minMonth: '2020-09', // The first month we have Planet NICFI monthly basemaps
             showModal: false,
             selectedBasemap: { id: 'custom', style: this.mapboxStyle}
         };
     },
     computed: {
-        maxMonth() {
+        maxMonth() { 
+            // Calculate one month ago
             const date = new Date();
             date.setMonth(date.getMonth() - 1);
             const year = date.getFullYear();
@@ -62,18 +70,18 @@
         emitBasemap() {
             this.$emit('basemapSelected', this.selectedBasemap);
         },
+        setPlanetDateRange(date) {
+            // minMonth and maxMonth are in format YYYY-MM, but date is a Date object
+            // so we need to convert it to a string in the same format
+            date = date.toISOString().slice(0, 7);
+            return date < this.minMonth || date > this.maxMonth;
+        },
         updatePlanetBasemap() {
             if (this.selectedBasemap.id === 'planet') {
                 this.selectedBasemap.monthYear = this.monthYear;
                 this.emitBasemap();
             }
         },
-        validateMonth(event) {
-            if (!event.target.value) {
-                this.$nextTick(() => {
-                    this.monthYear = this.maxMonth;  // Reset to the maximum allowed month if cleared
-                });            }
-        }
     },
     watch: {
         selectedBasemap(newVal, oldVal) {
