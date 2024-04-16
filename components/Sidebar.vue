@@ -22,6 +22,7 @@
       :image-extensions="imageExtensions"
       :is-alert="isAlert"
       :media-base-path="mediaBasePath"
+      :media-base-path-alerts="mediaBasePathAlerts"
       :video-extensions="videoExtensions"
     />
     <Download
@@ -54,6 +55,7 @@ export default {
     "isAlert",
     "logoUrl",
     "mediaBasePath",
+    "mediaBasePathAlerts",
     "showIntroPanel",
     "showSidebar",
     "showSlider",

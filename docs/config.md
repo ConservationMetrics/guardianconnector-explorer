@@ -40,6 +40,8 @@ If your alerts data comes with map resources to visualize, then you can set this
 
 Enables embedding of media filenames from the database in the Gallery or Map views. Set to `YES` and specify the base path for media files in `MEDIA_BASE_PATH`. If neither are set, the gallery view will be disabled for this table.
 
+For alerts, you need to provide a separate base path for alerts. Append your `MEDIA_BASE_PATH` variable with `_ALERTS`. If you are also using Mapeo data, then provide a separate `MEDIA_BASE_PATH` value.
+
 #### `FRONT_END_FILTERING` (optional)
 
 Activates a dropdown filter for data in views. Set to `YES` and define the field for filtering in `FRONT_END_FILTER_FIELD`.
