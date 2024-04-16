@@ -12,7 +12,7 @@
                 </label>
                 <label>
                     <input type="radio" :value="{ id: 'satellite-streets', style: 'mapbox://styles/mapbox/satellite-streets-v12' }" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
-                    Mapbox Satellite
+                    Mapbox Satellite (up to 2019)
                 </label>
                 <label>
                     <input type="radio" :value="{ id: 'streets', style: 'mapbox://styles/mapbox/streets-v12' }" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
@@ -21,23 +21,53 @@
                 <label
                     v-if="planetApiKey"
                 >
-                    <input type="radio" :value="{ id: 'planet'}" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
+                    <input type="radio" :value="{ id: 'planet', monthYear: monthYear}" name="basemap" v-model="selectedBasemap" @change="emitBasemap">
                     Planet Monthly Visual Basemap
                 </label>
+                <label v-if="selectedBasemap.id === 'planet'">
+                    <Datepicker v-model="monthYear" format="YYYY-MM" value-type="YYYY-MM" type="month" :default-value="maxMonth" :disabled-date="setPlanetDateRange" :clearable="false" @selected="updatePlanetBasemap"></Datepicker>
+                </label>
             </div>
+
         </div>
     </div>
   </template>
   
   <script>
+  // @ts-ignore
+  import Datepicker from 'vue2-datepicker';
+  import 'vue2-datepicker/index.css';
+
   export default {
     name: "BasemapSelector",
+    components: {
+        Datepicker
+    },
     props: ["mapboxStyle", "planetApiKey"],
     data() {
         return {
+            monthYear: this.maxMonth,
+            minMonth: '2020-09', // The first month we have Planet NICFI monthly basemaps
             showModal: false,
-            selectedBasemap: { id: 'custom', style: this.mapboxStyle }
+            selectedBasemap: { id: 'custom', style: this.mapboxStyle}
         };
+    },
+    computed: {
+        maxMonth() { 
+            // If the current day is less than or equal to 15, maxMonth is two months ago.
+            // Otherwise, maxMonth is the previous  month.
+            // This is because Planet NICFI monthly basemaps for the previous month are published on the 15th of each month.
+            const date = new Date();
+            if (date.getDate() <= 15) {
+                date.setMonth(date.getMonth() - 2);
+            } else {
+                date.setMonth(date.getMonth() - 1);
+            }
+            const year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            month = month < 10 ? `0${month}` : month;
+            return `${year}-${month}`;
+        }    
     },
     methods: {
         toggleModal() {
@@ -45,6 +75,31 @@
         },
         emitBasemap() {
             this.$emit('basemapSelected', this.selectedBasemap);
+        },
+        setPlanetDateRange(date) {
+            // minMonth and maxMonth are in format YYYY-MM, but date is a Date object
+            // so we need to convert it to a string in the same format
+            date = date.toISOString().slice(0, 7);
+            return date < this.minMonth || date > this.maxMonth;
+        },
+        updatePlanetBasemap() {
+            if (this.selectedBasemap.id === 'planet') {
+                this.selectedBasemap.monthYear = this.monthYear;
+                this.emitBasemap();
+            }
+        },
+    },
+    watch: {
+        selectedBasemap(newVal, oldVal) {
+            // Update the monthYear when the planet basemap is selected
+            if (newVal.id === 'planet' && newVal !== oldVal) {
+                this.monthYear = this.maxMonth;
+            }
+        },
+        monthYear(newVal, oldVal) {
+            if (this.selectedBasemap.id === 'planet') {
+                this.updatePlanetBasemap();
+            }
         }
     }
   };
