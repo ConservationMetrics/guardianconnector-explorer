@@ -25,7 +25,7 @@
                     Planet Monthly Visual Basemap
                 </label>
                 <label v-if="selectedBasemap.id === 'planet'">
-                    <input type="month" v-model="monthYear" @change="updatePlanetBasemap" @input="validateMonth" min="2020-09" :max="maxMonth">
+                    <input type="month" v-model="monthYear" @change="updatePlanetBasemap" @input="validateMonth" :min="minMonth" :max="maxMonth">
                 </label>
             </div>
 
@@ -40,6 +40,7 @@
     data() {
         return {
             monthYear: this.maxMonth,
+            minMonth: '2020-09',
             showModal: false,
             selectedBasemap: { id: 'custom', style: this.mapboxStyle}
         };
