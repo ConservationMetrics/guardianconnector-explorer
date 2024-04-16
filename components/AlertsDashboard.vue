@@ -22,6 +22,7 @@
       :is-alert="isAlert"
       :logo-url="logoUrl"
       :media-base-path="mediaBasePath"
+      :media-base-path-alerts="mediaBasePathAlerts"
       :show-intro-panel="showIntroPanel"
       :show-sidebar="showSidebar"
       :show-slider="showSlider"
@@ -79,6 +80,7 @@ export default {
     "mapboxZoom",
     "mapeoData",
     "mediaBasePath",
+    "mediaBasePathAlerts",
     "planetApiKey",
     "statistics",
   ],
@@ -842,7 +844,11 @@ export default {
       this.imageUrl = [];
       featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
       featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
-      featureObject["Photos"] && this.imageUrl.push(featureObject["Photos"]);
+      if (featureObject["Photos"]) {
+        const photos = featureObject["Photos"].split(',');
+        photos.forEach(photo => this.imageUrl.push(photo.trim()));
+      }
+
       delete featureObject["t0_url"], delete featureObject["t1_url"];
       delete featureObject["filter-color"];
 

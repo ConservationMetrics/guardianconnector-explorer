@@ -34,6 +34,7 @@ interface ViewConfig {
   MAPEO_CATEGORY_IDS: string;
   MAP_LEGEND_LAYER_IDS: string;
   MEDIA_BASE_PATH: string;
+  MEDIA_BASE_PATH_ALERTS: string;
   LOGO_URL: string;
   PLANET_API_KEY: string;
   UNWANTED_COLUMNS?: string;

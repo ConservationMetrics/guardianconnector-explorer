@@ -22,7 +22,7 @@
         :filePath="filePath"
         :image-extensions="imageExtensions"
         :key="filePath"
-        :mediaBasePath="mediaBasePath"
+        :mediaBasePath="setMediaBasePath()"
         :video-extensions="videoExtensions"
       />
     </div>
@@ -81,9 +81,18 @@ export default {
     "imageExtensions",
     "isAlert",
     "mediaBasePath",
+    "mediaBasePathAlerts",
     "videoExtensions",
   ],
-  methods: {},
+  methods: {
+    setMediaBasePath() {
+      if (this.isAlert) {
+        return this.mediaBasePathAlerts;
+      } else {
+        return this.mediaBasePath;
+      }
+    }
+  },
 };
 </script>
 

@@ -244,6 +244,7 @@ if (!VIEWS_CONFIG) {
               mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
               mapeoData: mapeoData,
               mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+              mediaBasePathAlerts: VIEWS[table].MEDIA_BASE_PATH_ALERTS,
               planetApiKey: VIEWS[table].PLANET_API_KEY,
               statistics: statistics,
               table: table,
