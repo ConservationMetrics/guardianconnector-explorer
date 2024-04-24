@@ -89,12 +89,6 @@ const config: NuxtConfig = {
         },
       },
     },
-    redirect: {
-      login: "/login",
-      logout: "/login",
-      callback: "/login",
-      home: "/",
-    },
   },
 
   axios: {

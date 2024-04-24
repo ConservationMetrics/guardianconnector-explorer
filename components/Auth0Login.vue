@@ -17,12 +17,11 @@ export default {
   data() {
     return {
       errorMessage: "",
+      redirectPath: "/",
     };
   },
-  beforeMount() {
-    if (this.$auth.loggedIn) {
-      this.$router.push("/");
-    }
+  created() {
+    this.redirectPath = this.$route.query.redirect || "/";
   },
   mounted() {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -33,16 +32,15 @@ export default {
       this.errorMessage = decodeURIComponent(errorDescription);
     }
   },
-  watch: {
-    "$auth.loggedIn"(loggedIn) {
-      if (loggedIn) {
-        this.$router.push("/");
-      }
-    },
-  },
   methods: {
     async login() {
-      await this.$auth.loginWith("auth0");
+      try {
+        await this.$auth.loginWith("auth0");      
+        this.$router.replace(this.redirectPath);
+        
+      } catch (error) {
+        console.error("Error logging in with Auth0:", error);
+      }
     },
   },
 };
