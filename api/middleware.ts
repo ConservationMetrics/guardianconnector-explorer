@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { API_KEY, AUTH_STRATEGY, SECRET_JWT_KEY } from "./config";
