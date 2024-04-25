@@ -221,6 +221,7 @@ if (!VIEWS_CONFIG) {
 
             // Optionally add GFW data
             if (VIEWS[table].GFW_API_KEY && VIEWS[table].GFW_AOI) {
+              console.log("Fetching GFW data...")
               const gfwApiKey = VIEWS[table].GFW_API_KEY;
               const gfwAOI = [JSON.parse(VIEWS[table].GFW_AOI)];
 
@@ -237,39 +238,46 @@ if (!VIEWS_CONFIG) {
               // from 2024-01-01 onwards.
               // We should allow these to be configurable in the future.
 
-              const rawGfwData = await fetch(
-                "https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest/query",
-                {
-                  method: "POST",
-                  headers: {
-                    "x-api-key": gfwApiKey,
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    geometry: {
-                      type: "Polygon",
-                      coordinates: gfwAOI,
+              try {
+                const rawGfwData = await fetch(
+                  "https://data-api.globalforestwatch.org/dataset/gfw_integrated_alerts/latest/query",
+                  {
+                    method: "POST",
+                    headers: {
+                      "x-api-key": gfwApiKey,
+                      "Content-Type": "application/json",
                     },
-                    sql: "SELECT latitude, longitude, gfw_integrated_alerts__date, gfw_integrated_alerts__confidence FROM results WHERE gfw_integrated_alerts__date >= '2024-01-01'",
-                  }),
-                },
-              ).then((res: Response) => res.json());
-
-              // Convert GFW data response to GeoJSON format
-              gfwData = {
-                type: 'FeatureCollection',
-                features: rawGfwData.data.map((alert: any) => ({
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [alert.longitude, alert.latitude]
+                    body: JSON.stringify({
+                      geometry: {
+                        type: "Polygon",
+                        coordinates: gfwAOI,
+                      },
+                      sql: "SELECT latitude, longitude, gfw_integrated_alerts__date, gfw_integrated_alerts__confidence FROM results WHERE gfw_integrated_alerts__date >= '2024-01-01'",
+                    }),
                   },
-                  properties: {
-                    date: alert.gfw_integrated_alerts__date,
-                    confidence: alert.gfw_integrated_alerts__confidence
-                  }
-                }))
-              };
+                ).then((res: Response) => res.json());
+
+                // Convert GFW data response to GeoJSON format
+                gfwData = {
+                  type: 'FeatureCollection',
+                  features: rawGfwData.data.map((alert: any) => ({
+                    type: 'Feature',
+                    geometry: {
+                      type: 'Point',
+                      coordinates: [alert.longitude, alert.latitude]
+                    },
+                    properties: {
+                      date: alert.gfw_integrated_alerts__date,
+                      confidence: alert.gfw_integrated_alerts__confidence
+                    }
+                  }))
+                };
+
+                console.log("Successfully fetched GFW data!");
+              } catch (error: any) {
+                console.error("Error fetching GFW data:", error.message);
+                gfwData = null;
+              }
             }
 
             // Prepare statistics data for the alerts view
