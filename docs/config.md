@@ -52,7 +52,7 @@ Depending on your data, you will want to use a meaningful field for filtering (f
 
 #### `GFW_API_KEY` (optional)
 
-If you want to show Global Forest Watch data on your alerts dashboard, provide an API key.
+If you want to show Global Forest Watch data on your alerts dashboard, provide an API key. Note that GFW API keys expire after one year, and need to be refreshed with a bearer token: https://www.globalforestwatch.org/help/developers/guides/create-and-use-an-api-key/
 
 #### `GFW_AOI` (optional)
 
