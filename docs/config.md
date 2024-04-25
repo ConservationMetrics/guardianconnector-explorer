@@ -50,6 +50,14 @@ Activates a dropdown filter for data in views. Set to `YES` and define the field
 
 Depending on your data, you will want to use a meaningful field for filtering (for example, `Category` for Mapeo data). This variable defines the field used for front-end dropdown filtering.
 
+#### `GFW_API_KEY` (optional)
+
+If you want to show Global Forest Watch data on your alerts dashboard, provide an API key.
+
+#### `GFW_AOI` (optional)
+
+If you want to show Global Forest Watch data on your alerts dashboard, provide an AOI (Area of Interest) where you want to query GFW data. It should be in format `[[long,lat],[long,lat]...]`.
+
 #### `LOGO_URL` (optional)
 
 You can provide a URL to your organization / community logo which will show up in the Alerts dashboard intro panel.

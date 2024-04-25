@@ -22,6 +22,8 @@ interface ViewConfig {
   EMBED_MEDIA: string;
   FRONT_END_FILTERING: string;
   FRONT_END_FILTER_FIELD: string;
+  GFW_API_KEY: string;
+  GFW_AOI: string;
   MAPBOX_STYLE: string;
   MAPBOX_PROJECTION: string;
   MAPBOX_CENTER_LATITUDE: string;

@@ -66,6 +66,7 @@ export default {
     "alertResources",
     "alertsData",
     "embedMedia",
+    "gfwData",
     "imageExtensions",
     "logoUrl",
     "mapLegendLayerIds",
@@ -378,6 +379,33 @@ export default {
         geoJsonSource.previousAlerts.features.some(
           (feature) => feature.geometry.type === "LineString",
         );
+    },
+
+    addGfwData() {
+      const geoJsonSource = this.gfwData;
+
+      // Add the GFW data source to the map
+      if (!this.map.getSource("global-forest-watch-data")) {
+        this.map.addSource("global-forest-watch-data", {
+          type: "geojson",
+          data: geoJsonSource,
+        });
+      }
+
+      // Add a layer for GFW data
+      if (!this.map.getLayer("global-forest-watch-data")) {
+        this.map.addLayer({
+          id: "global-forest-watch-data",
+          type: "circle",
+          source: "global-forest-watch-data",
+          paint: {
+            "circle-radius": 2,
+            "circle-color": "#808080",
+            "circle-stroke-width": 0,
+          },
+        });
+      }
+
     },
 
     addMapeoData() {
@@ -696,6 +724,9 @@ export default {
     },
 
     prepareMapCanvasContent() {
+      if (this.gfwData) {
+        this.addGfwData();
+      }
       if (this.alertsData) {
         this.addAlertsData();
       }
@@ -714,10 +745,14 @@ export default {
 
     prepareMapLegendContent() {
       this.map.once("idle", () => {
-        let mapLegendLayerIds;
+        let mapLegendLayerIds = this.mapLegendLayerIds;
+
+        // Add gfw-data layer to mapLegendContent
+        if (this.gfwData) {
+          mapLegendLayerIds = "global-forest-watch-data," + mapLegendLayerIds;
+        }
 
         // Add most-recent-alerts & previous-alerts layers to mapLegendContent
-        mapLegendLayerIds = this.mapLegendLayerIds;
         if (this.hasLineStrings) {
           mapLegendLayerIds = "most-recent-alerts-linestring,previous-alerts-linestring," + mapLegendLayerIds;
         } else {
