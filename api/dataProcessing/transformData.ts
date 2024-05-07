@@ -213,9 +213,9 @@ const prepareAlertData = (
 
     if (embedMedia) {
       transformedItem["t0_url"] =
-        `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/output_t0.jpg`;
+        `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T0_${item._id}.jpg`;
       transformedItem["t1_url"] =
-        `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/output_t1.jpg`;
+        `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T1_${item._id}.jpg`;
       transformedItem["Preview imagery source"] =
         satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
     }
