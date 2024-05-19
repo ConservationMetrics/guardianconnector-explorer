@@ -23,7 +23,7 @@
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
     />
-    <BasemapSelector 
+    <BasemapSelector
       v-if="showBasemapSelector"
       :mapbox-style="mapboxStyle"
       :planet-api-key="planetApiKey"
@@ -41,7 +41,11 @@ import MapLegend from "@/components/MapLegend.vue";
 import Sidebar from "@/components/Sidebar.vue";
 
 import { getFilePathsWithExtension } from "@/src/utils.ts";
-import { changeMapStyle, prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
+import {
+  changeMapStyle,
+  prepareMapLegendLayers,
+  prepareCoordinatesForSelectedFeature,
+} from "@/src/mapFunctions.ts";
 
 export default {
   components: { BasemapSelector, DataFilter, MapLegend, Sidebar },
@@ -188,7 +192,9 @@ export default {
 
           // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
           if (featureObject.Geocoordinates) {
-            featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(featureObject.Geocoordinates);
+            featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(
+              featureObject.Geocoordinates,
+            );
           }
 
           this.selectedFeature = featureObject;

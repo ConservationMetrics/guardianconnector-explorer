@@ -57,7 +57,7 @@ export default {
 }
 
 .circle-box {
-  border-radius: 50%;  
+  border-radius: 50%;
   width: 10px;
   height: 10px;
   margin: 5px;

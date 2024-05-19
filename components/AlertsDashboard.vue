@@ -34,7 +34,7 @@
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
     />
-    <BasemapSelector 
+    <BasemapSelector
       v-if="showBasemapSelector"
       :mapbox-style="mapboxStyle"
       :planet-api-key="planetApiKey"
@@ -54,7 +54,11 @@ import BasemapSelector from "@/components/BasemapSelector.vue";
 import Sidebar from "@/components/Sidebar.vue";
 import MapLegend from "@/components/MapLegend.vue";
 
-import { changeMapStyle, prepareMapLegendLayers, prepareCoordinatesForSelectedFeature } from "@/src/mapFunctions.ts";
+import {
+  changeMapStyle,
+  prepareMapLegendLayers,
+  prepareCoordinatesForSelectedFeature,
+} from "@/src/mapFunctions.ts";
 
 export default {
   components: {
@@ -349,8 +353,10 @@ export default {
       // Add event listeners for layers that start with 'most-recent-alerts' and 'alerts'
       this.map.getStyle().layers.forEach((layer) => {
         if (
-          layer.id.startsWith("most-recent-alerts") && !layer.id.includes("stroke") ||
-          layer.id.startsWith("previous-alerts") && !layer.id.includes("stroke")
+          (layer.id.startsWith("most-recent-alerts") &&
+            !layer.id.includes("stroke")) ||
+          (layer.id.startsWith("previous-alerts") &&
+            !layer.id.includes("stroke"))
         ) {
           this.map.on("mouseenter", layer.id, () => {
             this.featuresUnderCursor++;
@@ -392,7 +398,7 @@ export default {
             coordinates: feature.Geocoordinates,
           },
           properties: {
-            ...feature
+            ...feature,
           },
         })),
       };
@@ -404,7 +410,7 @@ export default {
         this.map.addSource("mapeo-data", {
           type: "geojson",
           data: geoJsonSource,
-          generateId: true
+          generateId: true,
         });
       }
 
@@ -427,22 +433,20 @@ export default {
             "circle-stroke-width": 2,
             "circle-stroke-color": "#fff",
           },
-        });    
+        });
       }
-      
+
       // Add event listeners
-      [
-        "mapeo-data"
-      ].forEach((layerId) => {
+      ["mapeo-data"].forEach((layerId) => {
         this.map.on("mouseenter", layerId, () => {
           this.featuresUnderCursor++;
           this.map.getCanvas().style.cursor = "pointer";
         });
         this.map.on("mouseleave", layerId, () => {
           this.featuresUnderCursor--;
-            if (this.featuresUnderCursor === 0) {
-              this.map.getCanvas().style.cursor = "";
-            }
+          if (this.featuresUnderCursor === 0) {
+            this.map.getCanvas().style.cursor = "";
+          }
         });
         this.map.on("click", layerId, (e) => {
           this.selectFeature(e.features[0], layerId);
@@ -591,17 +595,17 @@ export default {
       const pixelBuffer = 10;
       const bbox = [
         [e.point.x - pixelBuffer, e.point.y - pixelBuffer],
-        [e.point.x + pixelBuffer, e.point.y + pixelBuffer]
+        [e.point.x + pixelBuffer, e.point.y + pixelBuffer],
       ];
 
       const features = this.map.queryRenderedFeatures(bbox, {
-        layers: ['most-recent-alerts-linestring', 'previous-alerts-linestring']
+        layers: ["most-recent-alerts-linestring", "previous-alerts-linestring"],
       });
 
       if (features.length > 0) {
         const firstFeature = features[0];
-        const layerId = firstFeature.layer.id; 
-        this.selectFeature(firstFeature, layerId);      
+        const layerId = firstFeature.layer.id;
+        this.selectFeature(firstFeature, layerId);
       }
     },
 
@@ -709,7 +713,7 @@ export default {
       // Add buffer for LineStrings to make them easier to select
       if (this.hasLineStrings) {
         this.map.on("mousemove", this.handleBufferMouseEvent);
-        this.map.on('click', this.handleBufferClick);
+        this.map.on("click", this.handleBufferClick);
       }
     },
 
@@ -720,9 +724,13 @@ export default {
         // Add most-recent-alerts & previous-alerts layers to mapLegendContent
         mapLegendLayerIds = this.mapLegendLayerIds;
         if (this.hasLineStrings) {
-          mapLegendLayerIds = "most-recent-alerts-linestring,previous-alerts-linestring," + mapLegendLayerIds;
+          mapLegendLayerIds =
+            "most-recent-alerts-linestring,previous-alerts-linestring," +
+            mapLegendLayerIds;
         } else {
-          mapLegendLayerIds = "most-recent-alerts-polygon,previous-alerts-polygon," + mapLegendLayerIds;
+          mapLegendLayerIds =
+            "most-recent-alerts-polygon,previous-alerts-polygon," +
+            mapLegendLayerIds;
         }
 
         // Add mapeo-data layer to mapLegendContent
@@ -734,7 +742,7 @@ export default {
         if (!mapLegendLayerIds) {
           return;
         }
-        
+
         this.mapLegendContent = prepareMapLegendLayers(
           this.map,
           mapLegendLayerIds,
@@ -846,8 +854,8 @@ export default {
       featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
       featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
       if (featureObject["Photos"]) {
-        const photos = featureObject["Photos"].split(',');
-        photos.forEach(photo => this.imageUrl.push(photo.trim()));
+        const photos = featureObject["Photos"].split(",");
+        photos.forEach((photo) => this.imageUrl.push(photo.trim()));
       }
 
       delete featureObject["t0_url"], delete featureObject["t1_url"];
@@ -855,11 +863,13 @@ export default {
 
       // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
       if (featureObject.Geocoordinates) {
-        featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(featureObject.Geocoordinates);
+        featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(
+          featureObject.Geocoordinates,
+        );
       }
 
       this.removePulsingCircles();
-    }
+    },
   },
   mounted() {
     mapboxgl.accessToken = this.mapboxAccessToken;
@@ -904,7 +914,6 @@ export default {
       this.map.addControl(fullscreenControl, "top-right");
 
       this.showBasemapSelector = true;
-
     });
 
     this.dateOptions = this.getDateOptions();

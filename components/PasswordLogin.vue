@@ -97,6 +97,6 @@ export default {
         this.$router.push(this.redirectPath);
       }
     },
-  }
+  },
 };
 </script>

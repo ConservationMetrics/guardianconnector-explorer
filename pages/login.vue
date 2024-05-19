@@ -30,6 +30,6 @@ export default {
     loginComponent() {
       return this.authStrategy === "auth0" ? Auth0Login : PasswordLogin;
     },
-  }
+  },
 };
 </script>

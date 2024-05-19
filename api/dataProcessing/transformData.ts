@@ -35,7 +35,10 @@ const transformSurveyData = (
       if (key.toLowerCase().includes("category")) {
         transformedValue = transformedValue.replace(/-/g, " ");
       }
-      if (key.toLowerCase().includes("created") || key.toLowerCase().includes("modified")) {
+      if (
+        key.toLowerCase().includes("created") ||
+        key.toLowerCase().includes("modified")
+      ) {
         // First let's ensure the date is in the correct format
         const dateRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).*/;
         const dateMatch = transformedValue.match(dateRegex);
@@ -141,7 +144,6 @@ const prepareMapData = (
         item["filter-color"] = colorMap.get(filterFieldValue);
       } else {
         item["filter-color"] = "#3333FF"; // Fallback color of blue
-
       }
     } else {
       // Handle the case when filterField is undefined
@@ -448,8 +450,8 @@ const prepareAlertStatistics = (
   // Count the number of alerts for the most recent date
   const recentAlertDate =
     last12MonthsData.length > 0
-    ? `${last12MonthsData[last12MonthsData.length - 1].month_detec.padStart(2, "0")}-${last12MonthsData[last12MonthsData.length - 1].year_detec}`
-    : 'N/A';
+      ? `${last12MonthsData[last12MonthsData.length - 1].month_detec.padStart(2, "0")}-${last12MonthsData[last12MonthsData.length - 1].year_detec}`
+      : "N/A";
   const recentAlertsNumber = data.filter(
     (item) =>
       `${item.month_detec.padStart(2, "0")}-${item.year_detec}` ===

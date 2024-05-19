@@ -14,7 +14,7 @@
         </h2>
         <p class="text-l mb-2">
           Most recent alerts shown on map in
-          <span style="color: #FF0000"><strong>red</strong></span
+          <span style="color: #ff0000"><strong>red</strong></span
           >.
         </p>
         <div class="mb-2">
@@ -63,7 +63,10 @@
     </div>
     <!-- Chart -->
     <div v-if="statistics" class="feature p-4 rounded-lg shadow-lg">
-      <AlertsChart :statistics="statistics" :calculate-hectares="calculateHectares" />
+      <AlertsChart
+        :statistics="statistics"
+        :calculate-hectares="calculateHectares"
+      />
     </div>
   </div>
 </template>

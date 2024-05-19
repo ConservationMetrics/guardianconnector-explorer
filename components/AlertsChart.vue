@@ -37,8 +37,12 @@ export default {
   computed: {
     chartData() {
       // Determine which dataset to use based on the calculateHectares prop
-      const dataKey = this.calculateHectares ? 'hectaresPerMonth' : 'alertsPerMonth';
-      const label = this.calculateHectares ? 'Hectares affected' : 'Number of alerts';
+      const dataKey = this.calculateHectares
+        ? "hectaresPerMonth"
+        : "alertsPerMonth";
+      const label = this.calculateHectares
+        ? "Hectares affected"
+        : "Number of alerts";
 
       return {
         labels: Object.keys(this.statistics[dataKey]),

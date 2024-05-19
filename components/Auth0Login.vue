@@ -35,7 +35,7 @@ export default {
   methods: {
     async login() {
       try {
-        // TODO: This process of logging in with auth0 takes the user away from 
+        // TODO: This process of logging in with auth0 takes the user away from
         // GuardianConnector Views and onto the auth0 authorization page.
         // As a consequence, any app state (regarding routes, etc.) is lost, which
         // means that we cannot bring the user back to the same page after login.
@@ -43,13 +43,12 @@ export default {
         // but this will not work when GuardianConnector Views is embedded in an
         // iframe, as localStorage is not shared between the parent and the iframe.
         // This points to a deficiency in our current architecture (embedding
-        // GuardianConnector Views in an iframe on Superset). We will likely need to 
-        // move away from the iframe approach and instead build a common 
-        // post-authentication entry point for all of GCV, and link to Superset 
+        // GuardianConnector Views in an iframe on Superset). We will likely need to
+        // move away from the iframe approach and instead build a common
+        // post-authentication entry point for all of GCV, and link to Superset
         // from there.
-        await this.$auth.loginWith("auth0");      
+        await this.$auth.loginWith("auth0");
         this.$router.replace(this.redirectPath);
-        
       } catch (error) {
         console.error("Error logging in with Auth0:", error);
       }

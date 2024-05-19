@@ -168,7 +168,11 @@ if (!VIEWS_CONFIG) {
         async (_req: express.Request, res: express.Response) => {
           try {
             // Fetch data
-            const { mainData, metadata } = await fetchData(db, table, IS_SQLITE);
+            const { mainData, metadata } = await fetchData(
+              db,
+              table,
+              IS_SQLITE,
+            );
 
             // Prepare alerts data for the alerts view
             const changeDetectionData = prepareAlertData(
@@ -199,19 +203,20 @@ if (!VIEWS_CONFIG) {
                   return mapeoCategoryIds.includes(row.p__categoryid);
                 },
               );
-              
+
               // Filter only data with valid geofields
-              const filteredMapeoGeoData = filterGeoData(filteredMapeoDataByCategory);
-              // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
-              const transformedMapeoData = transformSurveyData(
-                filteredMapeoGeoData,
+              const filteredMapeoGeoData = filterGeoData(
+                filteredMapeoDataByCategory,
               );
+              // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
+              const transformedMapeoData =
+                transformSurveyData(filteredMapeoGeoData);
               // Process geodata
               const processedMapeoData = prepareMapData(
                 transformedMapeoData,
                 VIEWS[table].FRONT_END_FILTER_FIELD,
               );
-              
+
               mapeoData = processedMapeoData;
             }
 
@@ -223,7 +228,9 @@ if (!VIEWS_CONFIG) {
               mostRecentAlerts: transformToGeojson(
                 changeDetectionData.mostRecentAlerts,
               ),
-              previousAlerts: transformToGeojson(changeDetectionData.previousAlerts),
+              previousAlerts: transformToGeojson(
+                changeDetectionData.previousAlerts,
+              ),
             };
 
             const response = {

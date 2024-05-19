@@ -109,7 +109,7 @@ export default {
       } else {
         filename = "data.csv";
       }
-      
+
       const jsonStr = JSON.stringify(this.geojson, null, 2);
       const blob = new Blob([jsonStr], { type: "application/json" });
 
