@@ -454,6 +454,7 @@ export default {
       if (document.querySelector(".pulsing-dot")) {
         return;
       }
+      this.removePulsingCircles();
 
       // Define the pulsing dot CSS
       const pulsingDot = document.createElement("div");
