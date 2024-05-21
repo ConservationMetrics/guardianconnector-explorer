@@ -100,6 +100,7 @@ export default {
       map: null,
       mapeoDataColor: null,
       mapLegendContent: null,
+      pulsingCirclesAdded: null,
       selectedDateRange: null,
       selectedFeature: null,
       selectedFeatureGeojson: null,
@@ -455,6 +456,11 @@ export default {
     },
 
     addPulsingCircles() {
+      if (this.pulsingCirclesAdded) {
+        return;
+      }
+      this.pulsingCirclesAdded = true;
+      
       if (document.querySelector(".pulsing-dot")) {
         return;
       }
@@ -513,7 +519,15 @@ export default {
 
         const features = this.map.querySourceFeatures(sourceId);
 
+        const uniqueFeatures = new Set();
+
         features.forEach((feature) => {
+          const featureId = feature.id;
+          if (uniqueFeatures.has(featureId)) {
+            return;
+          }
+          uniqueFeatures.add(featureId);
+
           let lng, lat;
 
           if (feature.geometry.type === "Polygon") {
@@ -753,6 +767,7 @@ export default {
 
     removePulsingCircles() {
       document.querySelectorAll(".pulsing-dot").forEach((el) => el.remove());
+      this.pulsingCirclesAdded = false;
     },
 
     resetSelectedFeature() {
