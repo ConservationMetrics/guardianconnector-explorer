@@ -460,7 +460,7 @@ export default {
         return;
       }
       this.pulsingCirclesAdded = true;
-      
+
       if (document.querySelector(".pulsing-dot")) {
         return;
       }
@@ -502,60 +502,36 @@ export default {
       styleSheet.innerText = styles;
       document.head.appendChild(styleSheet);
 
-      // Check for sources that start with 'most-recent-alerts'
-      const sources = this.map.getStyle().sources;
-      const recentAlertsSources = Object.keys(sources).filter((source) =>
-        source.startsWith("most-recent-alerts"),
-      );
-      recentAlertsSources.forEach((sourceId) => {
-        // Wait until the map has loaded the source
-        if (!this.map.isSourceLoaded(sourceId)) {
-          this.map.once("idle", () => {
-            this.addPulsingCircles();
-          });
+      const addPulsingMarker = (feature) => {
+        let lng, lat;
+
+        if (feature.geometry.type === "Polygon") {
+          // Calculate the center of the bounding box
+          const bounds = bbox(feature);
+          lng = (bounds[0] + bounds[2]) / 2;
+          lat = (bounds[1] + bounds[3]) / 2;
+        } else if (feature.geometry.type === "LineString") {
+          // Use Turf to find the midpoint of the LineString
+          const line = lineString(feature.geometry.coordinates);
+          const lineLength = length(line, { units: "kilometers" });
+          const midpoint = along(line, lineLength / 2, { units: "kilometers" });
+          lng = midpoint.geometry.coordinates[0];
+          lat = midpoint.geometry.coordinates[1];
+        } else if (feature.geometry.type === "Point") {
+          [lng, lat] = feature.geometry.coordinates;
+        } else {
           return;
         }
 
-        const features = this.map.querySourceFeatures(sourceId);
+        // Create a new marker and add it to the map
+        const pulsingMarker = pulsingDot.cloneNode();
+        new mapboxgl.Marker(pulsingMarker)
+          .setLngLat([parseFloat(lng), parseFloat(lat)])
+          .addTo(this.map);
+      };
 
-        const uniqueFeatures = new Set();
-
-        features.forEach((feature) => {
-          const featureId = feature.id;
-          if (uniqueFeatures.has(featureId)) {
-            return;
-          }
-          uniqueFeatures.add(featureId);
-
-          let lng, lat;
-
-          if (feature.geometry.type === "Polygon") {
-            // Calculate the center of the bounding box
-            const bounds = bbox(feature);
-            lng = (bounds[0] + bounds[2]) / 2;
-            lat = (bounds[1] + bounds[3]) / 2;
-          } else if (feature.geometry.type === "LineString") {
-            // Use Turf to find the midpoint of the LineString
-            const line = lineString(feature.geometry.coordinates);
-            const lineLength = length(line, { units: "kilometers" });
-            const midpoint = along(line, lineLength / 2, {
-              units: "kilometers",
-            });
-            lng = midpoint.geometry.coordinates[0];
-            lat = midpoint.geometry.coordinates[1];
-          } else if (feature.geometry.type === "Point") {
-            [lng, lat] = feature.geometry.coordinates;
-          } else {
-            return;
-          }
-
-          // Create a new marker and add it to the map
-          const pulsingMarker = pulsingDot.cloneNode();
-          new mapboxgl.Marker(pulsingMarker)
-            .setLngLat([parseFloat(lng), parseFloat(lat)])
-            .addTo(this.map);
-        });
-      });
+      // Add pulsing markers for most recent alerts
+      this.alertsData.mostRecentAlerts.features.forEach(addPulsingMarker);
     },
 
     convertDates(start, end) {
@@ -739,12 +715,16 @@ export default {
         if (this.hasLineStrings) {
           mapLegendLayerIds =
             "most-recent-alerts-linestring," +
-            (this.alertsData.previousAlerts.features.length ? "previous-alerts-linestring," : "") +
+            (this.alertsData.previousAlerts.features.length
+              ? "previous-alerts-linestring,"
+              : "") +
             mapLegendLayerIds;
         } else {
           mapLegendLayerIds =
             "most-recent-alerts-polygon," +
-            (this.alertsData.previousAlerts.features.length ? "previous-alerts-polygon," : "") +
+            (this.alertsData.previousAlerts.features.length
+              ? "previous-alerts-polygon,"
+              : "") +
             mapLegendLayerIds;
         }
 
