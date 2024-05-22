@@ -507,7 +507,6 @@ export default {
       const recentAlertsSources = Object.keys(sources).filter((source) =>
         source.startsWith("most-recent-alerts"),
       );
-
       recentAlertsSources.forEach((sourceId) => {
         // Wait until the map has loaded the source
         if (!this.map.isSourceLoaded(sourceId)) {
@@ -739,11 +738,13 @@ export default {
         mapLegendLayerIds = this.mapLegendLayerIds;
         if (this.hasLineStrings) {
           mapLegendLayerIds =
-            "most-recent-alerts-linestring,previous-alerts-linestring," +
+            "most-recent-alerts-linestring," +
+            (this.alertsData.previousAlerts.features.length ? "previous-alerts-linestring," : "") +
             mapLegendLayerIds;
         } else {
           mapLegendLayerIds =
-            "most-recent-alerts-polygon,previous-alerts-polygon," +
+            "most-recent-alerts-polygon," +
+            (this.alertsData.previousAlerts.features.length ? "previous-alerts-polygon," : "") +
             mapLegendLayerIds;
         }
 
