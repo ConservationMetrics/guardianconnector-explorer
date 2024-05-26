@@ -1,0 +1,92 @@
+name: Publish to DockerHub
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+  release:
+    types: [created]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: communityfirst/guardianconnector-views
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+      - name: Docker Hub Description
+        if: github.event_name == 'release'
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: communityfirst/guardianconnector-views
+          short-description: 'A Nuxt app to visualize GuardianConnector data in different views.'
+    #   - name: Test run of Docker image
+    #     run: |
+    #       docker run --rm \
+    #         -e DATABASE="your_db_location" \
+    #         -e DATABASE="your_db_location"
+    #         -e DB_HOST="localhost"
+    #         -e DB_USER="your_db_user"
+    #         -e DB_PASSWORD="your_db_password"
+    #         -e DB_PORT="5432"
+    #         -e DB_SSL="true"
+    #         -e SQLITE_DB_PATH="./sql.db"
+    #         -e PORT="8080"
+    #         -e NUXT_ENV_AUTH_STRATEGY="none" 
+    #         -e PASSWORD="guardian-connector"
+    #         -e SECRET_JWT_KEY="secret-jwt-key"
+    #         -e NUXT_ENV_AUTH0_DOMAIN="domain.us.auth0.com"
+    #         -e NUXT_ENV_AUTH0_CLIENT_ID=""
+    #         -e NUXT_ENV_AUTH0_CLIENT_SECRET=""
+    #         -e NUXT_ENV_AUTH0_AUDIENCE="https://audience.auth0.com/api/v2/"
+    #         -e NUXT_ENV_AUTH0_BASE_URL='http://localhost:3000'
+    #         -e VUE_APP_API_KEY=""
+    #         -e MAPBOX_ACCESS_TOKEN="your_mapbox_token"
+    #         -e NUXT_ENV_VIEWS_CONFIG = "{
+    #              'kobo_submissions': {
+    #                  "VIEWS": "map,gallery",
+    #                  "EMBED_MEDIA": "YES",
+    #                  "MEDIA_BASE_PATH": "./media",
+    #                  "FRONT_END_FILTERING": "YES",
+    #                  "FRONT_END_FILTER_FIELD": "Community",
+    #                  "MAPBOX_STYLE": "mapbox://styles/mapbox/satellite-streets-v12",
+    #                  "MAPBOX_PROJECTION": "globe",
+    #                  "MAPBOX_CENTER_LATITUDE": "2",
+    #                  "MAPBOX_CENTER_LONGITUDE": "-55",
+    #                  "MAPBOX_ZOOM": "8",
+    #                  "MAPBOX_PITCH": "0",
+    #                  "MAPBOX_BEARING": "0",
+    #                  "MAPBOX_3D": "YES",
+    #                  "MAP_LEGEND_LAYER_IDS": "road-primary,aerialway",
+    #                  "UNWANTED_COLUMNS": "latitude,longitude,coordinates",
+    #                  "UNWANTED_SUBSTRINGS": "meta,version,formhub,xform,attachments,tags,notes,topic,sender,geolocation,submission_time,submitted_by,status,supplementalDetails,validation_status,start,end,location"
+    #              }
+    #           }"
+    #           ${{ steps.meta.outputs.tags }}
