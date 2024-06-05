@@ -32,7 +32,7 @@ import AlertsDashboard from "~/components/AlertsDashboard.vue";
 export default {
   head() {
     return {
-      title: "GuardianConnector Views: Change Detection Alerts",
+      title: "GuardianConnector Views: " + this.$t("changeDetectionAlerts"),
     };
   },
   components: { AlertsDashboard },

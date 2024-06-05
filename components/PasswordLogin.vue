@@ -2,16 +2,17 @@
   <div
     class="flex flex-col items-center justify-center min-h-screen bg-gray-100"
   >
+    <p class="italic">{{ $t("authMessage") }}.</p>
     <form
       @submit.prevent="login"
-      class="w-full max-w-sm bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+      class="w-full max-w-sm bg-white shadow-md rounded px-8 pt-6 pb-8 mt-4 mb-4"
     >
       <div class="mb-4">
         <label
           class="block text-gray-700 text-sm font-bold mb-2"
           for="password"
         >
-          Password
+          {{ $t("password") }}
         </label>
         <input
           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -26,7 +27,7 @@
           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
         >
-          Login
+          {{ $t("login") }}
         </button>
       </div>
     </form>
@@ -40,11 +41,13 @@ export default {
     return {
       password: "",
       error: null,
-      redirectPath: "/",
+      redirectPath: this.localePath("/"),
     };
   },
   async created() {
-    this.redirectPath = this.$route.query.redirect || "/";
+    this.redirectPath = this.$route.query.redirect
+      ? this.localePath(this.$route.query.redirect)
+      : this.localePath("/");
 
     if (this.$route.query.secret_key) {
       try {
@@ -59,7 +62,7 @@ export default {
           location.reload();
         }
       } catch (error) {
-        this.error = "An error occurred while trying to log in.";
+        this.error = this.$t("loginError") + ".";
       }
     }
   },
@@ -77,15 +80,14 @@ export default {
         } catch (error) {
           if (error.response) {
             if (error.response.status === 403) {
-              this.error = "The password you entered is incorrect.";
+              this.error = this.$t("passwordIncorrect") + ".";
             } else if (error.response.data && error.response.data.message) {
               this.error = error.response.data.message;
             } else {
-              this.error = "An error occurred while trying to log in.";
+              this.error = this.$t("loginError") + ".";
             }
           } else {
-            this.error =
-              error.message || "An error occurred while trying to log in.";
+            this.error = error.message || this.$t("loginError") + ".";
           }
         }
       }

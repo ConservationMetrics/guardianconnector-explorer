@@ -1,18 +1,13 @@
 import { Middleware } from "@nuxt/types";
 
 const authMiddleware: Middleware = ({ $auth, redirect, route }) => {
-  const AUTH_STRATEGY = process.env.NUXT_ENV_AUTH_STRATEGY
-    ? process.env.NUXT_ENV_AUTH_STRATEGY.replace(/['"]+/g, "")
-    : "none";
-
-  if (route.path !== "/login" && AUTH_STRATEGY === "auth0" && !$auth.loggedIn) {
-    return redirect(`/login?redirect=${route.fullPath}`);
-  } else if (
-    route.path !== "/login" &&
-    AUTH_STRATEGY === "password" &&
-    !$auth.loggedIn
-  ) {
-    return redirect(`/login?redirect=${route.fullPath}`);
+  if (route.path !== "/login" && !$auth.loggedIn) {
+    if (route.query.redirect) {
+      // If already redirected, avoid adding another redirect query parameter
+      return;
+    }
+    const redirectTo = encodeURIComponent(route.fullPath);
+    return redirect(`/login?redirect=${redirectTo}`);
   }
 };
 

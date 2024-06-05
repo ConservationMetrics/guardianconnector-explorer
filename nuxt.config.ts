@@ -25,9 +25,6 @@ const config: NuxtConfig = {
   head: {
     title: "GuardianConnector Views",
     script: [{ src: "/lightbox/lightbox-plus-jquery.js", body: true }],
-    htmlAttrs: {
-      lang: "en",
-    },
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -62,7 +59,7 @@ const config: NuxtConfig = {
   },
 
   // Modules: https://go.nuxtjs.dev/config-modules
-  modules: ["@nuxtjs/axios"],
+  modules: ["@nuxtjs/axios", "@nuxtjs/i18n"],
 
   auth: {
     strategies: {
@@ -112,6 +109,29 @@ const config: NuxtConfig = {
     apiKey: process.env.VUE_APP_API_KEY,
     authStrategy,
     tablesConfig,
+  },
+
+  i18n: {
+    locales: [
+      { code: "en", name: "English", iso: "en-US", file: "en.json" },
+      { code: "es", name: "Español", iso: "es-ES", file: "es.json" },
+      { code: "pt", name: "Português", iso: "pt-PT", file: "pt.json" },
+      { code: "nl", name: "Nederlands", iso: "nl-NL", file: "nl.json" },
+    ],
+    defaultLocale: "en",
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_redirected",
+      alwaysRedirect: true,
+      fallbackLocale: "en",
+      redirectOn: "all",
+    },
+    lazy: true,
+    langDir: "lang/",
+    strategy: "no_prefix",
+    vueI18n: {
+      fallbackLocale: "en",
+    },
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build

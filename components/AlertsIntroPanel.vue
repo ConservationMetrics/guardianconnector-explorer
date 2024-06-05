@@ -10,39 +10,41 @@
           alt="Logo"
         />
         <h2 class="text-2xl font-semibold mb-2">
-          Change detection alerts: {{ statistics.territory }} territory
+          {{ $t("changeDetectionAlerts") }}: {{ statistics.territory }}
+          {{ $t("territory") }}
         </h2>
         <p class="text-l mb-2">
-          Most recent alerts shown on map in
-          <span style="color: #ff0000"><strong>red</strong></span
+          {{ $t("mostRecentAlertsShownIn") }}
+          <span style="color: #ff0000"
+            ><strong>{{ $t("red") }}</strong></span
           >.
         </p>
         <div class="mb-2">
-          <span class="font-bold">Type of alerts:</span>
+          <span class="font-bold">{{ $t("typeOfAlerts") }}:</span>
           {{ statistics.typeOfAlerts.join(", ") }}
         </div>
         <div class="mb-2">
-          <span class="font-bold">Data provider(s):</span>
+          <span class="font-bold">{{ $t("dataProviders") }}:</span>
           {{ statistics.dataProviders.join(", ") }}
         </div>
         <div class="mb-2">
-          <span class="font-bold">Alert detection range:</span>
+          <span class="font-bold">{{ $t("alertDetectionRange") }}:</span>
           {{ statistics.alertDetectionRange }}
         </div>
         <div class="mb-2">
-          <span class="font-bold">Date of most recent alerts published:</span>
+          <span class="font-bold">{{ $t("recentAlertsDate") }}:</span>
           {{ statistics.recentAlertsDate }}
         </div>
         <div class="mb-2">
-          <span class="font-bold">Number of most recent alerts:</span>
+          <span class="font-bold">{{ $t("recentAlertsNumber") }}:</span>
           {{ statistics.recentAlertsNumber }}
         </div>
         <div class="mb-2">
-          <span class="font-bold">Total number of alerts:</span>
+          <span class="font-bold">{{ $t("alertsTotal") }}:</span>
           {{ statistics.alertsTotal }}
         </div>
         <div v-if="calculateHectares" class="mb-2">
-          <span class="font-bold">Total number of hectares affected:</span>
+          <span class="font-bold">{{ $t("hectaresTotal") }}:</span>
           {{ statistics.hectaresTotal }}
         </div>
       </div>

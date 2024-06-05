@@ -1,10 +1,11 @@
 <template>
   <div class="flex flex-col items-center justify-center h-screen">
+    <p class="italic">{{ $t("authMessage") }}.</p>
     <button
-      class="px-4 py-2 mb-4 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
+      class="px-4 py-2 mb-4 mt-4 bg-blue-500 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-opacity-50"
       @click="login"
     >
-      Login with auth0
+      {{ $t("loginButton") }}
     </button>
     <p v-if="errorMessage" class="text-red-500 text-xs italic">
       {{ errorMessage }}
@@ -17,11 +18,14 @@ export default {
   data() {
     return {
       errorMessage: "",
-      redirectPath: "/",
+      redirectPath: this.localePath("/"),
     };
   },
   created() {
-    this.redirectPath = this.$route.query.redirect || "/";
+    const redirect = this.$route.query.redirect;
+    this.redirectPath = redirect
+      ? decodeURIComponent(redirect)
+      : this.localePath("/");
   },
   mounted() {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -30,6 +34,9 @@ export default {
 
     if (error === "access_denied") {
       this.errorMessage = decodeURIComponent(errorDescription);
+    }
+    if (this.$auth.loggedIn) {
+      this.$router.replace(this.redirectPath);
     }
   },
   methods: {
@@ -47,10 +54,11 @@ export default {
         // move away from the iframe approach and instead build a common
         // post-authentication entry point for all of GCV, and link to Superset
         // from there.
-        await this.$auth.loginWith("auth0");
-        this.$router.replace(this.redirectPath);
+        await this.$auth.loginWith("auth0", {
+          redirectUri: window.location.origin + this.redirectPath,
+        });
       } catch (error) {
-        console.error("Error logging in with Auth0:", error);
+        console.error(this.$t("auth0LoginError") + ":", error);
       }
     },
   },

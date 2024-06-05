@@ -51,7 +51,7 @@
           <a
             :href="'https://www.google.com/maps/search/?api=1&query=' + value"
             target="_blank"
-            >(view on Google maps)</a
+            >({{ $t("viewOnGoogleMaps") }})</a
           >
         </span>
       </div>

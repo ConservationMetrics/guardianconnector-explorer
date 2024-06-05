@@ -1,17 +1,17 @@
 <template>
   <div class="container">
-    <h1>Available Views</h1>
+    <h1>{{ $t("availableViews") }}</h1>
     <div
       v-for="(config, tableName) in tablesConfig"
       :key="tableName"
       class="table-item"
     >
-      <h2><strong>Table:</strong> {{ tableName }}</h2>
+      <h2>
+        <strong>{{ $t("table") }}:</strong> {{ tableName }}
+      </h2>
       <ul>
         <li v-for="view in config.VIEWS.split(',')" :key="view">
-          <nuxt-link :to="`/${view}/${tableName}`">{{
-            formatViewName(view)
-          }}</nuxt-link>
+          <nuxt-link :to="`/${view}/${tableName}`">{{ $t(view) }}</nuxt-link>
         </li>
       </ul>
     </div>
@@ -31,14 +31,6 @@ export default {
     } catch (error) {
       console.error("Error fetching table config on client side:", error);
     }
-  },
-  methods: {
-    formatViewName(view) {
-      return (
-        view.charAt(0).toUpperCase() +
-        view.slice(1).toLowerCase().replace(/_/g, " ")
-      );
-    },
   },
 };
 </script>

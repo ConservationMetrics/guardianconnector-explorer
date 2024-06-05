@@ -15,10 +15,12 @@
         />
       </a>
       <div v-if="alertResources" class="text-center">
-        <span v-if="filePath.includes('t0.jpg')" class="italic">Before</span>
-        <span v-else-if="filePath.includes('t1.jpg')" class="italic"
-          >After</span
-        >
+        <span v-if="filePath.includes('t0.jpg')" class="italic">{{
+          $t("before")
+        }}</span>
+        <span v-else-if="filePath.includes('t1.jpg')" class="italic">{{
+          $t("after")
+        }}</span>
       </div>
     </div>
     <div v-if="isAudio" class="mb-4">
@@ -27,7 +29,7 @@
           :src="mediaBasePath + '/' + filePath"
           :type="'audio/' + getExtension(filePath)"
         />
-        Your browser does not support the audio element.
+        {{ $t("browserDoesntSupportAudio") }}.
       </audio>
     </div>
     <div v-if="isVideo" class="mb-4">
@@ -36,7 +38,7 @@
           :src="mediaBasePath + '/' + filePath"
           :type="'video/' + getExtension(filePath)"
         />
-        Your browser does not support the video element.
+        {{ $t("browserDoesntSupportVideo") }}.
       </video>
     </div>
   </div>

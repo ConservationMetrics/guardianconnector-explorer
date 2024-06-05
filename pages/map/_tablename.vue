@@ -31,7 +31,7 @@ import Map from "~/components/Map.vue";
 export default {
   head() {
     return {
-      title: "GuardianConnector Views: Map",
+      title: "GuardianConnector Views: " + this.$t("map"),
     };
   },
   components: { Map },

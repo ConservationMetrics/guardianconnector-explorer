@@ -9,7 +9,7 @@
     </div>
     <div v-if="showModal" class="modal rounded shadow">
       <div class="modal-content">
-        <h3 class="font-semibold mb-2">Select Basemap</h3>
+        <h3 class="font-semibold mb-2">{{ $t("selectBasemap") }}</h3>
         <label>
           <input
             type="radio"
@@ -18,7 +18,7 @@
             v-model="selectedBasemap"
             @change="emitBasemap"
           />
-          Your Mapbox Style (default)
+          {{ $t("yourMapboxStyleDefault") }}
         </label>
         <label>
           <input
@@ -31,7 +31,7 @@
             v-model="selectedBasemap"
             @change="emitBasemap"
           />
-          Mapbox Satellite (up to 2019)
+          {{ $t("mapboxSatelliteUpTo2019") }}
         </label>
         <label>
           <input
@@ -44,7 +44,7 @@
             v-model="selectedBasemap"
             @change="emitBasemap"
           />
-          Mapbox Streets
+          {{ $t("mapboxStreets") }}
         </label>
         <label v-if="planetApiKey">
           <input
@@ -54,7 +54,7 @@
             v-model="selectedBasemap"
             @change="emitBasemap"
           />
-          Planet Monthly Visual Basemap
+          {{ $t("planetMonthlyVisualBasemap") }}
         </label>
         <label v-if="selectedBasemap.id === 'planet'">
           <Datepicker
