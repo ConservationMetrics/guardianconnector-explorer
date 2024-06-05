@@ -1,6 +1,8 @@
 <template>
   <div class="mt-4 mb-10">
-    <h3 class="text-2xl font-semibold mb-2">Select an alert date range</h3>
+    <h3 class="text-2xl font-semibold mb-2">
+      {{ $t("selectAlertDateRange") }}
+    </h3>
     <div class="mb-6">
       <vue-slider
         class="date-slider"

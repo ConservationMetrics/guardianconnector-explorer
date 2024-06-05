@@ -1,7 +1,7 @@
 <template>
   <div class="filter-modal">
     <h4>
-      Filter data by field: <strong>{{ filterField }}</strong>
+      {{ $t("filterDataByField") }}: <strong>{{ filterField }}</strong>
     </h4>
     <v-select
       multiple

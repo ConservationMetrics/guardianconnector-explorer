@@ -1,6 +1,6 @@
 <template>
   <div class="mt-4">
-    <h3 class="text-2xl font-semibold mb-2">Alerts in the last 12 months</h3>
+    <h3 class="text-2xl font-semibold mb-2">{{ $t("alertsLast12Months") }}</h3>
     <div class="mb-2">
       <LineChart :data="chartData" />
     </div>
@@ -41,8 +41,8 @@ export default {
         ? "hectaresPerMonth"
         : "alertsPerMonth";
       const label = this.calculateHectares
-        ? "Hectares affected"
-        : "Number of alerts";
+        ? this.$t("hectaresPerMonth")
+        : this.$t("numberOfAlerts");
 
       return {
         labels: Object.keys(this.statistics[dataKey]),

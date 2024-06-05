@@ -1,6 +1,6 @@
 <template>
   <div class="map-legend feature p-4 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-semibold mb-2">Map Legend</h2>
+    <h2 class="text-2xl font-semibold mb-2">{{ $t("mapLegend") }}</h2>
     <div v-for="item in mapLegendContent" :key="item.id" class="legend-item">
       <div
         :class="['color-box', getTypeClass(item)]"

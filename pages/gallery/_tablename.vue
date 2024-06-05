@@ -11,10 +11,7 @@
       :media-base-path="mediaBasePath"
       :video-extensions="videoExtensions"
     />
-    <h3 v-if="!embedMedia && dataFetched">
-      GuardianConnector Views Gallery is not available. Please activate media
-      embedding.
-    </h3>
+    <h3 v-if="!embedMedia && dataFetched">{{ $t("galleryNotAvailable") }}.</h3>
   </div>
 </template>
 
@@ -24,7 +21,7 @@ import Gallery from "~/components/Gallery.vue";
 export default {
   head() {
     return {
-      title: "GuardianConnector Views: Gallery",
+      title: "GuardianConnector Views: " + this.$t("gallery"),
     };
   },
   components: { Gallery },
