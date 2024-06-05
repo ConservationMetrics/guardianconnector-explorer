@@ -5,6 +5,7 @@
       :alert-resources="alertResources"
       :alertsData="alertsData"
       :embed-media="embedMedia"
+      :gfw-data="gfwData"
       :image-extensions="imageExtensions"
       :logo-url="logoUrl"
       :map-legend-layer-ids="mapLegendLayerIds"
@@ -62,6 +63,7 @@ export default {
         alertsData: response.alertsData,
         dataFetched: true,
         embedMedia: response.embedMedia,
+        gfwData: response.gfwData,
         imageExtensions: response.imageExtensions,
         logoUrl: response.logoUrl,
         mapLegendLayerIds: response.mapLegendLayerIds,
