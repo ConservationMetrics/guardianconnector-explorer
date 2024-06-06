@@ -6,7 +6,17 @@
         :class="['color-box', getTypeClass(item)]"
         :style="{ backgroundColor: item.color }"
       ></div>
-      <span>{{ item.id }}</span>
+      <span>
+        {{
+          item.id === "Mapeo data"
+            ? $t("mapeoData")
+            : item.id === "Most recent alerts"
+            ? $t("mostRecentAlerts")
+            : item.id === "Previous alerts"
+            ? $t("previousAlerts")
+            : item.id
+        }}
+      </span>
     </div>
   </div>
 </template>
