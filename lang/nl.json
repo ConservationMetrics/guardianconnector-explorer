@@ -24,7 +24,7 @@
   "loginError": "Er is een fout opgetreden bij het inloggen",
   "map": "Kaart",
   "mapboxSatelliteUpTo2019": "Mapbox Satellite (tot 2019)",
-  "mapboxStreets": "Mapbox Straten",
+  "mapboxStreets": "Mapbox Streets",
   "mapeoData": "Mapeo Data",
   "mapLegend": "Kaartlegenda",
   "mostRecentAlerts": "Meest recente alerts",
@@ -32,7 +32,7 @@
   "numberOfAlerts": "Aantal alerts",
   "password": "Wachtwoord",
   "passwordIncorrect": "Het ingevoerde wachtwoord is onjuist",
-  "planetMonthlyVisualBasemap": "Planet Maandelijkse Visuele Basiskaart",
+  "planetMonthlyVisualBasemap": "Planet (NICFI) - maandelijkse visuele basiskaart",
   "previousAlerts": "Vorige alerts",
   "recentAlertsDate": "Datum van meest recent gepubliceerde meldingen",
   "recentAlertsNumber": "Aantal meest recente meldingen",
@@ -44,5 +44,5 @@
   "territory": "territorium",
   "typeOfAlerts": "Type meldingen",
   "viewOnGoogleMaps": "bekijk op Google Maps",
-  "yourMapboxStyleDefault": "Uw Mapbox-stijl (standaard)"
+  "yourMapboxStyleDefault": "Mapbox - uw stijl (standaard)"
 }

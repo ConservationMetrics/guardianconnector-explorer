@@ -32,7 +32,7 @@
   "numberOfAlerts": "Number of alerts",
   "password": "Password",
   "passwordIncorrect": "The password you entered is incorrect",
-  "planetMonthlyVisualBasemap": "Planet Monthly Visual Basemap",
+  "planetMonthlyVisualBasemap": "Planet (NICFI) - monthly visual basemap",
   "previousAlerts": "Previous alerts",
   "recentAlertsDate": "Date of most recent alerts published",
   "recentAlertsNumber": "Number of most recent alerts",
@@ -44,5 +44,5 @@
   "territory": "territory",
   "typeOfAlerts": "Type of alerts",
   "viewOnGoogleMaps": "view on Google Maps",
-  "yourMapboxStyleDefault": "Your Mapbox style (default)"
+  "yourMapboxStyleDefault": "Mapbox - your style (default)"
 }

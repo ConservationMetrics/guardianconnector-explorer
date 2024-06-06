@@ -24,7 +24,7 @@
   "loginError": "Ocorreu um erro ao tentar fazer login",
   "map": "Mapa",
   "mapboxSatelliteUpTo2019": "Mapbox Satellite (até 2019)",
-  "mapboxStreets": "Ruas do Mapbox",
+  "mapboxStreets": "Mapbox Streets",
   "mapeoData": "Dados do Mapeo",
   "mapLegend": "Legenda do mapa",
   "mostRecentAlerts": "Alertas mais recentes",
@@ -32,7 +32,7 @@
   "numberOfAlerts": "Número de alertas",
   "password": "Senha",
   "passwordIncorrect": "A senha que você inseriu está incorreta",
-  "planetMonthlyVisualBasemap": "Mapa base visual mensal do planeta",
+  "planetMonthlyVisualBasemap": "Planet (NICFI) - mapa base visual mensal",
   "previousAlerts": "Alertas anteriores",
   "recentAlertsDate": "Data das alertas mais recentes publicadas",
   "recentAlertsNumber": "Número de alertas mais recentes",
@@ -44,5 +44,5 @@
   "territory": "território",
   "typeOfAlerts": "Tipo de alertas",
   "viewOnGoogleMaps": "ver no Google Maps",
-  "yourMapboxStyleDefault": "Seu estilo Mapbox (padrão)"
+  "yourMapboxStyleDefault": "Mapbox - seu estilo (padrão)"
 }
