@@ -1,6 +1,10 @@
 import { Middleware } from "@nuxt/types";
 
 const authMiddleware: Middleware = ({ $auth, redirect, route }) => {
+  if ($auth.strategy.name === 'none') {
+    return;
+  }
+  
   if (route.path !== "/login" && !$auth.loggedIn) {
     if (route.query.redirect) {
       // If already redirected, avoid adding another redirect query parameter
