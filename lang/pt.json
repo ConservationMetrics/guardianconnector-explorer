@@ -14,6 +14,7 @@
   "dataProviders": "Provedor(es) de dados",
   "downloadCSV": "Baixar CSV",
   "downloadGeoJSON": "Baixar GeoJSON",
+  "downloadKML": "Baixar KML",
   "filterDataByField": "Filtrar dados por campo",
   "gallery": "Galeria",
   "galleryNotAvailable": "A galeria de visualizações do GuardianConnector não está disponível. Por favor, ative a incorporação de mídia",
