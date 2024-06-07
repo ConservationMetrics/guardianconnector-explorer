@@ -18,10 +18,22 @@
     >
       {{ $t("downloadGeoJSON") }}
     </button>
+    <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
+      @click="
+        typeOfData === 'alert' 
+          ? downloadAlertKML() 
+          : downloadKMLSelection()
+      "
+    >
+      {{ $t("downloadKML") }}
+    </button>
   </div>
 </template>
 
 <script>
+import tokml from "tokml";
+
 export default {
   props: ["geojson", "typeOfData"],
   methods: {
@@ -121,6 +133,36 @@ export default {
       link.click();
 
       // Clean up and free memory
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    },
+    downloadAlertKML() {
+      if (!this.geojson) {
+        console.error("No GeoJSON data available to download as KML.");
+        return;
+      }
+
+      const kmlString = tokml(this.geojson);
+
+      // Set filename
+      let filename;
+      if (this.geojson.properties["Alert ID"]) {
+        filename = `${this.geojson.properties["Alert ID"]}.kml`;
+      } else if (this.geojson.properties["Id"]) {
+        filename = `${this.geojson.properties["Id"]}.kml`;
+      } else {
+        filename = "data.kml";
+      }
+
+      const blob = new Blob([kmlString], { type: "application/vnd.google-earth.kml+xml" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+
+      link.click();
+
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
     },
@@ -238,6 +280,42 @@ export default {
       link.click();
 
       // Clean up and free memory
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    },
+    downloadKMLSelection() {
+      if (
+        !this.geojson ||
+        (this.geojson.mostRecentAlerts.features.length <= 0 &&
+          this.geojson.previousAlerts.features.length <= 0)
+      ) {
+        console.warn("No complete GeoJSON data available to download as KML.");
+        return;
+      }
+
+      const combinedFeatures = [
+        ...this.geojson.previousAlerts.features,
+        ...this.geojson.mostRecentAlerts.features,
+      ];
+
+      const combinedGeoJSON = {
+        type: "FeatureCollection",
+        features: combinedFeatures,
+      };
+
+      const kmlString = tokml(combinedGeoJSON);
+
+      const filename = `${combinedFeatures[0].properties["Territory"]}_alerts.kml`;
+
+      const blob = new Blob([kmlString], { type: "application/vnd.google-earth.kml+xml" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+
+      link.click();
+
       document.body.removeChild(link);
       URL.revokeObjectURL(link.href);
     },

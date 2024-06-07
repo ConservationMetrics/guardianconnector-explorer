@@ -14,6 +14,7 @@
   "dataProviders": "Data Provider(s)",
   "downloadCSV": "Download CSV",
   "downloadGeoJSON": "Download GeoJSON",
+  "downloadKML": "Download KML",
   "filterDataByField": "Filter data op veld",
   "gallery": "Galerij",
   "galleryNotAvailable": "GuardianConnector Views Gallery is niet beschikbaar. Activeer media-inbedding",
