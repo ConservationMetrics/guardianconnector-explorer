@@ -51,8 +51,8 @@ export default {
       let flattened = { ...properties }; // Start with properties
 
       // Ensure that all coordinate properties render well in CSV
-      flattened["Geographic centroid"] =
-        `[${properties["Geographic centroid"]}]`;
+      flattened["geographicCentroid"] =
+        `[${properties["geographicCentroid"]}]`;
       const coordinates = JSON.stringify(geometry.coordinates);
       delete flattened["coordinates"];
       delete flattened["YYYYMM"];
@@ -82,10 +82,10 @@ export default {
 
       // Set filename
       let filename;
-      if (this.geojson.properties["Alert ID"]) {
-        filename = `${this.geojson.properties["Alert ID"]}.csv`;
-      } else if (this.geojson.properties["Id"]) {
-        filename = `${this.geojson.properties["Id"]}.csv`;
+      if (this.geojson.properties["alertID"]) {
+        filename = `${this.geojson.properties["alertID"]}.csv`;
+      } else if (this.geojson.properties["ID"]) {
+        filename = `${this.geojson.properties["ID"]}.csv`;
       } else {
         filename = "data.csv";
       }
@@ -114,10 +114,10 @@ export default {
 
       // Set filename
       let filename;
-      if (this.geojson.properties["Alert ID"]) {
-        filename = `${this.geojson.properties["Alert ID"]}.geojson`;
-      } else if (this.geojson.properties["Id"]) {
-        filename = `${this.geojson.properties["Id"]}.geojson`;
+      if (this.geojson.properties["alertID"]) {
+        filename = `${this.geojson.properties["alertID"]}.geojson`;
+      } else if (this.geojson.properties["ID"]) {
+        filename = `${this.geojson.properties["ID"]}.geojson`;
       } else {
         filename = "data.csv";
       }
@@ -146,10 +146,10 @@ export default {
 
       // Set filename
       let filename;
-      if (this.geojson.properties["Alert ID"]) {
-        filename = `${this.geojson.properties["Alert ID"]}.kml`;
-      } else if (this.geojson.properties["Id"]) {
-        filename = `${this.geojson.properties["Id"]}.kml`;
+      if (this.geojson.properties["alertID"]) {
+        filename = `${this.geojson.properties["alertID"]}.kml`;
+      } else if (this.geojson.properties["ID"]) {
+        filename = `${this.geojson.properties["ID"]}.kml`;
       } else {
         filename = "data.kml";
       }
@@ -223,7 +223,7 @@ export default {
       });
 
       // Download CSV
-      const filename = `${combinedFeatures[0].properties["Territory"]}_alerts.csv`;
+      const filename = `${combinedFeatures[0].properties["territory"]}_alerts.csv`;
       const blob = new Blob([csvString], { type: "text/csv" });
 
       const link = document.createElement("a");
@@ -267,7 +267,7 @@ export default {
       };
 
       // Convert to string for download
-      const filename = `${combinedGeoJSON.features[0].properties["Territory"]}_alerts.geojson`;
+      const filename = `${combinedGeoJSON.features[0].properties["territory"]}_alerts.geojson`;
       const jsonStr = JSON.stringify(combinedGeoJSON, null, 2);
       const blob = new Blob([jsonStr], { type: "application/json" });
 
@@ -305,7 +305,7 @@ export default {
 
       const kmlString = tokml(combinedGeoJSON);
 
-      const filename = `${combinedFeatures[0].properties["Territory"]}_alerts.kml`;
+      const filename = `${combinedFeatures[0].properties["territory"]}_alerts.kml`;
 
       const blob = new Blob([kmlString], { type: "application/vnd.google-earth.kml+xml" });
 

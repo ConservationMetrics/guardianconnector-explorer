@@ -11,14 +11,15 @@ const transformSurveyData = (
 ): Array<Record<string, any>> => {
   const transformSurveyDataKey = (key: string): string => {
     let transformedKey = key
-      .replace(/^g__/, "Geo")
+      .replace(/^g__/, "geo")
       .replace(/^p__/, "")
       .replace(/_/g, " ");
-    transformedKey = transformedKey.replace(/\b\w/g, (c) => c.toUpperCase()); // Capitalize first letter of each word
     if (transformedKey.toLowerCase() === "today") {
-      transformedKey = "Data Collected On";
+      transformedKey = "dataCollectedOn";
     } else if (transformedKey.toLowerCase().includes("categoryid")) {
-      transformedKey = "Category";
+      transformedKey = "category";
+    } else if (transformedKey.toLowerCase() === "id") {
+      transformedKey = "ID";
     }
     return transformedKey.trimStart();
   };
@@ -87,25 +88,25 @@ const prepareMapData = (
   // Process different geometry types and extract coordinates
   const processGeolocation = (obj: any): any => {
     try {
-      const geometryType = obj.Geotype;
+      const geometryType = obj.geotype;
       let coordinates;
 
       // Convert string to array
-      if (!Array.isArray(obj.Geocoordinates)) {
-        coordinates = JSON.parse(obj.Geocoordinates);
+      if (!Array.isArray(obj.geocoordinates)) {
+        coordinates = JSON.parse(obj.geocoordinates);
       } else {
-        coordinates = obj.Geocoordinates;
+        coordinates = obj.geocoordinates;
       }
       if (
         geometryType === "Point" &&
         Array.isArray(coordinates) &&
         coordinates.length === 2
       ) {
-        obj.Geocoordinates = coordinates;
+        obj.geocoordinates = coordinates;
       } else if (geometryType === "LineString") {
-        obj.Geocoordinates = coordinates;
+        obj.geocoordinates = coordinates;
       } else if (geometryType === "Polygon") {
-        obj.Geocoordinates = [coordinates];
+        obj.geocoordinates = [coordinates];
       }
     } catch (error) {
       console.error("Error parsing coordinates:", error);
@@ -115,7 +116,7 @@ const prepareMapData = (
 
   // Add geometry type and process coordinates for each item
   const processedGeoData = transformedData.map((item) => {
-    if (!item.Geotype) {
+    if (!item.geotype) {
       let coordinateKey = Object.keys(item).find((key) =>
         key.toLowerCase().includes("coordinates"),
       );
@@ -127,9 +128,9 @@ const prepareMapData = (
           typeof coordinates[0] === "number" &&
           typeof coordinates[1] === "number"
         ) {
-          item.Geotype = "Point";
+          item.geotype = "Point";
         } else {
-          item.Geotype = "Polygon";
+          item.geotype = "Polygon";
         }
       }
     }
@@ -505,7 +506,7 @@ const transformToGeojson = (
     };
 
     Object.entries(input).forEach(([key, value]) => {
-      if (key === "Alert ID") {
+      if (key === "alertID") {
         feature.id = value.substring(4);
         feature.properties[key] = value;
       } else if (key.startsWith("g__")) {

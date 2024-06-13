@@ -113,8 +113,8 @@ export default {
         features: this.filteredData.map((feature) => ({
           type: "Feature",
           geometry: {
-            type: feature.Geotype,
-            coordinates: feature.Geocoordinates,
+            type: feature.geotype,
+            coordinates: feature.geocoordinates,
           },
           properties: {
             feature,
@@ -191,9 +191,9 @@ export default {
           delete featureObject["filter-color"];
 
           // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
-          if (featureObject.Geocoordinates) {
-            featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(
-              featureObject.Geocoordinates,
+          if (featureObject.geocoordinates) {
+            featureObject.geocoordinates = prepareCoordinatesForSelectedFeature(
+              featureObject.geocoordinates,
             );
           }
 
