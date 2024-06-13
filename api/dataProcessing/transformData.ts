@@ -202,6 +202,7 @@ const prepareAlertData = (
     transformedItem["Month detected"] = `${formattedMonth}-${item.year_detec}`;
     transformedItem["YYYYMM"] = `${item.year_detec}${formattedMonth}`;
     transformedItem["Data provider"] = capitalizeFirstLetter(`${item._topic}`);
+    transformedItem["Confidence level"] = item.confidence;
     transformedItem["Alert type"] = item.alert_type?.replace(/_/g, " ") ?? "";
     transformedItem["Alert area (hectares)"] =
       typeof item.area_alert_ha === "number"
