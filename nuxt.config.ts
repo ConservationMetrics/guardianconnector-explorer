@@ -131,6 +131,8 @@ const config: NuxtConfig = {
     strategy: "no_prefix",
     vueI18n: {
       fallbackLocale: "en",
+      silentTranslationWarn: true,
+      silentFallbackWarn: true
     },
   },
 
