@@ -100,67 +100,6 @@ if (!VIEWS_CONFIG) {
       }
     });
 
-    // Endpoint for the map view
-    if (VIEWS[table].VIEWS.includes("map")) {
-      app.get(
-        `/${table}/map`,
-        async (_req: express.Request, res: express.Response) => {
-          try {
-            // Fetch data
-            const { mainData, columnsData } = await fetchData(
-              db,
-              table,
-              IS_SQLITE,
-            );
-            // Filter data to remove unwanted columns and substrings
-            const filteredData = filterUnwantedKeys(
-              mainData,
-              columnsData,
-              VIEWS[table].UNWANTED_COLUMNS,
-              VIEWS[table].UNWANTED_SUBSTRINGS,
-            );
-            // Filter only data with valid geofields
-            const filteredGeoData = filterGeoData(filteredData);
-            // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
-            const transformedData = transformSurveyData(filteredGeoData);
-            // Process geodata
-            const processedGeoData = prepareMapData(
-              transformedData,
-              VIEWS[table].FRONT_END_FILTER_FIELD,
-            );
-
-            const response = {
-              audioExtensions: audioExtensions,
-              data: processedGeoData,
-              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
-              filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
-              filterField: VIEWS[table].FRONT_END_FILTER_FIELD,
-              imageExtensions: imageExtensions,
-              mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
-              mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
-              mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
-              mapboxBearing: VIEWS[table].MAPBOX_BEARING,
-              mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE,
-              mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE,
-              mapboxPitch: VIEWS[table].MAPBOX_PITCH,
-              mapboxProjection: VIEWS[table].MAPBOX_PROJECTION,
-              mapboxStyle: VIEWS[table].MAPBOX_STYLE,
-              mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
-              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
-              planetApiKey: VIEWS[table].PLANET_API_KEY,
-              table: table,
-              videoExtensions: videoExtensions,
-            };
-
-            res.json(response);
-          } catch (error: any) {
-            console.error("Error fetching data on API side:", error.message);
-            res.status(500).json({ error: error.message });
-          }
-        },
-      );
-    }
-
     // Endpoint for the alert dashboard view
     if (VIEWS[table].VIEWS.includes("alerts")) {
       app.get(
@@ -255,6 +194,67 @@ if (!VIEWS_CONFIG) {
               planetApiKey: VIEWS[table].PLANET_API_KEY,
               statistics: statistics,
               table: table,
+            };
+
+            res.json(response);
+          } catch (error: any) {
+            console.error("Error fetching data on API side:", error.message);
+            res.status(500).json({ error: error.message });
+          }
+        },
+      );
+    }
+
+    // Endpoint for the map view
+    if (VIEWS[table].VIEWS.includes("map")) {
+      app.get(
+        `/${table}/map`,
+        async (_req: express.Request, res: express.Response) => {
+          try {
+            // Fetch data
+            const { mainData, columnsData } = await fetchData(
+              db,
+              table,
+              IS_SQLITE,
+            );
+            // Filter data to remove unwanted columns and substrings
+            const filteredData = filterUnwantedKeys(
+              mainData,
+              columnsData,
+              VIEWS[table].UNWANTED_COLUMNS,
+              VIEWS[table].UNWANTED_SUBSTRINGS,
+            );
+            // Filter only data with valid geofields
+            const filteredGeoData = filterGeoData(filteredData);
+            // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
+            const transformedData = transformSurveyData(filteredGeoData);
+            // Process geodata
+            const processedGeoData = prepareMapData(
+              transformedData,
+              VIEWS[table].FRONT_END_FILTER_FIELD,
+            );
+
+            const response = {
+              audioExtensions: audioExtensions,
+              data: processedGeoData,
+              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
+              filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
+              filterField: VIEWS[table].FRONT_END_FILTER_FIELD,
+              imageExtensions: imageExtensions,
+              mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
+              mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
+              mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
+              mapboxBearing: VIEWS[table].MAPBOX_BEARING,
+              mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE,
+              mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE,
+              mapboxPitch: VIEWS[table].MAPBOX_PITCH,
+              mapboxProjection: VIEWS[table].MAPBOX_PROJECTION,
+              mapboxStyle: VIEWS[table].MAPBOX_STYLE,
+              mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
+              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+              planetApiKey: VIEWS[table].PLANET_API_KEY,
+              table: table,
+              videoExtensions: videoExtensions,
             };
 
             res.json(response);
