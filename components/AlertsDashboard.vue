@@ -395,8 +395,8 @@ export default {
           id: feature.Id,
           type: "Feature",
           geometry: {
-            type: feature.Geotype,
-            coordinates: feature.Geocoordinates,
+            type: feature.geotype,
+            coordinates: feature.geocoordinates,
           },
           properties: {
             ...feature,
@@ -542,11 +542,11 @@ export default {
         // Converts to YYYYMM format
       };
 
-      if (start === this.t("earlier")) {
+      if (start === this.$t("earlier")) {
         start = this.statistics.earliestAlertsDate;
       }
 
-      if (end === this.t("earlier")) {
+      if (end === this.$t("earlier")) {
         end = this.statistics.twelveMonthsBefore;
       }
 
@@ -564,7 +564,7 @@ export default {
       if (dates.length > 12) {
         const last12Dates = dates.slice(-12);
 
-        dates = [this.t("earlier"), ...last12Dates];
+        dates = [this.$t("earlier"), ...last12Dates];
       }
 
       return dates;
@@ -611,7 +611,7 @@ export default {
 
       if (features.length) {
         this.map.getCanvas().style.cursor = "pointer";
-      } else {
+      } else if (this.featuresUnderCursor === 0) {
         this.map.getCanvas().style.cursor = "";
       }
     },
@@ -620,11 +620,11 @@ export default {
       // Extract start and end dates from newRange
       let [start, end] = newRange;
 
-      if (start === this.t("earlier")) {
+      if (start === this.$t("earlier")) {
         start = this.statistics.earliestAlertsDate;
       }
 
-      if (end === this.t("earlier")) {
+      if (end === this.$t("earlier")) {
         end = this.statistics.twelveMonthsBefore;
       }
 
@@ -858,9 +858,9 @@ export default {
       delete featureObject["filter-color"];
 
       // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
-      if (featureObject.Geocoordinates) {
-        featureObject.Geocoordinates = prepareCoordinatesForSelectedFeature(
-          featureObject.Geocoordinates,
+      if (featureObject.geocoordinates) {
+        featureObject.geocoordinates = prepareCoordinatesForSelectedFeature(
+          featureObject.geocoordinates,
         );
       }
 
