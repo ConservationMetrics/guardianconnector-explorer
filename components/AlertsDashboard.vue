@@ -839,7 +839,7 @@ export default {
       this.showIntroPanel = false;
       this.downloadAlert = true;
 
-      if (featureObject["Alert ID"]) {
+      if (featureObject["alertID"]) {
         this.isAlert = true;
       } else {
         this.isAlert = false;
