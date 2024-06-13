@@ -849,8 +849,8 @@ export default {
       this.imageUrl = [];
       featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
       featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);
-      if (featureObject["Photos"]) {
-        const photos = featureObject["Photos"].split(",");
+      if (featureObject["photos"]) {
+        const photos = featureObject["photos"].split(",");
         photos.forEach((photo) => this.imageUrl.push(photo.trim()));
       }
 
