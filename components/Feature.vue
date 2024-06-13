@@ -38,7 +38,7 @@
         "
         class="mb-2"
       >
-        <span class="font-bold">{{ key }}</span
+        <span class="font-bold">{{ $t(key) }}</span
         >:
         <span
           v-if="key !== 'Geographic centroid' && key !== 'Geocoordinates'"

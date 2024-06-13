@@ -542,11 +542,11 @@ export default {
         // Converts to YYYYMM format
       };
 
-      if (start === "Earlier") {
+      if (start === this.t("earlier")) {
         start = this.statistics.earliestAlertsDate;
       }
 
-      if (end === "Earlier") {
+      if (end === this.t("earlier")) {
         end = this.statistics.twelveMonthsBefore;
       }
 
@@ -564,7 +564,7 @@ export default {
       if (dates.length > 12) {
         const last12Dates = dates.slice(-12);
 
-        dates = ["Earlier", ...last12Dates];
+        dates = [this.t("earlier"), ...last12Dates];
       }
 
       return dates;
@@ -620,11 +620,11 @@ export default {
       // Extract start and end dates from newRange
       let [start, end] = newRange;
 
-      if (start === "Earlier") {
+      if (start === this.t("earlier")) {
         start = this.statistics.earliestAlertsDate;
       }
 
-      if (end === "Earlier") {
+      if (end === this.t("earlier")) {
         end = this.statistics.twelveMonthsBefore;
       }
 

@@ -193,25 +193,25 @@ const prepareAlertData = (
     };
 
     // Include only the transformed fields
-    transformedItem["Territory"] = capitalizeFirstLetter(
+    transformedItem["territory"] = capitalizeFirstLetter(
       item.territory_name ?? "",
     );
-    transformedItem["Alert ID"] = item._id;
-    transformedItem["Alert detection range"] =
+    transformedItem["alertID"] = item._id;
+    transformedItem["alertDetectionRange"] =
       `${item.date_start_t1} to ${item.date_end_t1}`;
-    transformedItem["Month detected"] = `${formattedMonth}-${item.year_detec}`;
+    transformedItem["monthDetected"] = `${formattedMonth}-${item.year_detec}`;
     transformedItem["YYYYMM"] = `${item.year_detec}${formattedMonth}`;
-    transformedItem["Data provider"] = capitalizeFirstLetter(`${item._topic}`);
-    transformedItem["Confidence level"] = item.confidence;
-    transformedItem["Alert type"] = item.alert_type?.replace(/_/g, " ") ?? "";
-    transformedItem["Alert area (hectares)"] =
+    transformedItem["dataProvider"] = capitalizeFirstLetter(`${item._topic}`);
+    transformedItem["confidenceLevel"] = item.confidence;
+    transformedItem["alertType"] = item.alert_type?.replace(/_/g, " ") ?? "";
+    transformedItem["alertAreaHectares"] =
       typeof item.area_alert_ha === "number"
         ? item.area_alert_ha.toFixed(2)
         : item.area_alert_ha;
-    transformedItem["Geographic centroid"] = calculateCentroid(
+    transformedItem["geographicCentroid"] = calculateCentroid(
       item.g__coordinates,
     );
-    transformedItem["Satellite used for detection"] =
+    transformedItem["satelliteUsedForDetection"] =
       satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
 
     if (embedMedia) {
@@ -219,7 +219,7 @@ const prepareAlertData = (
         `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T0_${item._id}.jpg`;
       transformedItem["t1_url"] =
         `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T1_${item._id}.jpg`;
-      transformedItem["Preview imagery source"] =
+      transformedItem["previewImagerySource"] =
         satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
     }
 
