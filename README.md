@@ -13,11 +13,11 @@ To get started, copy `.env.example` to `.env` and add your database and table in
 * If you are using an auth0 strategy, then you need to provide a domain, client ID, client secret, audience, and base URL.
 * If you are using a password strategy, then you need to provide a password, and secret JWT key.
 
-**Vue API key:** Generate an API key to add to request headers made by the Nuxt front end.
+**Vue API key:** Generate an API key to add to request headers made by the Nuxt front end. You can generate one by running `openssl rand -base64 42`.
 
-**Mapbox access token:** Provide an access token to be used across the application for authenticating with Mabpox maps. (As of this moment, we are assuming that one token is sufficient for all maps views used, but we can revisit this if needed.)
+**Mapbox access token:** Provide an access token to be used across the application for authenticating with Mapbox maps. (As of this moment, we are assuming that one token is sufficient for all maps views used, but we can revisit this if needed.)
 
-**Views configuration:** GuardianConnector Views can render multiple tables and you can determine which views to show for each table. To configure your tables and views, set the multi-line variable `NUXT_ENV_VIEWS_CONFIG`. For more information on this, please see [config.md](docs/config.md).
+**Views configuration:** GuardianConnector Views can render multiple tables and you can determine which views to show for each table. To configure your tables and views, set the multi-line variable `NUXT_ENV_VIEWS_CONFIG`. For more information on this, please see [config.md](docs/config.md). You do not need to set this in order for GuardianConnector Views to start, however the index page will show an empty list and none of the view routes will load anything.
 
 ## Build Setup
 
