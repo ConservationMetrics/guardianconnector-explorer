@@ -470,36 +470,40 @@ export default {
       const pulsingDot = document.createElement("div");
       pulsingDot.className = "pulsing-dot";
 
-      // Add the CSS for the pulsing effect
-      const styles = `
-        @keyframes pulse {
-          0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(1.5); opacity: 0; }
-          }
-          .pulsing-dot {
-            width: 30px;
-            height: 30px;
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none!important;
-          }
+      // Add objects for different confidence levels
+      const confidenceLevels = [
+        { interval: "1", opacity: "1" },
+        { interval: "0", opacity: "0.35" }
+      ];
 
-          .pulsing-dot::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            border: 5px solid #FF0000;
-            border-radius: inherit;
-            box-shadow: 0 0 0 2px #FF0000;
-            animation: pulse 2s infinite;
-          }
-        `;
+      // Add the CSS for the pulsing effect
       const styleSheet = document.createElement("style");
       styleSheet.type = "text/css";
-      styleSheet.innerText = styles;
+      styleSheet.innerText = confidenceLevels.map(level => `
+        @keyframes pulse-${level.interval} {
+          0% { transform: scale(1); opacity: ${level.opacity}; }
+          100% { transform: scale(1.5); opacity: 0; }
+        }
+        .pulsing-dot-${level.interval} {
+          width: 30px;
+          height: 30px;
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none!important;
+        }
+        .pulsing-dot-${level.interval}::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: 5px solid #FF0000;
+          border-radius: inherit;
+          box-shadow: 0 0 0 2px #FF0000;
+          animation: pulse-${level.interval} 2s infinite;
+        }
+      `).join("");
       document.head.appendChild(styleSheet);
 
       const addPulsingMarker = (feature) => {
@@ -523,8 +527,15 @@ export default {
           return;
         }
 
+        // Determine the opacity  based on confidenceLevel
+        let confidenceInterval = "1";
+        if (feature.properties.confidenceLevel === "0") {
+          confidenceInterval = "0";
+        }
+
         // Create a new marker and add it to the map
         const pulsingMarker = pulsingDot.cloneNode();
+        pulsingMarker.classList.add(`pulsing-dot-${confidenceInterval}`);
         new mapboxgl.Marker(pulsingMarker)
           .setLngLat([parseFloat(lng), parseFloat(lat)])
           .addTo(this.map);
