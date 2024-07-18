@@ -136,10 +136,10 @@ if (!VIEWS_CONFIG) {
                 VIEWS[table].UNWANTED_SUBSTRINGS,
               );
 
-              // Filter Mapeo data to only show data where p__categoryid matches any values in mapeoCategoryIds (a comma-separated string of values)
+              // Filter Mapeo data to only show data where category matches any values in mapeoCategoryIds (a comma-separated string of values)
               const filteredMapeoDataByCategory = filteredMapeoData.filter(
                 (row: any) => {
-                  return mapeoCategoryIds.includes(row.p__categoryid);
+                  return mapeoCategoryIds.includes(row.category);
                 },
               );
 
