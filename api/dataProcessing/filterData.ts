@@ -103,7 +103,7 @@ export const filterOutUnwantedValues = (
   });
 
   return filteredData;
-}
+};
 
 // Filter out data without columns storing have valid coordinates
 export const filterGeoData = (

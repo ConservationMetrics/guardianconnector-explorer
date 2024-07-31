@@ -132,7 +132,7 @@ const config: NuxtConfig = {
     vueI18n: {
       fallbackLocale: "en",
       silentTranslationWarn: true,
-      silentFallbackWarn: true
+      silentFallbackWarn: true,
     },
   },
 

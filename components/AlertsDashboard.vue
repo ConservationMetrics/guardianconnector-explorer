@@ -473,13 +473,15 @@ export default {
       // Add objects for different confidence levels
       const confidenceLevels = [
         { interval: "1", opacity: "1" },
-        { interval: "0", opacity: "0.35" }
+        { interval: "0", opacity: "0.35" },
       ];
 
       // Add the CSS for the pulsing effect
       const styleSheet = document.createElement("style");
       styleSheet.type = "text/css";
-      styleSheet.innerText = confidenceLevels.map(level => `
+      styleSheet.innerText = confidenceLevels
+        .map(
+          (level) => `
         @keyframes pulse-${level.interval} {
           0% { transform: scale(1); opacity: ${level.opacity}; }
           100% { transform: scale(1.5); opacity: 0; }
@@ -503,7 +505,9 @@ export default {
           box-shadow: 0 0 0 2px #FF0000;
           animation: pulse-${level.interval} 2s infinite;
         }
-      `).join("");
+      `,
+        )
+        .join("");
       document.head.appendChild(styleSheet);
 
       const addPulsingMarker = (feature) => {

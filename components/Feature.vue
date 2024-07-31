@@ -38,7 +38,10 @@
         "
         class="mb-2"
       >
-        <span class="font-bold">{{ $t(key).charAt(0).toUpperCase() + $t(key).slice(1) }}</span>:
+        <span class="font-bold">{{
+          $t(key).charAt(0).toUpperCase() + $t(key).slice(1)
+        }}</span
+        >:
         <span
           v-if="key !== 'geographicCentroid' && key !== 'geocoordinates'"
           class="break-words"

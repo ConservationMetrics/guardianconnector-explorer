@@ -21,9 +21,7 @@
     <button
       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
       @click="
-        typeOfData === 'alert' 
-          ? downloadAlertKML() 
-          : downloadKMLSelection()
+        typeOfData === 'alert' ? downloadAlertKML() : downloadKMLSelection()
       "
     >
       {{ $t("downloadKML") }}
@@ -51,8 +49,7 @@ export default {
       let flattened = { ...properties }; // Start with properties
 
       // Ensure that all coordinate properties render well in CSV
-      flattened["geographicCentroid"] =
-        `[${properties["geographicCentroid"]}]`;
+      flattened["geographicCentroid"] = `[${properties["geographicCentroid"]}]`;
       const coordinates = JSON.stringify(geometry.coordinates);
       delete flattened["coordinates"];
       delete flattened["YYYYMM"];
@@ -154,7 +151,9 @@ export default {
         filename = "data.kml";
       }
 
-      const blob = new Blob([kmlString], { type: "application/vnd.google-earth.kml+xml" });
+      const blob = new Blob([kmlString], {
+        type: "application/vnd.google-earth.kml+xml",
+      });
 
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
@@ -307,7 +306,9 @@ export default {
 
       const filename = `${combinedFeatures[0].properties["territory"]}_alerts.kml`;
 
-      const blob = new Blob([kmlString], { type: "application/vnd.google-earth.kml+xml" });
+      const blob = new Blob([kmlString], {
+        type: "application/vnd.google-earth.kml+xml",
+      });
 
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);

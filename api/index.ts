@@ -137,12 +137,13 @@ if (!VIEWS_CONFIG) {
                 VIEWS[table].UNWANTED_SUBSTRINGS,
               );
 
-
               // Filter Mapeo data to only show data where category matches any values in mapeoCategoryIds (a comma-separated string of values)
               const filteredMapeoDataByCategory = filteredMapeoData.filter(
                 (row: any) => {
-                  return Object.keys(row).some(key => 
-                    key.includes("category") && mapeoCategoryIds.includes(row[key])
+                  return Object.keys(row).some(
+                    (key) =>
+                      key.includes("category") &&
+                      mapeoCategoryIds.includes(row[key]),
                   );
                 },
               );
@@ -232,8 +233,8 @@ if (!VIEWS_CONFIG) {
             const dataFilteredByValues = filterOutUnwantedValues(
               filteredData,
               VIEWS[table].FILTER_BY_COLUMN,
-              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN
-            )
+              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN,
+            );
             // Filter only data with valid geofields
             const filteredGeoData = filterGeoData(dataFilteredByValues);
             // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
@@ -299,8 +300,8 @@ if (!VIEWS_CONFIG) {
             const dataFilteredByValues = filterOutUnwantedValues(
               filteredData,
               VIEWS[table].FILTER_BY_COLUMN,
-              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN
-            )
+              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN,
+            );
             // Filter only data with media attachments
             const dataWithFilesOnly = filterDataByExtension(
               dataFilteredByValues,
