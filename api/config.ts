@@ -20,8 +20,10 @@ interface ViewConfig {
   VIEWS: string;
   ALERT_RESOURCES: string;
   EMBED_MEDIA: string;
+  FILTER_BY_COLUMN: string;
+  FILTER_OUT_VALUES_FROM_COLUMN: string;
   FRONT_END_FILTERING: string;
-  FRONT_END_FILTER_FIELD: string;
+  FRONT_END_FILTER_COLUMN: string;
   MAPBOX_STYLE: string;
   MAPBOX_PROJECTION: string;
   MAPBOX_CENTER_LATITUDE: string;

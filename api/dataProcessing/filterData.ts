@@ -86,7 +86,26 @@ export const filterUnwantedKeys = (
   return filteredData;
 };
 
-// Filter out data without fields that have valid coordinates
+// Filter out data that matches a comma-separated list of values for a given column
+export const filterOutUnwantedValues = (
+  data: any[],
+  filterByColumn: string | undefined,
+  filterOutValues: string | undefined,
+): any[] => {
+  if (!filterByColumn || !filterOutValues) {
+    return data;
+  }
+
+  const valuesToFilterOut = new Set(filterOutValues.split(","));
+
+  const filteredData = data.filter((item) => {
+    return !valuesToFilterOut.has(item[filterByColumn]);
+  });
+
+  return filteredData;
+}
+
+// Filter out data without columns storing have valid coordinates
 export const filterGeoData = (
   data: Array<Record<string, any>>,
 ): Array<Record<string, any>> => {
@@ -95,7 +114,7 @@ export const filterGeoData = (
   return geoData;
 };
 
-// Filter out data without any fields with file extensions
+// Filter out data without any columns storing file extensions
 export const filterDataByExtension = (
   data: Array<Record<string, any>>,
   extensions: string[],

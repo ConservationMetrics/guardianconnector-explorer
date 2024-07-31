@@ -4,6 +4,7 @@ import setupDatabaseConnection from "./database/dbConnection";
 import fetchData from "./database/dbOperations";
 import {
   filterUnwantedKeys,
+  filterOutUnwantedValues,
   filterGeoData,
   filterDataByExtension,
 } from "./dataProcessing/filterData";
@@ -156,7 +157,7 @@ if (!VIEWS_CONFIG) {
               // Process geodata
               const processedMapeoData = prepareMapData(
                 transformedMapeoData,
-                VIEWS[table].FRONT_END_FILTER_FIELD,
+                VIEWS[table].FRONT_END_FILTER_COLUMN,
               );
 
               mapeoData = processedMapeoData;
@@ -227,14 +228,20 @@ if (!VIEWS_CONFIG) {
               VIEWS[table].UNWANTED_COLUMNS,
               VIEWS[table].UNWANTED_SUBSTRINGS,
             );
+            // Filter data to remove unwanted values per chosen column
+            const dataFilteredByValues = filterOutUnwantedValues(
+              filteredData,
+              VIEWS[table].FILTER_BY_COLUMN,
+              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN
+            )
             // Filter only data with valid geofields
-            const filteredGeoData = filterGeoData(filteredData);
+            const filteredGeoData = filterGeoData(dataFilteredByValues);
             // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
             const transformedData = transformSurveyData(filteredGeoData);
             // Process geodata
             const processedGeoData = prepareMapData(
               transformedData,
-              VIEWS[table].FRONT_END_FILTER_FIELD,
+              VIEWS[table].FRONT_END_FILTER_COLUMN,
             );
 
             const response = {
@@ -242,7 +249,7 @@ if (!VIEWS_CONFIG) {
               data: processedGeoData,
               embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
               filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
-              filterField: VIEWS[table].FRONT_END_FILTER_FIELD,
+              filterColumn: VIEWS[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
               mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
               mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
@@ -288,9 +295,15 @@ if (!VIEWS_CONFIG) {
               VIEWS[table].UNWANTED_COLUMNS,
               VIEWS[table].UNWANTED_SUBSTRINGS,
             );
+            // Filter data to remove unwanted values per chosen column
+            const dataFilteredByValues = filterOutUnwantedValues(
+              filteredData,
+              VIEWS[table].FILTER_BY_COLUMN,
+              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN
+            )
             // Filter only data with media attachments
             const dataWithFilesOnly = filterDataByExtension(
-              filteredData,
+              dataFilteredByValues,
               allExtensions,
             );
             // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
@@ -301,7 +314,7 @@ if (!VIEWS_CONFIG) {
               data: transformedData,
               embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
               filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
-              filterField: VIEWS[table].FRONT_END_FILTER_FIELD,
+              filterColumn: VIEWS[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
               mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
               table: table,

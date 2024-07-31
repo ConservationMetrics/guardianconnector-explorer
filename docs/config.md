@@ -42,13 +42,21 @@ Enables embedding of media filenames from the database in the Gallery or Map vie
 
 For alerts, you need to provide a separate base path for alerts. Append your `MEDIA_BASE_PATH` variable with `_ALERTS`. If you are also using Mapeo data, then provide a separate `MEDIA_BASE_PATH` value.
 
+#### `FILTER_BY_COLUMN` (optional)
+
+Provides a column by which to filter out unwanted values. 
+
+#### `FILTER_OUT_VALUES_FROM_COLUMN` (optional)
+
+A comma-separated list of values, which if found in the value for `FILTER_BY_COLUMN`, will filter out the row from the API response.
+
 #### `FRONT_END_FILTERING` (optional)
 
-Activates a dropdown filter for data in views. Set to `YES` and define the field for filtering in `FRONT_END_FILTER_FIELD`.
+Activates a dropdown filter for data in views. Set to `YES` and define the column for filtering in `FRONT_END_FILTER_COLUMN`.
 
-#### `FRONT_END_FILTER_FIELD` (optional)
+#### `FRONT_END_FILTER_COLUMN` (optional)
 
-Depending on your data, you will want to use a meaningful field for filtering (for example, `Category` for Mapeo data). This variable defines the field used for front-end dropdown filtering.
+Depending on your data, you will want to use a meaningful column for filtering (for example, `Category` for Mapeo data). This variable defines the column used for front-end dropdown filtering.
 
 #### `LOGO_URL` (optional)
 
@@ -96,6 +104,6 @@ Provide a Planet NICFI Monthly Basemaps API key to enable the option to use the 
 
 #### `UNWANTED_COLUMNS` (optional) and `UNWANTED_SUBSTRINGS` (optional)
 
-List the exact column names (`UNWANTED_COLUMNS`) and/or columns containing specific substrings (`UNWANTED_SUBSTRINGS`) to be filtered out from data collection APIs. Useful for removing unnecessary metadata fields.
+List the exact column names (`UNWANTED_COLUMNS`) and/or columns containing specific substrings (`UNWANTED_SUBSTRINGS`) to be filtered out from data collection APIs. Useful for removing unnecessary metadata columns.
 
-Many outputs from data collection APIs have a lot of extraneous metadata fields that are not useful to the end user. See [schema.md](schema.md) for a list of these fields that are output by popular data collection APIs.
+Many outputs from data collection APIs have a lot of extraneous metadata columns that are not useful to the end user. See [schema.md](schema.md) for a list of these columns that are output by popular data collection APIs.

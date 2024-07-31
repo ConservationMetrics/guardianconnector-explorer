@@ -94,16 +94,16 @@ Currently, GuardianConnector expects these column headers, which follow the stru
 
 If found, GuardianConnector Views will use a column mapping SQL table (with "__column" suffix), like the one created by the `warehouse` component of [Frizzle](https://github.com/ConservationMetrics/frizzle), to handle filtering and key/value rewrites.
 
- Any fields specified in the `.env` file will be filtered out (*see "Unwanted columns and substrings" above*).
+ Any columns specified in the `.env` file will be filtered out (*see "Unwanted columns and substrings" above*).
 
 At this time, media attachments in the popups are handled in a somewhat brittle way by embedding any strings that end in the expected photo, audio, or video file ending (such as `.jpg`, `.mp3`, or `.mp4`). We can improve on this later when we know more about how media attachments will be stored in the SQL database, and what kind of metadata we have access to.
 
 ### GeoJSON export formats for map view ###
 
-The GuardianConnector Views map will render the feature on a map in accordance to what kind of `type` it is (Point, LineString, Polygon). The properties fields are shown in a popup opened by clicking on the feature.
+The GuardianConnector Views map will render the feature on a map in accordance to what kind of `type` it is (Point, LineString, Polygon). The properties are shown in a popup opened by clicking on the feature.
 
 The GuardianConnector Views map can work with any GeoJSON data stored in the expected tabular format, but the main purpose is to visualize field data collected using data collection applications such as Mapeo, OpenDataKit (ODK), and KoboToolbox. 
 
 * Mapeo data from Mapeo Desktop is already exported as GeoJSON file. GuardianConnector map can work with both Observations and Territory data.
-* ODK / KoboToolbox API survey data with a geospatial field may be transformed into such a format (as CMI does using [Frizzle](https://github.com/ConservationMetrics/frizzle) components).
+* ODK / KoboToolbox API survey data with a geospatial column may be transformed into such a format (as CMI does using [Frizzle](https://github.com/ConservationMetrics/frizzle) components).
 * In the future, we can do a similar transformation for Mapeo Cloud API data, if needed.
