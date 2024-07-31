@@ -24,7 +24,7 @@
   "downloadGeoJSON": "Baixar GeoJSON",
   "downloadKML": "Baixar KML",
   "earlier": "Anterior",
-  "filterDataByField": "Filtrar dados por campo",
+  "filterDataByColumn": "Filtrar dados por coluna",
   "gallery": "Galeria",
   "galleryNotAvailable": "A galeria de visualizações do GuardianConnector não está disponível. Por favor, ative a incorporação de mídia",
   "geocoordinates": "Coordenadas",

@@ -24,7 +24,7 @@
   "downloadGeoJSON": "Download GeoJSON",
   "downloadKML": "Download KML",
   "earlier": "Eerder",
-  "filterDataByField": "Filter data op veld",
+  "filterDataByColumn": "Filter data op kolom",
   "gallery": "Galerij",
   "galleryNotAvailable": "GuardianConnector Views Gallery is niet beschikbaar. Activeer media-inbedding",
   "geocoordinates": "Coördinaten",

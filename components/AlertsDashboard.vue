@@ -856,7 +856,7 @@ export default {
         this.isAlert = false;
       }
 
-      // Fields that may or may not exist, depending on views config
+      // Columns that may or may not exist, depending on views config
       this.imageUrl = [];
       featureObject.t0_url && this.imageUrl.push(featureObject.t0_url);
       featureObject.t1_url && this.imageUrl.push(featureObject.t1_url);

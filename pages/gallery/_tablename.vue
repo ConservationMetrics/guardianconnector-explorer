@@ -6,7 +6,7 @@
       :data="galleryData"
       :embed-media="embedMedia"
       :filter-data="filterData"
-      :filter-field="filterField"
+      :filter-column="filterColumn"
       :image-extensions="imageExtensions"
       :media-base-path="mediaBasePath"
       :video-extensions="videoExtensions"
@@ -51,7 +51,7 @@ export default {
         dataFetched: true,
         embedMedia: response.embedMedia,
         filterData: response.filterData,
-        filterField: response.filterField,
+        filterColumn: response.filterColumn,
         galleryData: response.data,
         imageExtensions: response.imageExtensions,
         mediaBasePath: response.mediaBasePath,

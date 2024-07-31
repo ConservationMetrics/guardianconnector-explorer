@@ -6,7 +6,7 @@
       :data="mapData"
       :embed-media="embedMedia"
       :filter-data="filterData"
-      :filter-field="filterField"
+      :filter-column="filterColumn"
       :image-extensions="imageExtensions"
       :map-legend-layer-ids="mapLegendLayerIds"
       :mapbox-access-token="mapboxAccessToken"
@@ -61,7 +61,7 @@ export default {
         dataFetched: true,
         embedMedia: response.embedMedia,
         filterData: response.filterData,
-        filterField: response.filterField,
+        filterColumn: response.filterColumn,
         imageExtensions: response.imageExtensions,
         mapData: response.data,
         mapLegendLayerIds: response.mapLegendLayerIds,

@@ -81,7 +81,7 @@ const transformSurveyData = (
 // Prepare data for the map view
 const prepareMapData = (
   transformedData: Array<Record<string, any>>,
-  filterField: string | undefined,
+  filterColumn: string | undefined,
 ): Array<Record<string, any>> => {
   const colorMap = new Map<string, string>();
 
@@ -135,19 +135,19 @@ const prepareMapData = (
       }
     }
 
-    // Add random color to each item per the filter field
-    if (filterField !== undefined) {
-      const filterFieldValue = item[filterField];
-      if (filterFieldValue) {
-        if (!colorMap.has(filterFieldValue)) {
-          colorMap.set(filterFieldValue, getRandomColor());
+    // Add random color to each item per the filter column
+    if (filterColumn !== undefined) {
+      const filterColumnValue = item[filterColumn];
+      if (filterColumnValue) {
+        if (!colorMap.has(filterColumnValue)) {
+          colorMap.set(filterColumnValue, getRandomColor());
         }
-        item["filter-color"] = colorMap.get(filterFieldValue);
+        item["filter-color"] = colorMap.get(filterColumnValue);
       } else {
         item["filter-color"] = "#3333FF"; // Fallback color of blue
       }
     } else {
-      // Handle the case when filterField is undefined
+      // Handle the case when filterColumn is undefined
       item["filter-color"] = "#3333FF"; // Fallback color of blue
     }
 
@@ -172,14 +172,14 @@ const prepareAlertData = (
   ): Record<string, any> => {
     const transformedItem: Record<string, any> = {};
 
-    // Keep fields starting with 'g__'
+    // Keep columns starting with 'g__'
     Object.keys(item).forEach((key) => {
       if (key.startsWith("g__")) {
         transformedItem[key] = item[key];
       }
     });
 
-    // To rewrite the satellite prefix field
+    // To rewrite the satellite prefix column
     const satelliteLookup: { [key: string]: string } = {
       S1: "Sentinel-1",
       S2: "Sentinel-2",
@@ -193,7 +193,7 @@ const prepareAlertData = (
       IK: "IKONOS",
     };
 
-    // Include only the transformed fields
+    // Include only the transformed columns
     transformedItem["territory"] = capitalizeFirstLetter(
       item.territory_name ?? "",
     );

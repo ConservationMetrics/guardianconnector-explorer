@@ -4,7 +4,7 @@
     <DataFilter
       v-if="filterData === true"
       :data="data"
-      :filter-field="filterField"
+      :filter-column="filterColumn"
       :show-colored-dot="true"
       @filter="filterValues"
     />
@@ -54,7 +54,7 @@ export default {
     "data",
     "embedMedia",
     "filterData",
-    "filterField",
+    "filterColumn",
     "imageExtensions",
     "mapLegendLayerIds",
     "mapbox3d",
@@ -208,7 +208,7 @@ export default {
         this.filteredData = [...this.processedData];
       } else {
         this.filteredData = this.processedData.filter((item) =>
-          values.includes(item[this.filterField]),
+          values.includes(item[this.filterColumn]),
         );
       }
       this.addDataToMap(); // Call this method to update the map data

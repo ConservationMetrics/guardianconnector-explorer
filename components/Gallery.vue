@@ -7,7 +7,7 @@
       <DataFilter
         v-if="filterData === true"
         :data="data"
-        :filter-field="filterField"
+        :filter-column="filterColumn"
         @filter="filter"
       />
     </div>
@@ -37,7 +37,7 @@ export default {
     "data",
     "embedMedia",
     "filterData",
-    "filterField",
+    "filterColumn",
     "imageExtensions",
     "mediaBasePath",
     "videoExtensions",
@@ -81,7 +81,7 @@ export default {
         this.filteredData = this.data;
       } else {
         this.filteredData = this.data.filter((item) =>
-          values.includes(item[this.filterField]),
+          values.includes(item[this.filterColumn]),
         );
       }
     },

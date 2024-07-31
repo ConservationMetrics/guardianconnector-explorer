@@ -120,8 +120,8 @@ export function prepareMapLegendLayers(
         return;
       }
 
-      const layerColorField = layerColor[3];
-      if (Array.isArray(layerColorField) && mapeoLegendColor) {
+      const layerColorColumn = layerColor[3];
+      if (Array.isArray(layerColorColumn) && mapeoLegendColor) {
         layerColor = mapeoLegendColor;
       }
 

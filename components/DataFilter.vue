@@ -1,7 +1,7 @@
 <template>
   <div class="filter-modal">
     <h4>
-      {{ $t("filterDataByField") }}: <strong>{{ filterField }}</strong>
+      {{ $t("filterDataByColumn") }}: <strong>{{ filterColumn }}</strong>
     </h4>
     <v-select
       multiple
@@ -38,7 +38,7 @@ import "vue-select/dist/vue-select.css";
 
 export default {
   components: { vSelect },
-  props: ["data", "filterField", "showColoredDot"],
+  props: ["data", "filterColumn", "showColoredDot"],
   data() {
     return {
       defaultColor: "#ffffff",
@@ -49,8 +49,8 @@ export default {
     uniqueValues() {
       const values = this.data
         .map((item) => ({
-          label: item[this.filterField],
-          value: item[this.filterField],
+          label: item[this.filterColumn],
+          value: item[this.filterColumn],
           color: item["filter-color"]
             ? item["filter-color"]
             : this.defaultColor,

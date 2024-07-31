@@ -77,7 +77,7 @@ jobs:
     #                  "EMBED_MEDIA": "YES",
     #                  "MEDIA_BASE_PATH": "./media",
     #                  "FRONT_END_FILTERING": "YES",
-    #                  "FRONT_END_FILTER_FIELD": "Community",
+    #                  "FRONT_END_FILTER_COLUMN": "Community",
     #                  "MAPBOX_STYLE": "mapbox://styles/mapbox/satellite-streets-v12",
     #                  "MAPBOX_PROJECTION": "globe",
     #                  "MAPBOX_CENTER_LATITUDE": "2",

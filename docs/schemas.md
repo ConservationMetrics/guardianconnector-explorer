@@ -10,7 +10,7 @@ Not an external API, but important to document here - the Frizzle warehouse comp
 
 ## KoboToolbox
 
-The KoboToolbox API includes the following metadata fields per each submission, which are likely not useful to the map viewer:
+The KoboToolbox API includes the following metadata columns per each submission, which are likely not useful to the map viewer:
 
 * `meta/instanceID`
 * `meta/instanceName`
@@ -30,7 +30,7 @@ The KoboToolbox API includes the following metadata fields per each submission, 
 * `_validation_status`
 * `__version__`
 
-Additionally, you may choose to filter out these fields that are commonly added to a KoboToolbox form for record keeping purposes, but possibly not relevant to show on this map:
+Additionally, you may choose to filter out these columns that are commonly added to a KoboToolbox form for record keeping purposes, but possibly not relevant to show on this map:
 
 * `start`
 * `end`
@@ -38,12 +38,12 @@ Additionally, you may choose to filter out these fields that are commonly added 
 
 ## ODK
 
-The KoboToolbox API includes the following metadata fields per each submission, which are likely not useful to the map viewer:
+The KoboToolbox API includes the following metadata columns per each submission, which are likely not useful to the map viewer:
 
 * `_id`
 * `meta`
 
-Additionally, you may choose to filter out these fields that are commonly added to a KoboToolbox form for record keeping purposes, but possibly not relevant to show on this map:
+Additionally, you may choose to filter out these columns that are commonly added to a KoboToolbox form for record keeping purposes, but possibly not relevant to show on this map:
 
 * `start`
 * `end`
@@ -53,9 +53,9 @@ Additionally, you may choose to filter out these fields that are commonly added 
 
 While we don't know (yet) about the schema for the future Mapeo Cloud API, we know that Mapeo data exported from Mapeo Desktop is in a GeoJSON format, with `type`, `geometry`, `id`, and `properties` keys.
 
-All of the tag fields are stored in `properties`. The main category key is `categoryId` and the primary data entry field for Mapeo Mobile ("What is happening here?) is `notes`.
+All of the tag columns are stored in `properties`. The main category key is `categoryId` and the primary data entry coumn for Mapeo Mobile ("What is happening here?) is `notes`.
 
-Additionally, there are metadata fields stored in `properties` prefixed by `$`. The file attachments (photos) field is handled in this way as well:
+Additionally, there are metadata columns stored in `properties` prefixed by `$`. The file attachments (photos) coumn is handled in this way as well:
 
 * `$created`
 * `$modified`
