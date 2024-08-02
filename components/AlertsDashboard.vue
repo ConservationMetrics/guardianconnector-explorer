@@ -93,6 +93,7 @@ export default {
   data() {
     return {
       calculateHectares: false,
+      currentBasemap: this.mapboxStyle, // Default to the initial map style
       dateOptions: [],
       downloadAlert: false,
       featuresUnderCursor: 0,
@@ -591,6 +592,8 @@ export default {
       this.removePulsingCircles();
       changeMapStyle(this.map, newBasemap, this.planetApiKey);
 
+      this.currentBasemap = newBasemap;
+
       // Once map is idle, re-add sources, layers, and event listeners
       this.map.once("idle", () => {
         this.prepareMapCanvasContent();
@@ -725,7 +728,7 @@ export default {
 
     prepareMapLegendContent() {
       this.map.once("idle", () => {
-        let mapLegendLayerIds;
+        let mapLegendLayerIds = '';
 
         // Add most-recent-alerts & previous-alerts layers to mapLegendContent
         mapLegendLayerIds = this.mapLegendLayerIds;
@@ -946,6 +949,11 @@ export default {
       this.calculateHectares = true;
     }
     this.showSlider = true;
+  },
+  watch: {
+    currentBasemap() {
+      this.prepareMapLegendContent();
+    },
   },
   beforeDestroy() {
     if (this.map) {

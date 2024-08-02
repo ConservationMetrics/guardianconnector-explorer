@@ -87,8 +87,6 @@ function getMapboxLayersForLegend(
     if (layer) {
       // Get the layer object and add it to the matchingLayers array
       matchingLayers.push(layer);
-    } else {
-      console.warn(`Layer with ID "${layerId}" not found.`);
     }
   });
 

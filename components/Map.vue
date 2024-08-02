@@ -75,6 +75,7 @@ export default {
   data() {
     return {
       colorMap: new Map(),
+      currentBasemap: this.mapboxStyle, // Default to the initial map style
       filteredData: [],
       map: null,
       mapLegendContent: null,
@@ -221,6 +222,8 @@ export default {
     handleBasemapChange(newBasemap) {
       changeMapStyle(this.map, newBasemap, this.planetApiKey);
 
+      this.currentBasemap = newBasemap;
+
       // Once map is idle, re-add sources, layers, and event listeners
       this.map.once("idle", () => {
         this.prepareMapCanvasContent();
@@ -295,6 +298,11 @@ export default {
 
       this.showBasemapSelector = true;
     });
+  },
+  watch: {
+    currentBasemap() {
+      this.prepareMapLegendContent();
+    },
   },
   beforeDestroy() {
     if (this.map) {
