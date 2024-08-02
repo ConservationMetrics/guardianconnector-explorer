@@ -133,7 +133,8 @@ export function prepareMapLegendLayers(
       formattedId = formattedId.replace(/ polygon| linestring$/i, "");
 
       return {
-        id: formattedId,
+        id: layerId,
+        name: formattedId,
         type: layerType,
         color: layerColor,
       };

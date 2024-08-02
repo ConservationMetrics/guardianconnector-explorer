@@ -33,6 +33,7 @@
     <MapLegend
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
+      @toggle-layer-visibility="toggleLayerVisibility"
     />
     <BasemapSelector
       v-if="showBasemapSelector"
@@ -188,9 +189,9 @@ export default {
         }
 
         // Add a stroke for most recent alerts Polygons
-        if (!this.map.getLayer("most-recent-alerts-stroke-polygon")) {
+        if (!this.map.getLayer("most-recent-alerts-polygon-stroke")) {
           this.map.addLayer({
-            id: "most-recent-alerts-stroke-polygon",
+            id: "most-recent-alerts-polygon-stroke",
             type: "line",
             source: "most-recent-alerts-polygon",
             paint: {
@@ -288,9 +289,9 @@ export default {
         }
 
         // Add a stroke for previous alerts Polygons
-        if (!this.map.getLayer("previous-alerts-stroke-polygon")) {
+        if (!this.map.getLayer("previous-alerts-polygon-stroke")) {
           this.map.addLayer({
-            id: "previous-alerts-stroke-polygon",
+            id: "previous-alerts-polygon-stroke",
             type: "line",
             source: "previous-alerts-polygon",
             paint: {
@@ -799,6 +800,13 @@ export default {
         }
       });
 
+      // Restore visibility for all map legend layers
+      this.mapLegendContent.forEach((item, index) => {
+        this.$set(this.mapLegendContent, index, { ...item, visible: true });
+        this.map.setLayoutProperty(item.id, "visibility", "visible");
+      });
+      this.$root.$emit("reset-legend-visibility");
+
       // Fly to the initial position
       this.map.flyTo({
         center: [this.mapboxLongitude || 0, this.mapboxLatitude || -15],
@@ -880,6 +888,19 @@ export default {
       }
 
       this.removePulsingCircles();
+    },
+
+    toggleLayerVisibility(item) {
+      const layerId = item.id;
+      const visibility = item.visible ? "visible" : "none";
+
+      this.map.setLayoutProperty(layerId, "visibility", visibility);
+
+      // Toggle visibility for the stroke layer if it exists
+      const strokeLayerId = `${layerId}-stroke`;
+      if (this.map.getLayer(strokeLayerId)) {
+        this.map.setLayoutProperty(strokeLayerId, "visibility", visibility);
+      }
     },
   },
   mounted() {
