@@ -46,7 +46,7 @@ import {
   changeMapStyle,
   prepareMapLegendLayers,
   prepareCoordinatesForSelectedFeature,
-  toggleLayerVisibility
+  toggleLayerVisibility,
 } from "@/src/mapFunctions.ts";
 
 export default {

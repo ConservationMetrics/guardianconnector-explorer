@@ -728,7 +728,7 @@ export default {
 
     prepareMapLegendContent() {
       this.map.once("idle", () => {
-        let mapLegendLayerIds = '';
+        let mapLegendLayerIds = "";
 
         // Add most-recent-alerts & previous-alerts layers to mapLegendContent
         mapLegendLayerIds = this.mapLegendLayerIds;
