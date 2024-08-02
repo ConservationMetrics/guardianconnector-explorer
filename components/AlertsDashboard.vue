@@ -59,6 +59,7 @@ import {
   changeMapStyle,
   prepareMapLegendLayers,
   prepareCoordinatesForSelectedFeature,
+  toggleLayerVisibility,
 } from "@/src/mapFunctions.ts";
 
 export default {
@@ -891,16 +892,7 @@ export default {
     },
 
     toggleLayerVisibility(item) {
-      const layerId = item.id;
-      const visibility = item.visible ? "visible" : "none";
-
-      this.map.setLayoutProperty(layerId, "visibility", visibility);
-
-      // Toggle visibility for the stroke layer if it exists
-      const strokeLayerId = `${layerId}-stroke`;
-      if (this.map.getLayer(strokeLayerId)) {
-        this.map.setLayoutProperty(strokeLayerId, "visibility", visibility);
-      }
+      toggleLayerVisibility(this.map, item);
     },
   },
   mounted() {

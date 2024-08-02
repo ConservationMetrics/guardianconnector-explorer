@@ -22,6 +22,7 @@
     <MapLegend
       v-if="mapLegendContent && map"
       :map-legend-content="mapLegendContent"
+      @toggle-layer-visibility="toggleLayerVisibility"
     />
     <BasemapSelector
       v-if="showBasemapSelector"
@@ -45,6 +46,7 @@ import {
   changeMapStyle,
   prepareMapLegendLayers,
   prepareCoordinatesForSelectedFeature,
+  toggleLayerVisibility
 } from "@/src/mapFunctions.ts";
 
 export default {
@@ -240,6 +242,10 @@ export default {
           this.mapLegendLayerIds,
         );
       });
+    },
+
+    toggleLayerVisibility(item) {
+      toggleLayerVisibility(this.map, item);
     },
   },
   mounted() {

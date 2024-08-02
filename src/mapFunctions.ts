@@ -163,3 +163,19 @@ export function prepareCoordinatesForSelectedFeature(
     .reverse()
     .join(",");
 }
+
+export function toggleLayerVisibility(
+  map: mapboxgl.Map,
+  item: { id: string; visible: boolean },
+) {
+  const layerId = item.id;
+  const visibility = item.visible ? "visible" : "none";
+
+  map.setLayoutProperty(layerId, "visibility", visibility);
+
+  // Toggle visibility for the stroke layer if it exists
+  const strokeLayerId = `${layerId}-stroke`;
+  if (map.getLayer(strokeLayerId)) {
+    map.setLayoutProperty(strokeLayerId, "visibility", visibility);
+  }
+}
