@@ -43,7 +43,7 @@
     </div>
     <h1>{{ $t("availableViews") }}</h1>
     <div
-      v-for="(config, tableName) in tablesConfig"
+      v-for="(config, tableName) in viewsConfig"
       :key="tableName"
       class="table-item"
     >
@@ -60,18 +60,41 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
-      tablesConfig: [],
+      viewsConfig: [],
       dropdownOpen: false,
     };
   },
   async mounted() {
     try {
-      this.tablesConfig = this.$config.tablesConfig;
+      // Set up the headers for the request
+      let headers = {
+        "x-api-key": this.$config.apiKey.replace(/['"]+/g, ""),
+        "x-auth-strategy": this.$auth.strategy.name,
+      };
+
+      // If the authentication strategy is 'local', include the token in the headers
+      if (this.$auth.strategy.name === "local") {
+        const token = this.$auth.strategy.token.get();
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      // Make the API call using Axios
+      const response = await axios.get("/api/config", { headers });
+
+      // Check if the response is OK
+      if (response.status !== 200) {
+        throw new Error("Network response was not ok");
+      }
+
+      // Set the viewsConfig data
+      this.viewsConfig = response.data;
     } catch (error) {
-      console.error("Error fetching table config on client side:", error);
+      console.error("Error fetching views config from API:", error);
     }
   },
   methods: {

@@ -5,7 +5,7 @@ type DatabaseConnection = Client | Database | null;
 
 let db: DatabaseConnection = null;
 
-const setupDatabaseConnection = (
+export const setupDatabaseConnection = (
   isSQLite: string,
   sqliteDbPath: string | undefined,
   database: string | undefined,
@@ -47,7 +47,7 @@ const setupDatabaseConnection = (
 
     db.connect()
       .then(() => {
-        console.log("Connected to the PostgreSQL database");
+        console.log(`Connected to the PostgreSQL database: "${database}"`);
       })
       .catch((error: Error) => {
         db = null;

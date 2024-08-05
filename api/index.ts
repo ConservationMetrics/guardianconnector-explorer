@@ -1,7 +1,7 @@
 import express from "express";
 
 import setupDatabaseConnection from "./database/dbConnection";
-import fetchData from "./database/dbOperations";
+import { fetchData, fetchViewsConfig } from "./database/dbOperations";
 import {
   filterUnwantedKeys,
   filterOutUnwantedValues,
@@ -28,8 +28,6 @@ import {
   IS_SQLITE,
   SQLITE_DB_PATH,
   MAPBOX_ACCESS_TOKEN,
-  VIEWS_CONFIG,
-  Views,
 } from "./config";
 
 const app = express();
@@ -42,6 +40,17 @@ app.post("/login", postLogin);
 // Apply middleware to Views routes
 app.use(checkAuthStrategy);
 
+const configDb = setupDatabaseConnection(
+  IS_SQLITE,
+  SQLITE_DB_PATH,
+  "gc_views",
+  DB_HOST,
+  DB_USER,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_SSL,
+);
+
 const db = setupDatabaseConnection(
   IS_SQLITE,
   SQLITE_DB_PATH,
@@ -53,18 +62,13 @@ const db = setupDatabaseConnection(
   DB_SSL,
 );
 
-// If TABLES is undefined or empty, throw an error before proceeding
-if (!VIEWS_CONFIG) {
-  throw new Error(
-    "The NUXT_ENV_VIEWS_CONFIG environment variable is not defined or is empty.",
-  );
-} else {
-  let VIEWS: Views;
+// Fetch views configuration from the database
+const initializeViews = async () => {
+  let VIEWS;
   try {
-    // Remove single quotes from stringified JSON
-    VIEWS = JSON.parse(VIEWS_CONFIG.replace(/'/g, ""));
+    VIEWS = await fetchViewsConfig(configDb, IS_SQLITE);
   } catch (error: any) {
-    throw new Error("Error parsing NUXT_ENV_VIEWS_CONFIG: " + error.message);
+    throw new Error("Error fetching views configuration: " + error.message);
   }
 
   const tableNames = Object.keys(VIEWS);
@@ -331,7 +335,20 @@ if (!VIEWS_CONFIG) {
       );
     }
   });
-}
+
+  app.get("/config", async (_req: express.Request, res: express.Response) => {
+    try {
+      res.json(VIEWS);
+    } catch (error: any) {
+      console.error("Error fetching views configuration:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  });
+};
+
+initializeViews().catch((error) => {
+  console.error("Error initializing views:", error.message);
+});
 
 export default {
   path: "/api",

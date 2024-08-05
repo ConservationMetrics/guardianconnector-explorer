@@ -8,43 +8,11 @@ interface EnvVars {
   IS_SQLITE: string;
   MAPBOX_ACCESS_TOKEN: string;
   NUXT_ENV_AUTH_STRATEGY: string;
-  NUXT_ENV_VIEWS_CONFIG: string;
   PASSWORD: string;
   PORT: string;
   SECRET_JWT_KEY: string;
   SQLITE_DB_PATH: string;
   VUE_APP_API_KEY: string;
-}
-
-interface ViewConfig {
-  VIEWS: string;
-  ALERT_RESOURCES: string;
-  EMBED_MEDIA: string;
-  FILTER_BY_COLUMN: string;
-  FILTER_OUT_VALUES_FROM_COLUMN: string;
-  FRONT_END_FILTERING: string;
-  FRONT_END_FILTER_COLUMN: string;
-  MAPBOX_STYLE: string;
-  MAPBOX_PROJECTION: string;
-  MAPBOX_CENTER_LATITUDE: string;
-  MAPBOX_CENTER_LONGITUDE: string;
-  MAPBOX_ZOOM: string;
-  MAPBOX_PITCH: string;
-  MAPBOX_BEARING: string;
-  MAPBOX_3D: string;
-  MAPEO_TABLE: string;
-  MAPEO_CATEGORY_IDS: string;
-  MAP_LEGEND_LAYER_IDS: string;
-  MEDIA_BASE_PATH: string;
-  MEDIA_BASE_PATH_ALERTS: string;
-  LOGO_URL: string;
-  PLANET_API_KEY: string;
-  UNWANTED_COLUMNS?: string;
-  UNWANTED_SUBSTRINGS?: string;
-}
-
-interface Views {
-  [key: string]: ViewConfig;
 }
 
 const env = process.env as unknown as EnvVars;
@@ -80,7 +48,6 @@ const MAPBOX_ACCESS_TOKEN = getEnvVar("MAPBOX_ACCESS_TOKEN", "pk.ey") as string;
 const PASSWORD = getEnvVar("PASSWORD");
 const SECRET_JWT_KEY = getEnvVar("SECRET_JWT_KEY", "secret-jwt-key") as string;
 const SQLITE_DB_PATH = getEnvVar("SQLITE_DB_PATH");
-const VIEWS_CONFIG = process.env.NUXT_ENV_VIEWS_CONFIG;
 
 export {
   API_KEY,
@@ -96,6 +63,4 @@ export {
   PASSWORD,
   SECRET_JWT_KEY,
   SQLITE_DB_PATH,
-  VIEWS_CONFIG,
-  Views,
 };
