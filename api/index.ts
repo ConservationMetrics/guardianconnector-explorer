@@ -40,10 +40,10 @@ app.post("/login", postLogin);
 // Apply middleware to Views routes
 app.use(checkAuthStrategy);
 
-const configDb = setupDatabaseConnection(
+let configDb = setupDatabaseConnection(
   IS_SQLITE,
   SQLITE_DB_PATH,
-  "gc_views",
+  DATABASE,
   DB_HOST,
   DB_USER,
   DB_PASSWORD,
@@ -66,6 +66,9 @@ const db = setupDatabaseConnection(
 const initializeViews = async () => {
   let VIEWS;
   try {
+    if (IS_SQLITE) {
+      configDb = db;
+    }
     VIEWS = await fetchViewsConfig(configDb, IS_SQLITE);
   } catch (error: any) {
     throw new Error("Error fetching views configuration: " + error.message);
