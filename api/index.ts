@@ -1,7 +1,7 @@
 import express from "express";
 
 import setupDatabaseConnection from "./database/dbConnection";
-import { fetchData, fetchViewsConfig } from "./database/dbOperations";
+import { fetchData, fetchConfig, updateConfig } from "./database/dbOperations";
 import {
   filterUnwantedKeys,
   filterOutUnwantedValues,
@@ -69,7 +69,7 @@ const initializeViews = async () => {
     if (IS_SQLITE) {
       configDb = db;
     }
-    VIEWS = await fetchViewsConfig(configDb, IS_SQLITE);
+    VIEWS = await fetchConfig(configDb, IS_SQLITE);
   } catch (error: any) {
     throw new Error("Error fetching views configuration: " + error.message);
   }
@@ -346,6 +346,20 @@ const initializeViews = async () => {
       console.error("Error fetching views configuration:", error.message);
       res.status(500).json({ error: error.message });
     }
+  });
+
+  app.post("/config/:tableName", async (req: express.Request, res: express.Response) => {
+    const { tableName } = req.params;
+    const config = req.body;
+
+    try {
+      await updateConfig(db, tableName, config, IS_SQLITE);
+      res.json({ message: "Configuration updated successfully" });
+    } catch (error: any) {
+      console.error("Error updating config:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+    
   });
 };
 

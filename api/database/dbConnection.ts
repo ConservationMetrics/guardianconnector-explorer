@@ -1,5 +1,5 @@
 import { Client } from "pg";
-import { verbose, Database, OPEN_READONLY } from "sqlite3";
+import { verbose, Database, OPEN_READWRITE, OPEN_CREATE } from "sqlite3";
 
 type DatabaseConnection = Client | Database | null;
 
@@ -24,7 +24,7 @@ export const setupDatabaseConnection = (
     const sqlite = verbose();
     db = new sqlite.Database(
       sqliteDbPath,
-      OPEN_READONLY,
+      OPEN_READWRITE | OPEN_CREATE,
       (err: Error | null) => {
         if (err) {
           console.error("Error connecting to SQLite database:", err.message);
