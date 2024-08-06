@@ -149,7 +149,7 @@ export const fetchViewsConfig = async (
 
   const viewsConfig: Views = {};
   result.forEach((row: any) => {
-    viewsConfig[row.table_name] = row.config;
+    viewsConfig[row.table_name] = isSQLite === "YES" ? JSON.parse(row.config) : row.config;
   });
 
   return viewsConfig;
