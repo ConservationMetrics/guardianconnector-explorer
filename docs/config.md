@@ -1,24 +1,10 @@
-# Views configuration (`NUXT_ENV_VIEWS_CONFIG`)
+# Views configuration
 
-Currently, the configuration for specific tables and views in a *GuardianConnector Views* deployment is done by setting the multi-line environmental variable `NUXT_ENV_VIEWS_CONFIG`.
-
-GuardianConnector Views can render multiple tables and you can determine which views to show for each table. The `NUXT_ENV_VIEWS_CONFIG` is a configuration object where each nested key corresponds to a specific table in your database. For each table, there's an array of settings under its key, which will be applied to configure the views associated with that table. The basic structure is as follows:
-
-```json
-NUXT_ENV_VIEWS_CONFIG = "{
-    'kobo_form_submissions': {
-        'properties': ...  // Settings for the 'kobo_form_submissions' table views
-    },
-    'mapeo_field_data': {
-        'properties': ...  // Settings for the 'mapeo_field_data' table views
-    },
-    // Additional tables and their view settings can be added here
-}"
-```
+The configuration for views in a *GuardianConnector Views* deployment is done by setting config for database tables in the `/config` route.
 
 ## Views Configuration Settings
 
-Each table in your `NUXT_ENV_VIEWS_CONFIG` can be customized using the following settings:
+Each table view can be configured using the following settings:
 
 #### `VIEWS` (required)
 
