@@ -41,9 +41,11 @@ const DB_USER = getEnvVar("DB_USER");
 const DB_PASSWORD = getEnvVar("DB_PASSWORD");
 const DB_PORT = getEnvVar("DB_PORT", "5432") as string;
 const DB_SSL = getEnvVar("DB_SSL", "YES") as string;
-const IS_SQLITE = getEnvVar("IS_SQLITE", "NO", (val) =>
-  val.toUpperCase() === "YES" ? "YES" : "NO",
-) as string;
+const IS_SQLITE = getEnvVar(
+  "IS_SQLITE",
+  "NO",
+  (val) => val.toUpperCase() === "YES",
+) as unknown as boolean;
 const MAPBOX_ACCESS_TOKEN = getEnvVar("MAPBOX_ACCESS_TOKEN", "pk.ey") as string;
 const PASSWORD = getEnvVar("PASSWORD");
 const SECRET_JWT_KEY = getEnvVar("SECRET_JWT_KEY", "secret-jwt-key") as string;

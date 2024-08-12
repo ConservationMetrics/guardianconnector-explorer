@@ -1,11 +1,11 @@
 const checkTableExists = (
   db: any,
   table: string | undefined,
-  isSQLite: string | undefined,
+  isSQLite: boolean | undefined,
 ): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     let query: string;
-    if (isSQLite === "YES") {
+    if (isSQLite) {
       query = `SELECT name FROM sqlite_master WHERE type='table' AND name='${table}'`;
       db.all(query, (err: Error, rows: any[]) => {
         if (err) reject(err);
@@ -24,10 +24,10 @@ const checkTableExists = (
 const fetchDataFromTable = async (
   db: any,
   table: string | undefined,
-  isSQLite: string | undefined,
+  isSQLite: boolean | undefined,
 ): Promise<any[]> => {
   let query: string;
-  if (isSQLite === "YES") {
+  if (isSQLite) {
     query = `SELECT * FROM ${table}`;
     return new Promise((resolve, reject) => {
       db.all(query, (err: Error, rows: any[]) => {
@@ -55,7 +55,7 @@ const fetchDataFromTable = async (
 export const fetchData = async (
   db: any,
   table: string | undefined,
-  isSQLite: string | undefined,
+  isSQLite: boolean | undefined,
 ): Promise<{
   mainData: any[];
   columnsData: any[] | null;
@@ -129,12 +129,33 @@ interface Views {
 
 export const fetchConfig = async (
   db: any,
-  isSQLite: string | undefined,
+  isSQLite: boolean | undefined,
 ): Promise<Views> => {
+  // Create the config table if it does not exist
+  const createConfigTable = `CREATE TABLE IF NOT EXISTS config (
+         table_name TEXT PRIMARY KEY,
+         config TEXT
+       )`;
+
+  await new Promise<void>((resolve, reject) => {
+    if (isSQLite) {
+      db.run(createConfigTable, (err: Error) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    } else {
+      db.query(createConfigTable, (err: Error) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    }
+  });
+
+  // Fetch the config data
   const query = `SELECT * FROM config`;
 
   const result = await new Promise<any[]>((resolve, reject) => {
-    if (isSQLite === "YES") {
+    if (isSQLite) {
       db.all(query, (err: Error, rows: any[]) => {
         if (err) reject(err);
         resolve(rows);
@@ -149,8 +170,7 @@ export const fetchConfig = async (
 
   const viewsConfig: Views = {};
   result.forEach((row: any) => {
-    viewsConfig[row.table_name] =
-      isSQLite === "YES" ? JSON.parse(row.config) : row.config;
+    viewsConfig[row.table_name] = JSON.parse(row.config);
   });
 
   return viewsConfig;
@@ -160,25 +180,32 @@ export const updateConfig = async (
   db: any,
   tableName: string,
   config: any,
-  isSQLite: string | undefined,
+  isSQLite: boolean | undefined,
 ): Promise<void> => {
-  const configString = isSQLite === "YES" ? JSON.stringify(config) : config;
+  const configString = JSON.stringify(config);
 
-  const query =
-    isSQLite === "YES"
-      ? `UPDATE config SET config = ? WHERE table_name = ?`
-      : `UPDATE config SET config = $1 WHERE table_name = $2`;
+  const query = isSQLite
+    ? `UPDATE config SET config = ? WHERE table_name = ?`
+    : `UPDATE config SET config = $1 WHERE table_name = $2`;
 
   return new Promise((resolve, reject) => {
-    if (isSQLite === "YES") {
+    if (isSQLite) {
       db.run(query, [configString, tableName], (err: Error) => {
-        if (err) reject(err);
-        resolve();
+        if (err) {
+          console.error("SQLite Error:", err);
+          reject(err);
+        } else {
+          resolve();
+        }
       });
     } else {
       db.query(query, [configString, tableName], (err: Error) => {
-        if (err) reject(err);
-        resolve();
+        if (err) {
+          console.error("PostgreSQL Error:", err);
+          reject(err);
+        } else {
+          resolve();
+        }
       });
     }
   });

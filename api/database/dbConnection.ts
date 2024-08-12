@@ -6,7 +6,7 @@ type DatabaseConnection = Client | Database | null;
 let db: DatabaseConnection = null;
 
 export const setupDatabaseConnection = (
-  isSQLite: string,
+  isSQLite: boolean,
   sqliteDbPath: string | undefined,
   database: string | undefined,
   host: string | undefined,
@@ -17,7 +17,7 @@ export const setupDatabaseConnection = (
 ): DatabaseConnection => {
   console.log("Setting up database connection...");
 
-  if (isSQLite === "YES") {
+  if (isSQLite) {
     if (sqliteDbPath === undefined) {
       throw new Error("sqliteDbPath is undefined");
     }
@@ -64,4 +64,50 @@ export const setupDatabaseConnection = (
   return db;
 };
 
-export default setupDatabaseConnection;
+export const createDatabaseIfNotExists = async (
+  dbName: string,
+  defaultDb: string | undefined,
+  host: string | undefined,
+  user: string | undefined,
+  password: string | undefined,
+  port: string,
+  ssl: string | undefined,
+): Promise<boolean> => {
+  if (!dbName) {
+    throw new Error("Database name is required");
+  }
+
+  const client = new Client({
+    user: user,
+    host: host,
+    password: password,
+    port: parseInt(port, 10),
+    ssl: ssl === "true" ? { rejectUnauthorized: false } : false,
+    database: defaultDb,
+  });
+
+  try {
+    await client.connect();
+    const res = await client.query(
+      `SELECT 1 FROM pg_database WHERE datname = $1`,
+      [dbName],
+    );
+    if (res.rowCount === 0) {
+      await client.query(`CREATE DATABASE ${dbName}`);
+      console.log(`Database ${dbName} created successfully.`);
+
+      // Grant privileges to the user
+      await client.query(
+        `GRANT ALL PRIVILEGES ON DATABASE ${dbName} TO ${user};`,
+      );
+    } else {
+      console.log(`Database ${dbName} already exists.`);
+    }
+    return true;
+  } catch (error) {
+    console.error(`Error creating database ${dbName}:`, error);
+    return false;
+  } finally {
+    await client.end();
+  }
+};

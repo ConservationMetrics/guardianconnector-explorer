@@ -1,6 +1,9 @@
 import express from "express";
 
-import setupDatabaseConnection from "./database/dbConnection";
+import {
+  setupDatabaseConnection,
+  createDatabaseIfNotExists,
+} from "./database/dbConnection";
 import { fetchData, fetchConfig, updateConfig } from "./database/dbOperations";
 import {
   filterUnwantedKeys,
@@ -37,81 +40,27 @@ app.use(express.json());
 app.get("/login", getLogin);
 app.post("/login", postLogin);
 
-// Apply middleware to viewsConfig routes
+// Apply middleware to views routes
 app.use(checkAuthStrategy);
 
-let configDb = setupDatabaseConnection(
-  IS_SQLITE,
-  SQLITE_DB_PATH,
-  DATABASE,
-  DB_HOST,
-  DB_USER,
-  DB_PASSWORD,
-  DB_PORT,
-  DB_SSL,
-);
-
-const db = setupDatabaseConnection(
-  IS_SQLITE,
-  SQLITE_DB_PATH,
-  DATABASE,
-  DB_HOST,
-  DB_USER,
-  DB_PASSWORD,
-  DB_PORT,
-  DB_SSL,
-);
-
-// Media extensions
-const imageExtensions = ["jpg", "jpeg", "png", "webp"];
-const audioExtensions = ["mp3", "ogg", "wav"];
-const videoExtensions = ["mov", "mp4", "avi", "mkv"];
-const allExtensions = [
-  ...imageExtensions,
-  ...audioExtensions,
-  ...videoExtensions,
-];
-
+// Fetch views config
 const getviewsConfig = async () => {
-  if (IS_SQLITE) {
-    configDb = db;
-  }
   const viewsConfig = await fetchConfig(configDb, IS_SQLITE);
   return viewsConfig;
 };
 
-app.get("/config", async (_req: express.Request, res: express.Response) => {
-  try {
-    res.json(await getviewsConfig());
-  } catch (error: any) {
-    console.error("Error fetching views configuration:", error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post(
-  "/config/:tableName",
-  async (req: express.Request, res: express.Response) => {
-    const { tableName } = req.params;
-    const config = req.body;
-
-    try {
-      await updateConfig(db, tableName, config, IS_SQLITE);
-      res.json({ message: "Configuration updated successfully" });
-
-      // Reinitialize viewsConfig with updated config
-      initializeviewsConfig().catch((error) => {
-        console.error("Error reinitializing views config:", error.message);
-      });
-    } catch (error: any) {
-      console.error("Error updating config:", error.message);
-      res.status(500).json({ error: error.message });
-    }
-  },
-);
-
 // Initialize views using config
 const initializeviewsConfig = async () => {
+  // Define allowed file extensions
+  const imageExtensions = ["jpg", "jpeg", "png", "webp"];
+  const audioExtensions = ["mp3", "ogg", "wav"];
+  const videoExtensions = ["mov", "mp4", "avi", "mkv"];
+  const allExtensions = [
+    ...imageExtensions,
+    ...audioExtensions,
+    ...videoExtensions,
+  ];
+
   const viewsConfig = await getviewsConfig();
 
   const tableNames = Object.keys(viewsConfig);
@@ -370,9 +319,87 @@ const initializeviewsConfig = async () => {
   });
 };
 
-initializeviewsConfig().catch((error) => {
+// Set up database connections for config and data
+let configDbName = "gc_views";
+if (IS_SQLITE && DATABASE) {
+  configDbName = DATABASE;
+}
+
+let configDb: any;
+let db: any;
+(async () => {
+  // Create config database if it does not exist
+  if (!IS_SQLITE) {
+    await createDatabaseIfNotExists(
+      configDbName,
+      DATABASE,
+      DB_HOST,
+      DB_USER,
+      DB_PASSWORD,
+      DB_PORT,
+      DB_SSL,
+    );
+  }
+
+  configDb = setupDatabaseConnection(
+    IS_SQLITE,
+    SQLITE_DB_PATH,
+    configDbName,
+    DB_HOST,
+    DB_USER,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_SSL,
+  );
+
+  db = setupDatabaseConnection(
+    IS_SQLITE,
+    SQLITE_DB_PATH,
+    DATABASE,
+    DB_HOST,
+    DB_USER,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_SSL,
+  );
+
+  // Initialize views using config
+  await initializeviewsConfig();
+})().catch((error) => {
   console.error("Error initializing views config:", error.message);
 });
+
+// GET views configuration
+app.get("/config", async (_req: express.Request, res: express.Response) => {
+  try {
+    res.json(await getviewsConfig());
+  } catch (error: any) {
+    console.error("Error fetching views configuration:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST views configuration
+app.post(
+  "/config/:tableName",
+  async (req: express.Request, res: express.Response) => {
+    const { tableName } = req.params;
+    const config = req.body;
+
+    try {
+      await updateConfig(configDb, tableName, config, IS_SQLITE);
+      res.json({ message: "Configuration updated successfully" });
+
+      // Reinitialize viewsConfig with updated config
+      initializeviewsConfig().catch((error) => {
+        console.error("Error reinitializing views config:", error.message);
+      });
+    } catch (error: any) {
+      console.error("Error updating config:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
 
 export default {
   path: "/api",
