@@ -3,7 +3,6 @@
   "version": "2.0.0",
   "type": "module",
   "description": "A Nuxt app to visualize GuardianConnector data in different views",
-  "private": true,
   "scripts": {
     "dev": "./node_modules/.bin/nuxt",
     "build": "./node_modules/.bin/nuxt build",
@@ -57,8 +56,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,vue}": [
-      "prettier --write ./",
-      "git add"
+      "prettier --write ./"
     ]
   },
   "engines": {
