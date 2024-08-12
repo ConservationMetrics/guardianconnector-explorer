@@ -50,7 +50,7 @@ const getviewsConfig = async () => {
 };
 
 // Initialize views using config
-const initializeviewsConfig = async () => {
+const initializeViewsConfig = async () => {
   // Define allowed file extensions
   const imageExtensions = ["jpg", "jpeg", "png", "webp"];
   const audioExtensions = ["mp3", "ogg", "wav"];
@@ -364,7 +364,7 @@ let db: any;
   );
 
   // Initialize views using config
-  await initializeviewsConfig();
+  await initializeViewsConfig();
 })().catch((error) => {
   console.error("Error initializing views config:", error.message);
 });
@@ -391,7 +391,7 @@ app.post(
       res.json({ message: "Configuration updated successfully" });
 
       // Reinitialize viewsConfig with updated config
-      initializeviewsConfig().catch((error) => {
+      initializeViewsConfig().catch((error) => {
         console.error("Error reinitializing views config:", error.message);
       });
     } catch (error: any) {
