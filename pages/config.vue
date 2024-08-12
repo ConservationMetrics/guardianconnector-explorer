@@ -41,7 +41,7 @@
         </div>
       </div>
     </div>
-    <h1>{{ $t("availableViews") }}: {{  $t("configuration") }}</h1>
+    <h1>{{ $t("availableViews") }}: {{ $t("configuration") }}</h1>
     <div class="grid-container">
       <div
         v-for="(config, tableName) in viewsConfig"
@@ -61,9 +61,12 @@
                 class="input-field"
               />
             </div>
-            <button type="submit" 
+            <button
+              type="submit"
               class="submit-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-200 md:block"
-            >{{ $t("submit") }}</button>
+            >
+              {{ $t("submit") }}
+            </button>
           </form>
         </div>
       </div>
@@ -138,7 +141,9 @@ export default {
         }
 
         // Make the API call using Axios
-        const response = await axios.post(`/api/config/${tableName}`, config, { headers });
+        const response = await axios.post(`/api/config/${tableName}`, config, {
+          headers,
+        });
 
         // Check if the response is OK
         if (response.status !== 200) {
@@ -147,7 +152,7 @@ export default {
 
         console.log("Configuration updated successfully");
         (this.modalMessage = this.$t("configUpdated") + "!"),
-        (this.showModal = true);
+          (this.showModal = true);
         // wait 3 seconds and refresh the page content
         setTimeout(() => {
           this.showModal = false;
@@ -189,7 +194,10 @@ export default {
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); /* Increased min-width to 400px */
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(400px, 1fr)
+  ); /* Increased min-width to 400px */
   gap: 1em;
   width: 100%;
   max-width: 1200px;

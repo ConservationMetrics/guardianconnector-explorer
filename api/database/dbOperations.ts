@@ -149,7 +149,8 @@ export const fetchConfig = async (
 
   const viewsConfig: Views = {};
   result.forEach((row: any) => {
-    viewsConfig[row.table_name] = isSQLite === "YES" ? JSON.parse(row.config) : row.config;
+    viewsConfig[row.table_name] =
+      isSQLite === "YES" ? JSON.parse(row.config) : row.config;
   });
 
   return viewsConfig;
@@ -163,10 +164,11 @@ export const updateConfig = async (
 ): Promise<void> => {
   const configString = isSQLite === "YES" ? JSON.stringify(config) : config;
 
-  const query = isSQLite === "YES"
-    ? `UPDATE config SET config = ? WHERE table_name = ?`
-    : `UPDATE config SET config = $1 WHERE table_name = $2`;
-  
+  const query =
+    isSQLite === "YES"
+      ? `UPDATE config SET config = ? WHERE table_name = ?`
+      : `UPDATE config SET config = $1 WHERE table_name = $2`;
+
   return new Promise((resolve, reject) => {
     if (isSQLite === "YES") {
       db.run(query, [configString, tableName], (err: Error) => {

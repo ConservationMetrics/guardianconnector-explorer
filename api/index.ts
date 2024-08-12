@@ -74,11 +74,11 @@ const allExtensions = [
 
 const getviewsConfig = async () => {
   if (IS_SQLITE) {
-      configDb = db;
-    }
+    configDb = db;
+  }
   const viewsConfig = await fetchConfig(configDb, IS_SQLITE);
   return viewsConfig;
-}
+};
 
 app.get("/config", async (_req: express.Request, res: express.Response) => {
   try {
@@ -89,27 +89,29 @@ app.get("/config", async (_req: express.Request, res: express.Response) => {
   }
 });
 
-app.post("/config/:tableName", async (req: express.Request, res: express.Response) => {
-  const { tableName } = req.params;
-  const config = req.body;
+app.post(
+  "/config/:tableName",
+  async (req: express.Request, res: express.Response) => {
+    const { tableName } = req.params;
+    const config = req.body;
 
-  try {
-    await updateConfig(db, tableName, config, IS_SQLITE);
-    res.json({ message: "Configuration updated successfully" });
+    try {
+      await updateConfig(db, tableName, config, IS_SQLITE);
+      res.json({ message: "Configuration updated successfully" });
 
-    // Reinitialize viewsConfig with updated config
-    initializeviewsConfig().catch((error) => {
-      console.error("Error reinitializing views config:", error.message);
-    });
-  } catch (error: any) {
-    console.error("Error updating config:", error.message);
-    res.status(500).json({ error: error.message });
-  }
-});
+      // Reinitialize viewsConfig with updated config
+      initializeviewsConfig().catch((error) => {
+        console.error("Error reinitializing views config:", error.message);
+      });
+    } catch (error: any) {
+      console.error("Error updating config:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
 
 // Initialize views using config
 const initializeviewsConfig = async () => {
-
   const viewsConfig = await getviewsConfig();
 
   const tableNames = Object.keys(viewsConfig);
