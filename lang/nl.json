@@ -17,6 +17,7 @@
   "changeDetectionAlerts": "Veranderingsdetectie waarschuwingen",
   "confidenceLevel": "Betrouwbaarheidsniveau",
   "configuration": "Instellingen",
+  "configUpdated": "Instellingen zijn aangepast",
   "created": "Gemaakt",
   "dataCollectedOn": "Data verzameld op",
   "dataProvider": "Data provider",

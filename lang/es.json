@@ -17,6 +17,7 @@
   "changeDetectionAlerts": "Alertas de detección de cambios",
   "confidenceLevel": "Nivel de confianza",
   "configuration": "Configuración",
+  "configUpdated": "Config fue actualizado",
   "created": "Creado",
   "dataCollectedOn": "Datos recopilados el",
   "dataProvider": "Proveedor de datos",

@@ -68,17 +68,23 @@
         </div>
       </div>
     </div>
+    <div v-if="showModal" class="overlay"></div>
+    <div v-if="showModal" class="modal">
+      {{ modalMessage }}
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import overlayModal from "@/components/overlay.css";
 
 export default {
   data() {
     return {
       viewsConfig: [],
       dropdownOpen: false,
+      showModal: false,
     };
   },
   async mounted() {
@@ -140,6 +146,13 @@ export default {
         }
 
         console.log("Configuration updated successfully");
+        (this.modalMessage = this.$t("configUpdated") + "!"),
+        (this.showModal = true);
+        // wait 3 seconds and refresh the page content
+        setTimeout(() => {
+          this.showModal = false;
+          location.reload();
+        }, 3000);
       } catch (error) {
         console.error("Error updating config:", error);
       }

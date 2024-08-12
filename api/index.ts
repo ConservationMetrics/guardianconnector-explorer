@@ -37,7 +37,7 @@ app.use(express.json());
 app.get("/login", getLogin);
 app.post("/login", postLogin);
 
-// Apply middleware to Views routes
+// Apply middleware to viewsConfig routes
 app.use(checkAuthStrategy);
 
 let configDb = setupDatabaseConnection(
@@ -62,34 +62,62 @@ const db = setupDatabaseConnection(
   DB_SSL,
 );
 
-// Fetch views configuration from the database
-const initializeViews = async () => {
-  let VIEWS;
-  try {
-    if (IS_SQLITE) {
+// Media extensions
+const imageExtensions = ["jpg", "jpeg", "png", "webp"];
+const audioExtensions = ["mp3", "ogg", "wav"];
+const videoExtensions = ["mov", "mp4", "avi", "mkv"];
+const allExtensions = [
+  ...imageExtensions,
+  ...audioExtensions,
+  ...videoExtensions,
+];
+
+const getviewsConfig = async () => {
+  if (IS_SQLITE) {
       configDb = db;
     }
-    VIEWS = await fetchConfig(configDb, IS_SQLITE);
+  const viewsConfig = await fetchConfig(configDb, IS_SQLITE);
+  return viewsConfig;
+}
+
+app.get("/config", async (_req: express.Request, res: express.Response) => {
+  try {
+    res.json(await getviewsConfig());
   } catch (error: any) {
-    throw new Error("Error fetching views configuration: " + error.message);
+    console.error("Error fetching views configuration:", error.message);
+    res.status(500).json({ error: error.message });
   }
+});
 
-  const tableNames = Object.keys(VIEWS);
+app.post("/config/:tableName", async (req: express.Request, res: express.Response) => {
+  const { tableName } = req.params;
+  const config = req.body;
 
-  // Media extensions
-  const imageExtensions = ["jpg", "jpeg", "png", "webp"];
-  const audioExtensions = ["mp3", "ogg", "wav"];
-  const videoExtensions = ["mov", "mp4", "avi", "mkv"];
-  const allExtensions = [
-    ...imageExtensions,
-    ...audioExtensions,
-    ...videoExtensions,
-  ];
+  try {
+    await updateConfig(db, tableName, config, IS_SQLITE);
+    res.json({ message: "Configuration updated successfully" });
+
+    // Reinitialize viewsConfig with updated config
+    initializeviewsConfig().catch((error) => {
+      console.error("Error reinitializing views config:", error.message);
+    });
+  } catch (error: any) {
+    console.error("Error updating config:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Initialize views using config
+const initializeviewsConfig = async () => {
+
+  const viewsConfig = await getviewsConfig();
+
+  const tableNames = Object.keys(viewsConfig);
 
   tableNames.forEach((table) => {
-    // Check if VIEWS[table].VIEWS is not set
-    if (!VIEWS[table].VIEWS) {
-      console.log(`Views not defined for ${table}, skipping...`);
+    // Check if viewsConfig[table].viewsConfig is not set
+    if (!viewsConfig[table].VIEWS) {
+      console.log(`viewsConfig not defined for ${table}, skipping...`);
       return;
     }
 
@@ -109,7 +137,7 @@ const initializeViews = async () => {
     });
 
     // Endpoint for the alert dashboard view
-    if (VIEWS[table].VIEWS.includes("alerts")) {
+    if (viewsConfig[table].VIEWS.includes("alerts")) {
       app.get(
         `/${table}/alerts`,
         async (_req: express.Request, res: express.Response) => {
@@ -124,11 +152,11 @@ const initializeViews = async () => {
             // Prepare alerts data for the alerts view
             const changeDetectionData = prepareAlertData(
               mainData,
-              VIEWS[table].EMBED_MEDIA === "YES",
+              viewsConfig[table].EMBED_MEDIA === "YES",
             );
 
-            const mapeoTable = VIEWS[table].MAPEO_TABLE;
-            const mapeoCategoryIds = VIEWS[table].MAPEO_CATEGORY_IDS;
+            const mapeoTable = viewsConfig[table].MAPEO_TABLE;
+            const mapeoCategoryIds = viewsConfig[table].MAPEO_CATEGORY_IDS;
 
             let mapeoData = null;
 
@@ -140,8 +168,8 @@ const initializeViews = async () => {
               const filteredMapeoData = filterUnwantedKeys(
                 rawMapeoData.mainData,
                 rawMapeoData.columnsData,
-                VIEWS[table].UNWANTED_COLUMNS,
-                VIEWS[table].UNWANTED_SUBSTRINGS,
+                viewsConfig[table].UNWANTED_COLUMNS,
+                viewsConfig[table].UNWANTED_SUBSTRINGS,
               );
 
               // Filter Mapeo data to only show data where category matches any values in mapeoCategoryIds (a comma-separated string of values)
@@ -165,7 +193,7 @@ const initializeViews = async () => {
               // Process geodata
               const processedMapeoData = prepareMapData(
                 transformedMapeoData,
-                VIEWS[table].FRONT_END_FILTER_COLUMN,
+                viewsConfig[table].FRONT_END_FILTER_COLUMN,
               );
 
               mapeoData = processedMapeoData;
@@ -185,25 +213,25 @@ const initializeViews = async () => {
             };
 
             const response = {
-              alertResources: VIEWS[table].ALERT_RESOURCES === "YES",
+              alertResources: viewsConfig[table].ALERT_RESOURCES === "YES",
               alertsData: geojsonData,
-              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
+              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
               imageExtensions: imageExtensions,
-              logoUrl: VIEWS[table].LOGO_URL,
-              mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
-              mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
+              logoUrl: viewsConfig[table].LOGO_URL,
+              mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
+              mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
               mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
-              mapboxBearing: VIEWS[table].MAPBOX_BEARING,
-              mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE,
-              mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE,
-              mapboxPitch: VIEWS[table].MAPBOX_PITCH,
-              mapboxProjection: VIEWS[table].MAPBOX_PROJECTION,
-              mapboxStyle: VIEWS[table].MAPBOX_STYLE,
-              mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
+              mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
+              mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
+              mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
+              mapboxPitch: viewsConfig[table].MAPBOX_PITCH,
+              mapboxProjection: viewsConfig[table].MAPBOX_PROJECTION,
+              mapboxStyle: viewsConfig[table].MAPBOX_STYLE,
+              mapboxZoom: viewsConfig[table].MAPBOX_ZOOM,
               mapeoData: mapeoData,
-              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
-              mediaBasePathAlerts: VIEWS[table].MEDIA_BASE_PATH_ALERTS,
-              planetApiKey: VIEWS[table].PLANET_API_KEY,
+              mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
+              mediaBasePathAlerts: viewsConfig[table].MEDIA_BASE_PATH_ALERTS,
+              planetApiKey: viewsConfig[table].PLANET_API_KEY,
               statistics: statistics,
               table: table,
             };
@@ -218,7 +246,7 @@ const initializeViews = async () => {
     }
 
     // Endpoint for the map view
-    if (VIEWS[table].VIEWS.includes("map")) {
+    if (viewsConfig[table].VIEWS.includes("map")) {
       app.get(
         `/${table}/map`,
         async (_req: express.Request, res: express.Response) => {
@@ -233,14 +261,14 @@ const initializeViews = async () => {
             const filteredData = filterUnwantedKeys(
               mainData,
               columnsData,
-              VIEWS[table].UNWANTED_COLUMNS,
-              VIEWS[table].UNWANTED_SUBSTRINGS,
+              viewsConfig[table].UNWANTED_COLUMNS,
+              viewsConfig[table].UNWANTED_SUBSTRINGS,
             );
             // Filter data to remove unwanted values per chosen column
             const dataFilteredByValues = filterOutUnwantedValues(
               filteredData,
-              VIEWS[table].FILTER_BY_COLUMN,
-              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN,
+              viewsConfig[table].FILTER_BY_COLUMN,
+              viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN,
             );
             // Filter only data with valid geofields
             const filteredGeoData = filterGeoData(dataFilteredByValues);
@@ -249,28 +277,28 @@ const initializeViews = async () => {
             // Process geodata
             const processedGeoData = prepareMapData(
               transformedData,
-              VIEWS[table].FRONT_END_FILTER_COLUMN,
+              viewsConfig[table].FRONT_END_FILTER_COLUMN,
             );
 
             const response = {
               audioExtensions: audioExtensions,
               data: processedGeoData,
-              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
-              filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
-              filterColumn: VIEWS[table].FRONT_END_FILTER_COLUMN,
+              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
+              filterData: viewsConfig[table].FRONT_END_FILTERING === "YES",
+              filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
-              mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
-              mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
+              mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
+              mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
               mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
-              mapboxBearing: VIEWS[table].MAPBOX_BEARING,
-              mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE,
-              mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE,
-              mapboxPitch: VIEWS[table].MAPBOX_PITCH,
-              mapboxProjection: VIEWS[table].MAPBOX_PROJECTION,
-              mapboxStyle: VIEWS[table].MAPBOX_STYLE,
-              mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
-              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
-              planetApiKey: VIEWS[table].PLANET_API_KEY,
+              mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
+              mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
+              mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
+              mapboxPitch: viewsConfig[table].MAPBOX_PITCH,
+              mapboxProjection: viewsConfig[table].MAPBOX_PROJECTION,
+              mapboxStyle: viewsConfig[table].MAPBOX_STYLE,
+              mapboxZoom: viewsConfig[table].MAPBOX_ZOOM,
+              mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
+              planetApiKey: viewsConfig[table].PLANET_API_KEY,
               table: table,
               videoExtensions: videoExtensions,
             };
@@ -285,7 +313,7 @@ const initializeViews = async () => {
     }
 
     // Endpoint for the gallery view
-    if (VIEWS[table].VIEWS.includes("gallery")) {
+    if (viewsConfig[table].VIEWS.includes("gallery")) {
       app.get(
         `/${table}/gallery`,
         async (_req: express.Request, res: express.Response) => {
@@ -300,14 +328,14 @@ const initializeViews = async () => {
             const filteredData = filterUnwantedKeys(
               mainData,
               columnsData,
-              VIEWS[table].UNWANTED_COLUMNS,
-              VIEWS[table].UNWANTED_SUBSTRINGS,
+              viewsConfig[table].UNWANTED_COLUMNS,
+              viewsConfig[table].UNWANTED_SUBSTRINGS,
             );
             // Filter data to remove unwanted values per chosen column
             const dataFilteredByValues = filterOutUnwantedValues(
               filteredData,
-              VIEWS[table].FILTER_BY_COLUMN,
-              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN,
+              viewsConfig[table].FILTER_BY_COLUMN,
+              viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN,
             );
             // Filter only data with media attachments
             const dataWithFilesOnly = filterDataByExtension(
@@ -320,11 +348,11 @@ const initializeViews = async () => {
             const response = {
               audioExtensions: audioExtensions,
               data: transformedData,
-              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
-              filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
-              filterColumn: VIEWS[table].FRONT_END_FILTER_COLUMN,
+              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
+              filterData: viewsConfig[table].FRONT_END_FILTERING === "YES",
+              filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
-              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+              mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
               table: table,
               videoExtensions: videoExtensions,
             };
@@ -338,33 +366,10 @@ const initializeViews = async () => {
       );
     }
   });
-
-  app.get("/config", async (_req: express.Request, res: express.Response) => {
-    try {
-      res.json(VIEWS);
-    } catch (error: any) {
-      console.error("Error fetching views configuration:", error.message);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post("/config/:tableName", async (req: express.Request, res: express.Response) => {
-    const { tableName } = req.params;
-    const config = req.body;
-
-    try {
-      await updateConfig(db, tableName, config, IS_SQLITE);
-      res.json({ message: "Configuration updated successfully" });
-    } catch (error: any) {
-      console.error("Error updating config:", error.message);
-      res.status(500).json({ error: error.message });
-    }
-    
-  });
 };
 
-initializeViews().catch((error) => {
-  console.error("Error initializing views:", error.message);
+initializeviewsConfig().catch((error) => {
+  console.error("Error initializing views config:", error.message);
 });
 
 export default {
