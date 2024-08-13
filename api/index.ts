@@ -33,6 +33,9 @@ import {
   MAPBOX_ACCESS_TOKEN,
 } from "./config";
 
+let configDb: any;
+let db: any;
+
 const app = express();
 
 app.use(express.json());
@@ -320,14 +323,12 @@ const initializeViewsConfig = async () => {
 };
 
 // Set up database connections for config and data
-let configDbName = "gc_views";
-if (IS_SQLITE && DATABASE) {
-  configDbName = DATABASE;
-}
+const setupAndInitialize = async () => {
+  let configDbName = "gc_views";
+  if (IS_SQLITE && DATABASE) {
+    configDbName = DATABASE;
+  }
 
-let configDb: any;
-let db: any;
-(async () => {
   // Create config database if it does not exist
   if (!IS_SQLITE) {
     await createDatabaseIfNotExists(
@@ -365,9 +366,7 @@ let db: any;
 
   // Initialize views using config
   await initializeViewsConfig();
-})().catch((error) => {
-  console.error("Error initializing views config:", error.message);
-});
+}
 
 // GET views configuration
 app.get("/config", async (_req: express.Request, res: express.Response) => {
@@ -400,6 +399,10 @@ app.post(
     }
   },
 );
+
+setupAndInitialize().catch((error) => {
+  console.error("Error initializing views config:", error.message);
+});
 
 export default {
   path: "/api",
