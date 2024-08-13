@@ -41,32 +41,53 @@
         </div>
       </div>
     </div>
-    <h1>{{ $t("availableViews") }}</h1>
-    <div
-      v-for="(config, tableName) in viewsConfig"
-      :key="tableName"
-      class="table-item"
-    >
-      <h2>
-        <strong>{{ $t("table") }}:</strong> {{ tableName }}
-      </h2>
-      <ul>
-        <li v-for="view in config.VIEWS.split(',')" :key="view">
-          <nuxt-link :to="`/${view}/${tableName}`">{{ $t(view) }}</nuxt-link>
-        </li>
-      </ul>
+    <h1>{{ $t("availableViews") }}: {{ $t("configuration") }}</h1>
+    <div class="grid-container">
+      <div
+        v-for="(config, tableName) in viewsConfig"
+        :key="tableName"
+        class="table-item card"
+      >
+        <h2 class="card-header">
+          <strong>{{ $t("table") }}:</strong> {{ tableName }}
+        </h2>
+        <div class="card-body">
+          <form @submit.prevent="submitConfig(tableName, config)">
+            <div v-for="(value, key) in config" :key="key" class="config-field">
+              <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+              <input
+                :id="`${tableName}-${key}`"
+                v-model="config[key]"
+                class="input-field"
+              />
+            </div>
+            <button
+              type="submit"
+              class="submit-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer transition-colors duration-200 md:block"
+            >
+              {{ $t("submit") }}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div v-if="showModal" class="overlay"></div>
+    <div v-if="showModal" class="modal">
+      {{ modalMessage }}
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import overlayModal from "@/components/overlay.css";
 
 export default {
   data() {
     return {
       viewsConfig: [],
       dropdownOpen: false,
+      showModal: false,
     };
   },
   async mounted() {
@@ -105,6 +126,42 @@ export default {
       this.$i18n.setLocale(localeCode);
       this.dropdownOpen = false;
     },
+    async submitConfig(tableName, config) {
+      try {
+        // Set up the headers for the request
+        let headers = {
+          "x-api-key": this.$config.apiKey.replace(/['"]+/g, ""),
+          "x-auth-strategy": this.$auth.strategy.name,
+        };
+
+        // If the authentication strategy is 'local', include the token in the headers
+        if (this.$auth.strategy.name === "local") {
+          const token = this.$auth.strategy.token.get();
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        // Make the API call using Axios
+        const response = await axios.post(`/api/config/${tableName}`, config, {
+          headers,
+        });
+
+        // Check if the response is OK
+        if (response.status !== 200) {
+          throw new Error("Network response was not ok");
+        }
+
+        console.log("Configuration updated successfully");
+        (this.modalMessage = this.$t("configUpdated") + "!"),
+          (this.showModal = true);
+        // wait 3 seconds and refresh the page content
+        setTimeout(() => {
+          this.showModal = false;
+          location.reload();
+        }, 3000);
+      } catch (error) {
+        console.error("Error updating config:", error);
+      }
+    },
   },
   computed: {
     currentLocaleName() {
@@ -133,6 +190,18 @@ export default {
   margin-bottom: 1em;
   font-size: 2em;
   font-weight: 900;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(400px, 1fr)
+  ); /* Increased min-width to 400px */
+  gap: 1em;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .table-item {
@@ -165,5 +234,46 @@ export default {
 .table-item ul li a:hover {
   color: #0056b3;
   text-decoration: underline;
+}
+
+.table-item.card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1em;
+  width: 100%;
+  max-width: 600px;
+}
+
+.card-header {
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  padding: 0.75em 1em;
+  font-size: 1.25em;
+  font-weight: bold;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.card-body {
+  padding: 1em;
+}
+
+.config-field {
+  margin-bottom: 1em;
+}
+
+.config-field label {
+  display: block;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.config-field .input-field {
+  width: 100%;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 </style>

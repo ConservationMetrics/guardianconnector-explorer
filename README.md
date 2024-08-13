@@ -17,7 +17,7 @@ To get started, copy `.env.example` to `.env` and add your database and table in
 
 **Mapbox access token:** Provide an access token to be used across the application for authenticating with Mapbox maps. (As of this moment, we are assuming that one token is sufficient for all maps views used, but we can revisit this if needed.)
 
-**Views configuration:** GuardianConnector Views can render multiple tables and you can determine which views to show for each table. To configure your tables and views, set the multi-line variable `NUXT_ENV_VIEWS_CONFIG`. For more information on this, please see [config.md](docs/config.md). You do not need to set this in order for GuardianConnector Views to start, however the index page will show an empty list and none of the view routes will load anything.
+**Views configuration:** GuardianConnector Views can render multiple tables and you can determine which views to show for each table. To configure your tables and views, access the `/config` route once the application has started. For more information on this, please see [config.md](docs/config.md). You do not need to set this in order for GuardianConnector Views to start, however the index page will show an empty list and none of the view routes will load anything.
 
 ## Build Setup
 
@@ -47,18 +47,10 @@ HOST: 0.0.0.0
 NODE_ENV: production
 ```
 
-If you are using Docker for deployment, you need to parse your `.env` file to 
-turn the multi-line variable `NUXT_ENV_VIEWS_CONFIG` into a single line. To do so,
-Run the `dockerenv.sh` script to generate a `.env.docker` file that can be used in Docker (or to supply environmental variables elsewhere, like on Azure):
-
-```sh
-./bin/dockerenv.sh
-```
-
 Local deployment of Docker:
 
 ```sh
-docker run --env-file=.env.docker -it -p 8080:8080 guardianconnector-views:latest
+docker run --env-file=.env -it -p 8080:8080 guardianconnector-views:latest
 ```
 
 ## Available Views

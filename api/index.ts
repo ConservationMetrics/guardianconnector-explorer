@@ -1,7 +1,10 @@
 import express from "express";
 
-import setupDatabaseConnection from "./database/dbConnection";
-import fetchData from "./database/dbOperations";
+import {
+  setupDatabaseConnection,
+  createDatabaseIfNotExists,
+} from "./database/dbConnection";
+import { fetchData, fetchConfig, updateConfig } from "./database/dbOperations";
 import {
   filterUnwantedKeys,
   filterOutUnwantedValues,
@@ -28,9 +31,10 @@ import {
   IS_SQLITE,
   SQLITE_DB_PATH,
   MAPBOX_ACCESS_TOKEN,
-  VIEWS_CONFIG,
-  Views,
 } from "./config";
+
+let configDb: any;
+let db: any;
 
 const app = express();
 
@@ -39,37 +43,18 @@ app.use(express.json());
 app.get("/login", getLogin);
 app.post("/login", postLogin);
 
-// Apply middleware to Views routes
+// Apply middleware to views routes
 app.use(checkAuthStrategy);
 
-const db = setupDatabaseConnection(
-  IS_SQLITE,
-  SQLITE_DB_PATH,
-  DATABASE,
-  DB_HOST,
-  DB_USER,
-  DB_PASSWORD,
-  DB_PORT,
-  DB_SSL,
-);
+// Fetch views config
+const getViewsConfig = async () => {
+  const viewsConfig = await fetchConfig(configDb, IS_SQLITE);
+  return viewsConfig;
+};
 
-// If TABLES is undefined or empty, throw an error before proceeding
-if (!VIEWS_CONFIG) {
-  throw new Error(
-    "The NUXT_ENV_VIEWS_CONFIG environment variable is not defined or is empty.",
-  );
-} else {
-  let VIEWS: Views;
-  try {
-    // Remove single quotes from stringified JSON
-    VIEWS = JSON.parse(VIEWS_CONFIG.replace(/'/g, ""));
-  } catch (error: any) {
-    throw new Error("Error parsing NUXT_ENV_VIEWS_CONFIG: " + error.message);
-  }
-
-  const tableNames = Object.keys(VIEWS);
-
-  // Media extensions
+// Initialize views using config
+const initializeViewsConfig = async () => {
+  // Define allowed file extensions
   const imageExtensions = ["jpg", "jpeg", "png", "webp"];
   const audioExtensions = ["mp3", "ogg", "wav"];
   const videoExtensions = ["mov", "mp4", "avi", "mkv"];
@@ -79,10 +64,14 @@ if (!VIEWS_CONFIG) {
     ...videoExtensions,
   ];
 
+  const viewsConfig = await getViewsConfig();
+
+  const tableNames = Object.keys(viewsConfig);
+
   tableNames.forEach((table) => {
-    // Check if VIEWS[table].VIEWS is not set
-    if (!VIEWS[table].VIEWS) {
-      console.log(`Views not defined for ${table}, skipping...`);
+    // Check if viewsConfig[table].viewsConfig is not set
+    if (!viewsConfig[table].VIEWS) {
+      console.log(`viewsConfig not defined for ${table}, skipping...`);
       return;
     }
 
@@ -102,7 +91,7 @@ if (!VIEWS_CONFIG) {
     });
 
     // Endpoint for the alert dashboard view
-    if (VIEWS[table].VIEWS.includes("alerts")) {
+    if (viewsConfig[table].VIEWS.includes("alerts")) {
       app.get(
         `/${table}/alerts`,
         async (_req: express.Request, res: express.Response) => {
@@ -117,11 +106,11 @@ if (!VIEWS_CONFIG) {
             // Prepare alerts data for the alerts view
             const changeDetectionData = prepareAlertData(
               mainData,
-              VIEWS[table].EMBED_MEDIA === "YES",
+              viewsConfig[table].EMBED_MEDIA === "YES",
             );
 
-            const mapeoTable = VIEWS[table].MAPEO_TABLE;
-            const mapeoCategoryIds = VIEWS[table].MAPEO_CATEGORY_IDS;
+            const mapeoTable = viewsConfig[table].MAPEO_TABLE;
+            const mapeoCategoryIds = viewsConfig[table].MAPEO_CATEGORY_IDS;
 
             let mapeoData = null;
 
@@ -133,8 +122,8 @@ if (!VIEWS_CONFIG) {
               const filteredMapeoData = filterUnwantedKeys(
                 rawMapeoData.mainData,
                 rawMapeoData.columnsData,
-                VIEWS[table].UNWANTED_COLUMNS,
-                VIEWS[table].UNWANTED_SUBSTRINGS,
+                viewsConfig[table].UNWANTED_COLUMNS,
+                viewsConfig[table].UNWANTED_SUBSTRINGS,
               );
 
               // Filter Mapeo data to only show data where category matches any values in mapeoCategoryIds (a comma-separated string of values)
@@ -158,7 +147,7 @@ if (!VIEWS_CONFIG) {
               // Process geodata
               const processedMapeoData = prepareMapData(
                 transformedMapeoData,
-                VIEWS[table].FRONT_END_FILTER_COLUMN,
+                viewsConfig[table].FRONT_END_FILTER_COLUMN,
               );
 
               mapeoData = processedMapeoData;
@@ -178,25 +167,25 @@ if (!VIEWS_CONFIG) {
             };
 
             const response = {
-              alertResources: VIEWS[table].ALERT_RESOURCES === "YES",
+              alertResources: viewsConfig[table].ALERT_RESOURCES === "YES",
               alertsData: geojsonData,
-              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
+              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
               imageExtensions: imageExtensions,
-              logoUrl: VIEWS[table].LOGO_URL,
-              mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
-              mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
+              logoUrl: viewsConfig[table].LOGO_URL,
+              mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
+              mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
               mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
-              mapboxBearing: VIEWS[table].MAPBOX_BEARING,
-              mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE,
-              mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE,
-              mapboxPitch: VIEWS[table].MAPBOX_PITCH,
-              mapboxProjection: VIEWS[table].MAPBOX_PROJECTION,
-              mapboxStyle: VIEWS[table].MAPBOX_STYLE,
-              mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
+              mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
+              mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
+              mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
+              mapboxPitch: viewsConfig[table].MAPBOX_PITCH,
+              mapboxProjection: viewsConfig[table].MAPBOX_PROJECTION,
+              mapboxStyle: viewsConfig[table].MAPBOX_STYLE,
+              mapboxZoom: viewsConfig[table].MAPBOX_ZOOM,
               mapeoData: mapeoData,
-              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
-              mediaBasePathAlerts: VIEWS[table].MEDIA_BASE_PATH_ALERTS,
-              planetApiKey: VIEWS[table].PLANET_API_KEY,
+              mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
+              mediaBasePathAlerts: viewsConfig[table].MEDIA_BASE_PATH_ALERTS,
+              planetApiKey: viewsConfig[table].PLANET_API_KEY,
               statistics: statistics,
               table: table,
             };
@@ -211,7 +200,7 @@ if (!VIEWS_CONFIG) {
     }
 
     // Endpoint for the map view
-    if (VIEWS[table].VIEWS.includes("map")) {
+    if (viewsConfig[table].VIEWS.includes("map")) {
       app.get(
         `/${table}/map`,
         async (_req: express.Request, res: express.Response) => {
@@ -226,14 +215,14 @@ if (!VIEWS_CONFIG) {
             const filteredData = filterUnwantedKeys(
               mainData,
               columnsData,
-              VIEWS[table].UNWANTED_COLUMNS,
-              VIEWS[table].UNWANTED_SUBSTRINGS,
+              viewsConfig[table].UNWANTED_COLUMNS,
+              viewsConfig[table].UNWANTED_SUBSTRINGS,
             );
             // Filter data to remove unwanted values per chosen column
             const dataFilteredByValues = filterOutUnwantedValues(
               filteredData,
-              VIEWS[table].FILTER_BY_COLUMN,
-              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN,
+              viewsConfig[table].FILTER_BY_COLUMN,
+              viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN,
             );
             // Filter only data with valid geofields
             const filteredGeoData = filterGeoData(dataFilteredByValues);
@@ -242,28 +231,28 @@ if (!VIEWS_CONFIG) {
             // Process geodata
             const processedGeoData = prepareMapData(
               transformedData,
-              VIEWS[table].FRONT_END_FILTER_COLUMN,
+              viewsConfig[table].FRONT_END_FILTER_COLUMN,
             );
 
             const response = {
               audioExtensions: audioExtensions,
               data: processedGeoData,
-              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
-              filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
-              filterColumn: VIEWS[table].FRONT_END_FILTER_COLUMN,
+              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
+              filterData: viewsConfig[table].FRONT_END_FILTERING === "YES",
+              filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
-              mapLegendLayerIds: VIEWS[table].MAP_LEGEND_LAYER_IDS,
-              mapbox3d: VIEWS[table].MAPBOX_3D === "YES",
+              mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
+              mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
               mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
-              mapboxBearing: VIEWS[table].MAPBOX_BEARING,
-              mapboxLatitude: VIEWS[table].MAPBOX_CENTER_LATITUDE,
-              mapboxLongitude: VIEWS[table].MAPBOX_CENTER_LONGITUDE,
-              mapboxPitch: VIEWS[table].MAPBOX_PITCH,
-              mapboxProjection: VIEWS[table].MAPBOX_PROJECTION,
-              mapboxStyle: VIEWS[table].MAPBOX_STYLE,
-              mapboxZoom: VIEWS[table].MAPBOX_ZOOM,
-              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
-              planetApiKey: VIEWS[table].PLANET_API_KEY,
+              mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
+              mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
+              mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
+              mapboxPitch: viewsConfig[table].MAPBOX_PITCH,
+              mapboxProjection: viewsConfig[table].MAPBOX_PROJECTION,
+              mapboxStyle: viewsConfig[table].MAPBOX_STYLE,
+              mapboxZoom: viewsConfig[table].MAPBOX_ZOOM,
+              mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
+              planetApiKey: viewsConfig[table].PLANET_API_KEY,
               table: table,
               videoExtensions: videoExtensions,
             };
@@ -278,7 +267,7 @@ if (!VIEWS_CONFIG) {
     }
 
     // Endpoint for the gallery view
-    if (VIEWS[table].VIEWS.includes("gallery")) {
+    if (viewsConfig[table].VIEWS.includes("gallery")) {
       app.get(
         `/${table}/gallery`,
         async (_req: express.Request, res: express.Response) => {
@@ -293,14 +282,14 @@ if (!VIEWS_CONFIG) {
             const filteredData = filterUnwantedKeys(
               mainData,
               columnsData,
-              VIEWS[table].UNWANTED_COLUMNS,
-              VIEWS[table].UNWANTED_SUBSTRINGS,
+              viewsConfig[table].UNWANTED_COLUMNS,
+              viewsConfig[table].UNWANTED_SUBSTRINGS,
             );
             // Filter data to remove unwanted values per chosen column
             const dataFilteredByValues = filterOutUnwantedValues(
               filteredData,
-              VIEWS[table].FILTER_BY_COLUMN,
-              VIEWS[table].FILTER_OUT_VALUES_FROM_COLUMN,
+              viewsConfig[table].FILTER_BY_COLUMN,
+              viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN,
             );
             // Filter only data with media attachments
             const dataWithFilesOnly = filterDataByExtension(
@@ -313,11 +302,11 @@ if (!VIEWS_CONFIG) {
             const response = {
               audioExtensions: audioExtensions,
               data: transformedData,
-              embedMedia: VIEWS[table].EMBED_MEDIA === "YES",
-              filterData: VIEWS[table].FRONT_END_FILTERING === "YES",
-              filterColumn: VIEWS[table].FRONT_END_FILTER_COLUMN,
+              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
+              filterData: viewsConfig[table].FRONT_END_FILTERING === "YES",
+              filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
-              mediaBasePath: VIEWS[table].MEDIA_BASE_PATH,
+              mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
               table: table,
               videoExtensions: videoExtensions,
             };
@@ -331,7 +320,89 @@ if (!VIEWS_CONFIG) {
       );
     }
   });
-}
+};
+
+// Set up database connections for config and data
+const setupAndInitialize = async () => {
+  let configDbName = "gc_views";
+  if (IS_SQLITE && DATABASE) {
+    configDbName = DATABASE;
+  }
+
+  // Create config database if it does not exist
+  if (!IS_SQLITE) {
+    await createDatabaseIfNotExists(
+      configDbName,
+      DATABASE,
+      DB_HOST,
+      DB_USER,
+      DB_PASSWORD,
+      DB_PORT,
+      DB_SSL,
+    );
+  }
+
+  configDb = setupDatabaseConnection(
+    IS_SQLITE,
+    SQLITE_DB_PATH,
+    configDbName,
+    DB_HOST,
+    DB_USER,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_SSL,
+  );
+
+  db = setupDatabaseConnection(
+    IS_SQLITE,
+    SQLITE_DB_PATH,
+    DATABASE,
+    DB_HOST,
+    DB_USER,
+    DB_PASSWORD,
+    DB_PORT,
+    DB_SSL,
+  );
+
+  // Initialize views using config
+  await initializeViewsConfig();
+};
+
+// GET views configuration
+app.get("/config", async (_req: express.Request, res: express.Response) => {
+  try {
+    res.json(await getViewsConfig());
+  } catch (error: any) {
+    console.error("Error fetching views configuration:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST views configuration
+app.post(
+  "/config/:tableName",
+  async (req: express.Request, res: express.Response) => {
+    const { tableName } = req.params;
+    const config = req.body;
+
+    try {
+      await updateConfig(configDb, tableName, config, IS_SQLITE);
+      res.json({ message: "Configuration updated successfully" });
+
+      // Reinitialize viewsConfig with updated config
+      initializeViewsConfig().catch((error) => {
+        console.error("Error reinitializing views config:", error.message);
+      });
+    } catch (error: any) {
+      console.error("Error updating config:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
+
+setupAndInitialize().catch((error) => {
+  console.error("Error initializing views config:", error.message);
+});
 
 export default {
   path: "/api",

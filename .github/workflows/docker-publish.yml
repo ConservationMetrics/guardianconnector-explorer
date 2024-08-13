@@ -71,24 +71,4 @@ jobs:
     #         -e NUXT_ENV_AUTH0_BASE_URL='http://localhost:3000'
     #         -e VUE_APP_API_KEY=""
     #         -e MAPBOX_ACCESS_TOKEN="your_mapbox_token"
-    #         -e NUXT_ENV_VIEWS_CONFIG = "{
-    #              'kobo_submissions': {
-    #                  "VIEWS": "map,gallery",
-    #                  "EMBED_MEDIA": "YES",
-    #                  "MEDIA_BASE_PATH": "./media",
-    #                  "FRONT_END_FILTERING": "YES",
-    #                  "FRONT_END_FILTER_COLUMN": "Community",
-    #                  "MAPBOX_STYLE": "mapbox://styles/mapbox/satellite-streets-v12",
-    #                  "MAPBOX_PROJECTION": "globe",
-    #                  "MAPBOX_CENTER_LATITUDE": "2",
-    #                  "MAPBOX_CENTER_LONGITUDE": "-55",
-    #                  "MAPBOX_ZOOM": "8",
-    #                  "MAPBOX_PITCH": "0",
-    #                  "MAPBOX_BEARING": "0",
-    #                  "MAPBOX_3D": "YES",
-    #                  "MAP_LEGEND_LAYER_IDS": "road-primary,aerialway",
-    #                  "UNWANTED_COLUMNS": "latitude,longitude,coordinates",
-    #                  "UNWANTED_SUBSTRINGS": "meta,version,formhub,xform,attachments,tags,notes,topic,sender,geolocation,submission_time,submitted_by,status,supplementalDetails,validation_status,start,end,location"
-    #              }
-    #           }"
     #           ${{ steps.meta.outputs.tags }}

@@ -1,16 +1,15 @@
 {
   "name": "guardianconnector-views",
-  "version": "1.1.1",
+  "version": "2.0.0",
   "type": "module",
   "description": "A Nuxt app to visualize GuardianConnector data in different views",
-  "private": true,
   "scripts": {
     "dev": "./node_modules/.bin/nuxt",
     "build": "./node_modules/.bin/nuxt build",
     "start": "./node_modules/.bin/nuxt start",
     "generate": "./node_modules/.bin/nuxt generate",
     "lint": "prettier --write ./ --ignore-path .prettierignore",
-    "prepare": "husky install"
+    "prepare": "[ -f ./node_modules/.bin/husky ] && husky install || echo 'Skipping husky install'"
   },
   "dependencies": {
     "@nuxtjs/auth-next": "5.0.0-1667386184.dfbbb54",
@@ -57,7 +56,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,vue}": [
-      "prettier --write"
+      "prettier --write ./"
     ]
   },
   "engines": {
