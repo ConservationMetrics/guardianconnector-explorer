@@ -47,7 +47,7 @@ app.post("/login", postLogin);
 app.use(checkAuthStrategy);
 
 // Fetch views config
-const getviewsConfig = async () => {
+const getViewsConfig = async () => {
   const viewsConfig = await fetchConfig(configDb, IS_SQLITE);
   return viewsConfig;
 };
@@ -64,7 +64,7 @@ const initializeViewsConfig = async () => {
     ...videoExtensions,
   ];
 
-  const viewsConfig = await getviewsConfig();
+  const viewsConfig = await getViewsConfig();
 
   const tableNames = Object.keys(viewsConfig);
 
@@ -366,12 +366,12 @@ const setupAndInitialize = async () => {
 
   // Initialize views using config
   await initializeViewsConfig();
-}
+};
 
 // GET views configuration
 app.get("/config", async (_req: express.Request, res: express.Response) => {
   try {
-    res.json(await getviewsConfig());
+    res.json(await getViewsConfig());
   } catch (error: any) {
     console.error("Error fetching views configuration:", error.message);
     res.status(500).json({ error: error.message });

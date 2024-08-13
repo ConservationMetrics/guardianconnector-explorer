@@ -134,7 +134,7 @@ export const fetchConfig = async (
   // Create the config table if it does not exist
   const createConfigTable = `CREATE TABLE IF NOT EXISTS config (
          table_name TEXT PRIMARY KEY,
-         config TEXT
+         views_config TEXT
        )`;
 
   await new Promise<void>((resolve, reject) => {
@@ -170,7 +170,7 @@ export const fetchConfig = async (
 
   const viewsConfig: Views = {};
   result.forEach((row: any) => {
-    viewsConfig[row.table_name] = JSON.parse(row.config);
+    viewsConfig[row.table_name] = JSON.parse(row.views_config);
   });
 
   return viewsConfig;
@@ -185,8 +185,8 @@ export const updateConfig = async (
   const configString = JSON.stringify(config);
 
   const query = isSQLite
-    ? `UPDATE config SET config = ? WHERE table_name = ?`
-    : `UPDATE config SET config = $1 WHERE table_name = $2`;
+    ? `UPDATE config SET views_config = ? WHERE table_name = ?`
+    : `UPDATE config SET views_config = $1 WHERE table_name = $2`;
 
   return new Promise((resolve, reject) => {
     if (isSQLite) {
