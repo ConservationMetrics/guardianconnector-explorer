@@ -11,7 +11,6 @@
         />
         <h2 class="text-2xl font-semibold mb-2">
           {{ $t("changeDetectionAlerts") }}: {{ statistics.territory }}
-          {{ $t("territory") }}
         </h2>
         <p class="text-l mb-2">
           {{ $t("mostRecentAlertsShownIn") }}
