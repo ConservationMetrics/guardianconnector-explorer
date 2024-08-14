@@ -132,7 +132,7 @@ const initializeViewsConfig = async () => {
                   return Object.keys(row).some(
                     (key) =>
                       key.includes("category") &&
-                      mapeoCategoryIds.includes(row[key]),
+                      mapeoCategoryIds.split(',').includes(row[key]),
                   );
                 },
               );
