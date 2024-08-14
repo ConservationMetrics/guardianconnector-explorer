@@ -46,14 +46,17 @@ app.post("/login", postLogin);
 // Apply middleware to views routes
 app.use(checkAuthStrategy);
 
+let viewsConfig: any = {};
+
 // Fetch views config
 const getViewsConfig = async () => {
-  const viewsConfig = await fetchConfig(configDb, IS_SQLITE);
+  viewsConfig = await fetchConfig(configDb, IS_SQLITE);
   return viewsConfig;
 };
 
 // Initialize views using config
 const initializeViewsConfig = async () => {
+
   // Define allowed file extensions
   const imageExtensions = ["jpg", "jpeg", "png", "webp"];
   const audioExtensions = ["mp3", "ogg", "wav"];
@@ -64,7 +67,9 @@ const initializeViewsConfig = async () => {
     ...videoExtensions,
   ];
 
-  const viewsConfig = await getViewsConfig();
+  await getViewsConfig();
+
+  console.log("Views config when initialized", viewsConfig["mapeo_patypaty"].MAPBOX_CENTER_LONGITUDE);
 
   const tableNames = Object.keys(viewsConfig);
 
@@ -96,6 +101,8 @@ const initializeViewsConfig = async () => {
         `/${table}/alerts`,
         async (_req: express.Request, res: express.Response) => {
           try {
+            // Fetch the latest viewsConfig
+            const viewsConfig = await getViewsConfig();
             // Fetch data
             const { mainData, metadata } = await fetchData(
               db,
@@ -205,12 +212,15 @@ const initializeViewsConfig = async () => {
         `/${table}/map`,
         async (_req: express.Request, res: express.Response) => {
           try {
+            // Fetch the latest viewsConfig
+            const viewsConfig = await getViewsConfig();
             // Fetch data
             const { mainData, columnsData } = await fetchData(
               db,
               table,
               IS_SQLITE,
             );
+
             // Filter data to remove unwanted columns and substrings
             const filteredData = filterUnwantedKeys(
               mainData,
@@ -233,6 +243,8 @@ const initializeViewsConfig = async () => {
               transformedData,
               viewsConfig[table].FRONT_END_FILTER_COLUMN,
             );
+
+            console.log("Views config in endpoint", viewsConfig[table].MAPBOX_CENTER_LONGITUDE);
 
             const response = {
               audioExtensions: audioExtensions,
@@ -272,12 +284,15 @@ const initializeViewsConfig = async () => {
         `/${table}/gallery`,
         async (_req: express.Request, res: express.Response) => {
           try {
+            // Fetch the latest viewsConfig
+            const viewsConfig = await getViewsConfig(); 
             // Fetch data
             const { mainData, columnsData } = await fetchData(
               db,
               table,
               IS_SQLITE,
             );
+            
             // Filter data to remove unwanted columns and substrings
             const filteredData = filterUnwantedKeys(
               mainData,
@@ -390,6 +405,7 @@ app.post(
       res.json({ message: "Configuration updated successfully" });
 
       // Reinitialize viewsConfig with updated config
+      await getViewsConfig();
       initializeViewsConfig().catch((error) => {
         console.error("Error reinitializing views config:", error.message);
       });
