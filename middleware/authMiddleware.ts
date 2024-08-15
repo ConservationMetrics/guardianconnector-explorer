@@ -1,7 +1,9 @@
 import { Middleware } from "@nuxt/types";
 
-const authMiddleware: Middleware = ({ $auth, redirect, route }) => {
-  if ($auth.strategy.name === "none") {
+const authMiddleware: Middleware = ({ $auth, redirect, route, $config }) => {
+  const AUTH_STRATEGY = $config.authStrategy;
+
+  if (AUTH_STRATEGY === "none") {
     return;
   }
 
