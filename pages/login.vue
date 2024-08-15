@@ -3,8 +3,8 @@
 </template>
 
 <script>
-import Auth0Login from "~/components/Auth0Login.vue";
-import PasswordLogin from "~/components/PasswordLogin.vue";
+import Auth0Login from "~/components/auth/Auth0Login.vue";
+import PasswordLogin from "~/components/auth/PasswordLogin.vue";
 
 export default {
   data() {

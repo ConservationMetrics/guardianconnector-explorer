@@ -36,10 +36,10 @@
 <script>
 import mapboxgl from "mapbox-gl";
 
-import BasemapSelector from "@/components/BasemapSelector.vue";
-import DataFilter from "@/components/DataFilter.vue";
-import MapLegend from "@/components/MapLegend.vue";
-import Sidebar from "@/components/Sidebar.vue";
+import BasemapSelector from "~/components/shared/BasemapSelector.vue";
+import DataFilter from "~/components/shared/DataFilter.vue";
+import MapLegend from "~/components/shared/MapLegend.vue";
+import Sidebar from "~/components/shared/Sidebar.vue";
 
 import { getFilePathsWithExtension } from "@/src/utils.ts";
 import {

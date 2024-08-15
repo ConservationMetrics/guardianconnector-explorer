@@ -80,7 +80,7 @@
 
 <script>
 import axios from "axios";
-import overlayModal from "@/components/overlay.css";
+import overlayModal from "@/components/shared/overlay.css";
 
 export default {
   data() {

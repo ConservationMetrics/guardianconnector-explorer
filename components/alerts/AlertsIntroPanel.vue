@@ -73,9 +73,9 @@
 </template>
 
 <script>
-import AlertsChart from "@/components/AlertsChart.vue";
-import AlertsSlider from "@/components/AlertsSlider.vue";
-import Download from "@/components/Download.vue";
+import AlertsChart from "~/components/alerts/AlertsChart.vue";
+import AlertsSlider from "~/components/alerts/AlertsSlider.vue";
+import Download from "~/components/shared/Download.vue";
 
 export default {
   name: "AlertsIntroPanel",

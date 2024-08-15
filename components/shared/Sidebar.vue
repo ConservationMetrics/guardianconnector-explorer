@@ -34,9 +34,9 @@
 </template>
 
 <script>
-import Download from "@/components/Download.vue";
-import Feature from "@/components/Feature.vue";
-import AlertsIntroPanel from "@/components/AlertsIntroPanel.vue";
+import Download from "~/components/shared/Download.vue";
+import Feature from "~/components/shared/Feature.vue";
+import AlertsIntroPanel from "~/components/alerts/AlertsIntroPanel.vue";
 
 export default {
   components: { AlertsIntroPanel, Download, Feature },

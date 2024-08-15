@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import Media from "@/components/Media.vue";
+import Media from "~/components/shared/Media.vue";
 
 export default {
   components: { Media },

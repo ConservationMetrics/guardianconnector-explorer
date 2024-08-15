@@ -51,9 +51,9 @@ import { lineString } from "@turf/helpers";
 import length from "@turf/length";
 import along from "@turf/along";
 
-import BasemapSelector from "@/components/BasemapSelector.vue";
-import Sidebar from "@/components/Sidebar.vue";
-import MapLegend from "@/components/MapLegend.vue";
+import BasemapSelector from "~/components/shared/BasemapSelector.vue";
+import Sidebar from "~/components/shared/Sidebar.vue";
+import MapLegend from "~/components/shared/MapLegend.vue";
 
 import {
   changeMapStyle,

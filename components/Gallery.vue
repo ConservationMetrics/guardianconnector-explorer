@@ -26,8 +26,8 @@
 </template>
 
 <script>
-import DataFilter from "@/components/DataFilter.vue";
-import Feature from "@/components/Feature.vue";
+import DataFilter from "~/components/shared/DataFilter.vue";
+import Feature from "~/components/shared/Feature.vue";
 import { getFilePathsWithExtension } from "@/src/utils.ts";
 
 export default {
