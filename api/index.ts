@@ -56,7 +56,6 @@ const getViewsConfig = async () => {
 
 // Initialize views using config
 const initializeViewsConfig = async () => {
-
   // Define allowed file extensions
   const imageExtensions = ["jpg", "jpeg", "png", "webp"];
   const audioExtensions = ["mp3", "ogg", "wav"];
@@ -68,8 +67,6 @@ const initializeViewsConfig = async () => {
   ];
 
   await getViewsConfig();
-
-  console.log("Views config when initialized", viewsConfig["mapeo_patypaty"].MAPBOX_CENTER_LONGITUDE);
 
   const tableNames = Object.keys(viewsConfig);
 
@@ -139,7 +136,7 @@ const initializeViewsConfig = async () => {
                   return Object.keys(row).some(
                     (key) =>
                       key.includes("category") &&
-                      mapeoCategoryIds.split(',').includes(row[key]),
+                      mapeoCategoryIds.split(",").includes(row[key]),
                   );
                 },
               );
@@ -244,8 +241,6 @@ const initializeViewsConfig = async () => {
               viewsConfig[table].FRONT_END_FILTER_COLUMN,
             );
 
-            console.log("Views config in endpoint", viewsConfig[table].MAPBOX_CENTER_LONGITUDE);
-
             const response = {
               audioExtensions: audioExtensions,
               data: processedGeoData,
@@ -285,14 +280,14 @@ const initializeViewsConfig = async () => {
         async (_req: express.Request, res: express.Response) => {
           try {
             // Fetch the latest viewsConfig
-            const viewsConfig = await getViewsConfig(); 
+            const viewsConfig = await getViewsConfig();
             // Fetch data
             const { mainData, columnsData } = await fetchData(
               db,
               table,
               IS_SQLITE,
             );
-            
+
             // Filter data to remove unwanted columns and substrings
             const filteredData = filterUnwantedKeys(
               mainData,
