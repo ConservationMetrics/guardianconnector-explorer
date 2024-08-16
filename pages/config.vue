@@ -15,32 +15,24 @@ import Config from "~/components/Config.vue";
 export default {
   head() {
     return {
-      title: "GuardianConnector Views: " + this.$t("changeDetectionAlerts"),
-    };
-  },
-  data() {
-    return {
-      viewsConfig: {},
-      dataFetched: false,
+      title: "GuardianConnector Views: " + this.$t("configuration"),
     };
   },
   components: { Config },
-  async mounted() {
+  async asyncData({ $axios, app }) {
+    // Set up the headers for the request
+    let headers = {
+      "x-api-key": app.$config.apiKey.replace(/['"]+/g, ""),
+      "x-auth-strategy": app.$auth.strategy.name,
+    };
+
+    // If the authentication strategy is 'local', include the token in the headers
+    if (app.$auth.strategy.name === "local") {
+      const token = app.$auth.strategy.token.get();
+      headers["Authorization"] = `Bearer ${token}`;
+    }
     try {
-      // Set up the headers for the request
-      let headers = {
-        "x-api-key": this.$config.apiKey.replace(/['"]+/g, ""),
-        "x-auth-strategy": this.$auth.strategy.name,
-      };
-
-      // If the authentication strategy is 'local', include the token in the headers
-      if (this.$auth.strategy.name === "local") {
-        const token = this.$auth.strategy.token.get();
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-
-      // Make the API call using Axios
-      const response = await axios.get("/api/config", { headers });
+      const response = await $axios.get("/api/config", { headers });
 
       // Check if the response is OK
       if (response.status !== 200) {
@@ -48,11 +40,22 @@ export default {
       }
 
       // Set the viewsConfig data
-      this.viewsConfig = response.data;
-      this.dataFetched = true;
+      return {
+        viewsConfig: response.data,
+        dataFetched: true,
+      };
     } catch (error) {
       console.error("Error fetching views config from API:", error);
+      return {
+        dataFetched: false,
+      };
     }
+  },
+  data() {
+    return {
+      viewsConfig: {},
+      dataFetched: false,
+    };
   },
   methods: {
     async submitConfig(tableName, config) {
