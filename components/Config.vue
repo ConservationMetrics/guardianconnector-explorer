@@ -6,10 +6,12 @@
     <h1>{{ $t("availableViews") }}: {{ $t("configuration") }}</h1>
     <div class="grid-container">
       <ConfigCard
-        v-for="(config, tableName) in viewsConfig"
+        v-for="(config, tableName) in sortedViewsConfig"
         :key="tableName"
         :tableName="tableName"
         :config="config"
+        :isMinimized="minimizedCards[tableName]"
+        @toggle-minimize="toggleMinimize"
         @submit-config="handleSubmit"
       />
     </div>
@@ -36,9 +38,27 @@ export default {
   data() {
     return {
       showModal: false,
+      minimizedCards: this.initializeMinimizedCards(),
     };
   },
+  computed: {
+    sortedViewsConfig() {
+      return Object.keys(this.viewsConfig)
+        .sort()
+        .reduce((acc, key) => {
+          acc[key] = this.viewsConfig[key];
+          return acc;
+        }, {});
+    },
+  },
   methods: {
+    initializeMinimizedCards() {
+      const minimized = {};
+      for (const tableName in this.viewsConfig) {
+        minimized[tableName] = true;
+      }
+      return minimized;
+    },
     async handleSubmit(tableName, config) {
       this.$emit("submit-config", tableName, config);
       this.modalMessage = this.$t("configUpdated") + "!";
@@ -47,6 +67,13 @@ export default {
         this.showModal = false;
         location.reload();
       }, 3000);
+    },
+    toggleMinimize(tableName) {
+      const isCurrentlyMinimized = this.minimizedCards[tableName];
+      for (let key in this.minimizedCards) {
+        this.$set(this.minimizedCards, key, true);
+      }
+      this.$set(this.minimizedCards, tableName, !isCurrentlyMinimized);
     },
   },
 };
@@ -68,11 +95,9 @@ export default {
 }
 
 .grid-container {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(400px, 1fr)
-  ); /* Increased min-width to 400px */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 1em;
   width: 100%;
   max-width: 1200px;
