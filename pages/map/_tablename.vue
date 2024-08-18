@@ -4,8 +4,6 @@
       v-if="dataFetched"
       :audio-extensions="audioExtensions"
       :data="mapData"
-      :embed-media="embedMedia"
-      :filter-data="filterData"
       :filter-column="filterColumn"
       :image-extensions="imageExtensions"
       :map-legend-layer-ids="mapLegendLayerIds"
@@ -59,8 +57,6 @@ export default {
       return {
         audioExtensions: response.audioExtensions,
         dataFetched: true,
-        embedMedia: response.embedMedia,
-        filterData: response.filterData,
         filterColumn: response.filterColumn,
         imageExtensions: response.imageExtensions,
         mapData: response.data,

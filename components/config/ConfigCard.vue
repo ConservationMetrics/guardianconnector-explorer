@@ -8,18 +8,48 @@
     </h2>
     <div v-if="!isMinimized" class="card-body">
       <form @submit.prevent="handleSubmit">
-        <ConfigViews v-if="shouldShowConfigViews" :tableName="tableName" :config="config" :views="views" @update:views="updateViews" />
-        <ConfigMap v-if="shouldShowConfigMap" :tableName="tableName" :views="views" :config="config" />
-        <ConfigMedia v-if="shouldShowConfigMedia" :tableName="tableName" :views="views" :config="config" />
-        <ConfigAlerts v-if="shouldShowConfigAlerts" :tableName="tableName" :views="views" :config="config" />
-        <ConfigFilters v-if="shouldShowConfigFilters" :tableName="tableName" :views="views" :config="config" />
+        <ConfigViews
+          v-if="shouldShowConfigViews"
+          :tableName="tableName"
+          :config="config"
+          :views="views"
+          @update:views="updateViews"
+        />
+        <ConfigMap
+          v-if="shouldShowConfigMap"
+          :tableName="tableName"
+          :views="views"
+          :config="config"
+        />
+        <ConfigMedia
+          v-if="shouldShowConfigMedia"
+          :tableName="tableName"
+          :views="views"
+          :config="config"
+        />
+        <ConfigAlerts
+          v-if="shouldShowConfigAlerts"
+          :tableName="tableName"
+          :views="views"
+          :config="config"
+        />
+        <ConfigFilters
+          v-if="shouldShowConfigFilters"
+          :tableName="tableName"
+          :views="views"
+          :config="config"
+        />
         <div v-if="hasOtherConfig && views.length" class="config-section">
           <div class="config-header">
-                <h3>{{ $t("other") }} {{ $t("configuration") }}</h3>
-              </div>
-          <div v-if="isOtherConfigKey(key)" v-for="(value, key) in config" :key="key" class="config-field">
+            <h3>{{ $t("other") }} {{ $t("configuration") }}</h3>
+          </div>
+          <div
+            v-if="isOtherConfigKey(key)"
+            v-for="(value, key) in config"
+            :key="key"
+            class="config-field"
+          >
             <template>
-
               <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
               <template v-if="key === 'LOGO_URL'">
                 <input
@@ -59,11 +89,11 @@
 </template>
 
 <script>
-import ConfigViews from './ConfigViews.vue';
-import ConfigMap from './ConfigMap.vue';
-import ConfigMedia from './ConfigMedia.vue';
-import ConfigAlerts from './ConfigAlerts.vue';
-import ConfigFilters from './ConfigFilters.vue';
+import ConfigViews from "./ConfigViews.vue";
+import ConfigMap from "./ConfigMap.vue";
+import ConfigMedia from "./ConfigMedia.vue";
+import ConfigAlerts from "./ConfigAlerts.vue";
+import ConfigFilters from "./ConfigFilters.vue";
 
 export default {
   props: {
@@ -104,15 +134,14 @@ export default {
       ];
     },
     mediaKeys() {
-      return ["EMBED_MEDIA", "MEDIA_BASE_PATH", "MEDIA_BASE_PATH_ALERTS"];
+      return ["MEDIA_BASE_PATH", "MEDIA_BASE_PATH_ALERTS"];
     },
     alertKeys() {
-      return ["ALERT_RESOURCES", "MAPEO_CATEGORY_IDS", "MAPEO_TABLE"];
+      return ["MAPEO_CATEGORY_IDS", "MAPEO_TABLE"];
     },
     filterKeys() {
       return [
         "FRONT_END_FILTER_COLUMN",
-        "FRONT_END_FILTERING",
         "UNWANTED_COLUMNS",
         "UNWANTED_SUBSTRINGS",
       ];
@@ -123,9 +152,9 @@ export default {
         ...this.mapConfigKeys,
         ...this.filterKeys,
         ...this.mediaKeys,
-        ...this.alertKeys
+        ...this.alertKeys,
       ];
-      return Object.keys(this.config).some(key => !allKeys.includes(key));
+      return Object.keys(this.config).some((key) => !allKeys.includes(key));
     },
     isChanged() {
       return (
@@ -136,24 +165,31 @@ export default {
       return this.hasConfigKey(this.viewsKeys);
     },
     shouldShowConfigMap() {
-      return this.hasConfigKey(this.mapConfigKeys) && this.hasView(['alerts', 'map']);
+      return (
+        this.hasConfigKey(this.mapConfigKeys) && this.hasView(["alerts", "map"])
+      );
     },
     shouldShowConfigMedia() {
-      return this.hasConfigKey(this.mediaKeys) && this.hasView(['map', 'gallery', 'alerts']);
+      return (
+        this.hasConfigKey(this.mediaKeys) &&
+        this.hasView(["map", "gallery", "alerts"])
+      );
     },
     shouldShowConfigAlerts() {
-      return this.hasConfigKey(this.alertKeys) && this.hasView(['alerts']);
+      return this.hasConfigKey(this.alertKeys) && this.hasView(["alerts"]);
     },
     shouldShowConfigFilters() {
-      return this.hasConfigKey(this.filterKeys) && this.hasView(['map', 'gallery']);
+      return (
+        this.hasConfigKey(this.filterKeys) && this.hasView(["map", "gallery"])
+      );
     },
   },
   methods: {
     hasConfigKey(keys) {
-      return keys.some(key => key in this.config);
+      return keys.some((key) => key in this.config);
     },
     hasView(views) {
-      return views.some(view => this.views.includes(view));
+      return views.some((view) => this.views.includes(view));
     },
     handleSubmit() {
       this.originalConfig = JSON.parse(JSON.stringify(this.config));
@@ -165,7 +201,7 @@ export default {
         ...this.mapConfigKeys,
         ...this.filterKeys,
         ...this.mediaKeys,
-        ...this.alertKeys
+        ...this.alertKeys,
       ];
       return !allKeys.includes(key);
     },

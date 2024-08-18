@@ -30,7 +30,6 @@ import {
   DB_SSL,
   IS_SQLITE,
   SQLITE_DB_PATH,
-  MAPBOX_ACCESS_TOKEN,
 } from "./config";
 
 let configDb: any;
@@ -108,10 +107,7 @@ const initializeViewsConfig = async () => {
             );
 
             // Prepare alerts data for the alerts view
-            const changeDetectionData = prepareAlertData(
-              mainData,
-              viewsConfig[table].EMBED_MEDIA === "YES",
-            );
+            const changeDetectionData = prepareAlertData(mainData);
 
             const mapeoTable = viewsConfig[table].MAPEO_TABLE;
             const mapeoCategoryIds = viewsConfig[table].MAPEO_CATEGORY_IDS;
@@ -171,14 +167,12 @@ const initializeViewsConfig = async () => {
             };
 
             const response = {
-              alertResources: viewsConfig[table].ALERT_RESOURCES === "YES",
               alertsData: geojsonData,
-              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
               imageExtensions: imageExtensions,
               logoUrl: viewsConfig[table].LOGO_URL,
               mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
-              mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
-              mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
+              mapbox3d: viewsConfig[table].MAPBOX_3D,
+              mapboxAccessToken: viewsConfig[table].MAPBOX_ACCESS_TOKEN,
               mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
               mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
               mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
@@ -244,13 +238,11 @@ const initializeViewsConfig = async () => {
             const response = {
               audioExtensions: audioExtensions,
               data: processedGeoData,
-              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
-              filterData: viewsConfig[table].FRONT_END_FILTERING === "YES",
               filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
               mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
-              mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
-              mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
+              mapbox3d: viewsConfig[table].MAPBOX_3D,
+              mapboxAccessToken: viewsConfig[table].MAPBOX_ACCESS_TOKEN,
               mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
               mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
               mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
@@ -312,8 +304,6 @@ const initializeViewsConfig = async () => {
             const response = {
               audioExtensions: audioExtensions,
               data: transformedData,
-              embedMedia: viewsConfig[table].EMBED_MEDIA === "YES",
-              filterData: viewsConfig[table].FRONT_END_FILTERING === "YES",
               filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
               imageExtensions: imageExtensions,
               mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,

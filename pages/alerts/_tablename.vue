@@ -2,9 +2,7 @@
   <div>
     <AlertsDashboard
       v-if="dataFetched"
-      :alert-resources="alertResources"
       :alertsData="alertsData"
-      :embed-media="embedMedia"
       :image-extensions="imageExtensions"
       :logo-url="logoUrl"
       :map-legend-layer-ids="mapLegendLayerIds"
@@ -58,10 +56,8 @@ export default {
 
       // Return the data to be merged with the component's data
       return {
-        alertResources: response.alertResources,
         alertsData: response.alertsData,
         dataFetched: true,
-        embedMedia: response.embedMedia,
         imageExtensions: response.imageExtensions,
         logoUrl: response.logoUrl,
         mapLegendLayerIds: response.mapLegendLayerIds,

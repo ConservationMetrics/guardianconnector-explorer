@@ -9,11 +9,9 @@
       {{ $t("resetDashboard") }}
     </button>
     <Sidebar
-      :alert-resources="alertResources"
       :calculate-hectares="calculateHectares"
       :date-options="dateOptions"
       :download-alert="downloadAlert"
-      :embed-media="embedMedia"
       :feature-geojson="selectedFeatureGeojson"
       :feature="selectedFeature"
       :file-paths="imageUrl"
@@ -69,9 +67,7 @@ export default {
     MapLegend,
   },
   props: [
-    "alertResources",
     "alertsData",
-    "embedMedia",
     "imageExtensions",
     "logoUrl",
     "mapLegendLayerIds",

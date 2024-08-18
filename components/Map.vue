@@ -2,7 +2,7 @@
   <div>
     <div id="map"></div>
     <DataFilter
-      v-if="filterData === true"
+      v-if="filterColumn"
       :data="data"
       :filter-column="filterColumn"
       :show-colored-dot="true"
@@ -10,7 +10,6 @@
     />
     <Sidebar
       :audio-extensions="audioExtensions"
-      :embed-media="embedMedia"
       :feature="selectedFeature"
       :file-paths="getFilePathsWithExtension(selectedFeature, allExtensions)"
       :image-extensions="imageExtensions"
@@ -54,8 +53,6 @@ export default {
   props: [
     "audioExtensions",
     "data",
-    "embedMedia",
-    "filterData",
     "filterColumn",
     "imageExtensions",
     "mapLegendLayerIds",

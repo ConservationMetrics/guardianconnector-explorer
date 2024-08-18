@@ -18,13 +18,9 @@ Currently available options:
   
 The routes for all views are listed on the index.html route (`/`).
 
-#### `ALERT_RESOURCES` (optional)
+#### `MEDIA_BASE_PATH` (optional)
 
-If your alerts data comes with map resources to visualize, then you can set this to `YES` to provide links to access or download the map resouces.
-
-#### `EMBED_MEDIA` (optional) and `MEDIA_BASE_PATH` (optional)
-
-Enables embedding of media filenames from the database in the Gallery or Map views. Set to `YES` and specify the base path for media files in `MEDIA_BASE_PATH`. If neither are set, the gallery view will be disabled for this table.
+Enables embedding of media filenames from the database in the Gallery or Map views. To use this, specify the base path for media files in `MEDIA_BASE_PATH`. If not set, the gallery view will be disabled for this table.
 
 For alerts, you need to provide a separate base path for alerts. Append your `MEDIA_BASE_PATH` variable with `_ALERTS`. If you are also using Mapeo data, then provide a separate `MEDIA_BASE_PATH` value.
 
@@ -35,10 +31,6 @@ Provides a column by which to filter out unwanted values.
 #### `FILTER_OUT_VALUES_FROM_COLUMN` (optional)
 
 A comma-separated list of values, which if found in the value for `FILTER_BY_COLUMN`, will filter out the row from the API response.
-
-#### `FRONT_END_FILTERING` (optional)
-
-Activates a dropdown filter for data in views. Set to `YES` and define the column for filtering in `FRONT_END_FILTER_COLUMN`.
 
 #### `FRONT_END_FILTER_COLUMN` (optional)
 

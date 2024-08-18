@@ -25,7 +25,6 @@
 <script>
 import ConfigCard from "./config/ConfigCard.vue";
 import LanguagePicker from "./shared/LanguagePicker.vue";
-import overlayModal from "@/components/shared/overlay.css";
 
 export default {
   components: {
@@ -80,6 +79,8 @@ export default {
 </script>
 
 <style scoped>
+@import "@/components/shared/overlay.css";
+
 .container {
   display: flex;
   flex-direction: column;

@@ -14,9 +14,7 @@
     />
     <Feature
       v-if="feature"
-      :alert-resources="alertResources"
       :audio-extensions="audioExtensions"
-      :embed-media="embedMedia"
       :feature="filteredFeature"
       :file-paths="filePaths"
       :image-extensions="imageExtensions"
@@ -41,12 +39,10 @@ import AlertsIntroPanel from "~/components/alerts/AlertsIntroPanel.vue";
 export default {
   components: { AlertsIntroPanel, Download, Feature },
   props: [
-    "alertResources",
     "audioExtensions",
     "calculateHectares",
     "dateOptions",
     "downloadAlert",
-    "embedMedia",
     "feature",
     "featureGeojson",
     "filePaths",
