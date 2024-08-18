@@ -12,6 +12,7 @@
     "prepare": "[ -f ./node_modules/.bin/husky ] && husky install || echo 'Skipping husky install'"
   },
   "dependencies": {
+    "@johmun/vue-tags-input": "^2.1.0",
     "@nuxtjs/auth-next": "5.0.0-1667386184.dfbbb54",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/dotenv": "^1.4.2",
