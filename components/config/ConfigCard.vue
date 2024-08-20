@@ -10,7 +10,7 @@
       <form @submit.prevent="handleSubmit">
         <ConfigViews
           :tableName="tableName"
-          :config="config"
+          :config="localConfig"
           :views="views"
           @update:views="updateViews"
         />
@@ -18,31 +18,31 @@
           v-if="shouldShowConfigMap"
           :tableName="tableName"
           :views="views"
-          :config="config"
+          :config="localConfig"
         />
         <ConfigMedia
           v-if="shouldShowConfigMedia"
           :tableName="tableName"
           :views="views"
-          :config="config"
+          :config="localConfig"
         />
         <ConfigAlerts
           v-if="shouldShowConfigAlerts"
           :tableName="tableName"
           :views="views"
-          :config="config"
+          :config="localConfig"
         />
         <ConfigFilters
           v-if="shouldShowConfigFilters"
           :tableName="tableName"
           :views="views"
-          :config="config"
+          :config="localConfig"
         />
         <ConfigOther
           v-if="shouldShowConfigOther"
           :tableName="tableName"
           :views="views"
-          :config="config"
+          :config="localConfig"
         />
         <button
           type="submit"
@@ -87,9 +87,17 @@ export default {
   },
   data() {
     return {
-      originalConfig: JSON.parse(JSON.stringify(this.config)),
-      views: this.config.VIEWS ? this.config.VIEWS.split(",") : [],
+      localConfig: {},
+      originalConfig: null,
+      views: [],
     };
+  },
+  mounted() {
+    if (this.config) {
+      this.localConfig = JSON.parse(JSON.stringify(this.config));
+    }
+    this.originalConfig = JSON.parse(JSON.stringify(this.localConfig));
+    this.views = this.localConfig?.VIEWS ? this.localConfig.VIEWS.split(",") : [];
   },
   computed: {
     viewsKeys() {
@@ -127,19 +135,25 @@ export default {
     otherKeys() {
       return ["LOGO_URL"];
     },
+    isChanged() {
+      const localConfigFiltered = Object.fromEntries(
+        Object.entries(this.localConfig).filter(([key, value]) => value !== "")
+      );
+      const originalConfigFiltered = Object.fromEntries(
+        Object.entries(this.originalConfig).filter(([key, value]) => value !== "")
+      );
+      return (
+        JSON.stringify(localConfigFiltered) !== JSON.stringify(originalConfigFiltered)
+      );
+    },
     isFormValid() {
       // Validations for required fields
-      return (
-        (!this.shouldShowConfigMap ||
-          (this.config.MAPBOX_ACCESS_TOKEN)) &&
-        (!this.shouldShowConfigMedia || this.config.MEDIA_BASE_PATH)
-      );
-    },
-    isChanged() {
-      return (
-        JSON.stringify(this.config) !== JSON.stringify(this.originalConfig)
-      );
-    },
+      const isMapConfigValid = this.shouldShowConfigMap 
+      ? this.localConfig.MAPBOX_ACCESS_TOKEN?.trim() !== "" && this.localConfig.MAPBOX_ACCESS_TOKEN != null
+      : true;
+
+      return isMapConfigValid;
+    },    
     shouldShowConfigMap() {
       return this.hasView(["alerts", "map"]);
     },
@@ -161,12 +175,12 @@ export default {
       return views.some((view) => this.views.includes(view));
     },
     handleSubmit() {
-      this.originalConfig = JSON.parse(JSON.stringify(this.config));
-      this.$emit("submit-config", this.tableName, this.config);
+      // this.originalConfig = JSON.parse(JSON.stringify(this.localConfig));
+      this.$emit("submit-config", this.tableName, this.localConfig);
     },
     updateViews(newViews) {
       this.views = newViews;
-      this.config.VIEWS = newViews.join(",");
+      this.localConfig.VIEWS = newViews.join(",");
     },
   },
 };

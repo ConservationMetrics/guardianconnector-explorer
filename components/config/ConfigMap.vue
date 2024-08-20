@@ -45,7 +45,7 @@
           v-model="config[key]"
           class="input-field"
           type="number"
-          step="0.00001"
+          step="any"
           :min="
             key === 'MAPBOX_BEARING'
               ? -180
@@ -167,11 +167,6 @@ export default {
     updateTags(key, newTags) {
       this.tags[key] = newTags;
       this.config[key] = newTags.map((tag) => tag.text).join(",");
-    },
-  },
-  computed: {
-    isFormValid() {
-      return this.config.MAPBOX_STYLE && this.config.MAPBOX_ACCESS_TOKEN;
     },
   },
   mounted() {
