@@ -254,7 +254,7 @@ export default {
     this.map = new mapboxgl.Map({
       container: "map",
       style: this.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
-      projection: this.mapboxProjection || "globe",
+      projection: this.mapboxProjection || "mercator",
       center: [this.mapboxLongitude || 0, this.mapboxLatitude || -15],
       zoom: this.mapboxZoom || 2.5,
       pitch: this.mapboxPitch || 0,
