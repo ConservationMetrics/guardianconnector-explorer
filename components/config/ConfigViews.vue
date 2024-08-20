@@ -1,6 +1,6 @@
 <template>
   <div class="config-section">
-    <div v-for="key in viewsKeys" :key="key" class="config-field">
+    <div v-for="key in keys" :key="key" class="config-field">
       <template v-if="key === 'VIEWS'">
         <div class="config-header">
           <h3>{{ $t("views") }}</h3>
@@ -45,10 +45,10 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
+    keys: Array,
   },
   data() {
     return {
-      viewsKeys: ["VIEWS"],
       localViews: [...this.views],
     };
   },

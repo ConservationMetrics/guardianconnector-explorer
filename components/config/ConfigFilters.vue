@@ -3,7 +3,7 @@
     <div class="config-header">
       <h3>{{ $t("filtering") }} {{ $t("configuration") }}</h3>
     </div>
-    <div v-for="key in filterKeys" :key="key" class="config-field">
+    <div v-for="key in keys" :key="key" class="config-field">
       <template v-if="key === 'FRONT_END_FILTER_COLUMN'">
         <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
         <input
@@ -44,6 +44,7 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
+    keys: Array,
   },
   components: {
     VueTagsInput: () => import("@johmun/vue-tags-input"),
@@ -66,12 +67,6 @@ export default {
             }))
           : [],
       },
-      filterKeys: [
-        "FILTER_OUT_VALUES_FROM_COLUMN",
-        "FRONT_END_FILTER_COLUMN",
-        "UNWANTED_COLUMNS",
-        "UNWANTED_SUBSTRINGS",
-      ],
       isClient: false,
     };
   },

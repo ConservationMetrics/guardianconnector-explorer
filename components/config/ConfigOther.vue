@@ -3,7 +3,7 @@
     <div class="config-header">
       <h3>{{ $t("other") }} {{ $t("configuration") }}</h3>
     </div>
-    <div v-for="key in mediaKeys" :key="key" class="config-field">
+    <div v-for="key in keys" :key="key" class="config-field">
       <template v-if="key === 'LOGO_URL'">
         <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
         <input
@@ -23,11 +23,7 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
-  },
-  data() {
-    return {
-      mediaKeys: ["LOGO_URL"],
-    };
+    keys: Array,
   },
 };
 </script>

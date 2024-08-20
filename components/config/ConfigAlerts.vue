@@ -3,7 +3,7 @@
     <div class="config-header">
       <h3>{{ $t("alerts") }} {{ $t("configuration") }}</h3>
     </div>
-    <div v-for="key in alertKeys" :key="key" class="config-field">
+    <div v-for="key in keys" :key="key" class="config-field">
       <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
       <template v-if="key === 'MAPEO_TABLE'">
         <input
@@ -32,6 +32,7 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
+    keys: Array,
   },
   components: {
     VueTagsInput: () => import("@johmun/vue-tags-input"),
@@ -48,7 +49,6 @@ export default {
             }))
           : [],
       },
-      alertKeys: ["MAPEO_CATEGORY_IDS", "MAPEO_TABLE"],
       isClient: false,
     };
   },

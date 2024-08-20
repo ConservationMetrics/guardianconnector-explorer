@@ -3,7 +3,7 @@
     <div class="config-header">
       <h3>{{ $t("map") }} {{ $t("configuration") }}</h3>
     </div>
-    <div v-for="key in mapConfigKeys" :key="key" class="config-field">
+    <div v-for="key in keys" :key="key" class="config-field">
       <template v-if="key === 'MAPBOX_STYLE'">
         <label :for="`${tableName}-${key}`"
           >{{ $t(key) }}</label
@@ -131,6 +131,7 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
+    keys: Array,
   },
   components: {
     VueTagsInput: () => import("@johmun/vue-tags-input"),
@@ -147,19 +148,6 @@ export default {
             }))
           : [],
       },
-      mapConfigKeys: [
-        "MAPBOX_STYLE",
-        "MAPBOX_ACCESS_TOKEN",
-        "MAPBOX_ZOOM",
-        "MAPBOX_CENTER_LATITUDE",
-        "MAPBOX_CENTER_LONGITUDE",
-        "MAPBOX_PROJECTION",
-        "MAPBOX_BEARING",
-        "MAPBOX_PITCH",
-        "MAPBOX_3D",
-        "MAP_LEGEND_LAYER_IDS",
-        "PLANET_API_KEY",
-      ],
       isClient: false,
     };
   },

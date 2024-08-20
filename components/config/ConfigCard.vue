@@ -12,6 +12,7 @@
           :tableName="tableName"
           :config="localConfig"
           :views="views"
+          :keys="viewsKeys"
           @update:views="updateViews"
         />
         <ConfigMap
@@ -19,30 +20,35 @@
           :tableName="tableName"
           :views="views"
           :config="localConfig"
+          :keys="mapConfigKeys"
         />
         <ConfigMedia
           v-if="shouldShowConfigMedia"
           :tableName="tableName"
           :views="views"
           :config="localConfig"
+          :keys="mediaKeys"
         />
         <ConfigAlerts
           v-if="shouldShowConfigAlerts"
           :tableName="tableName"
           :views="views"
           :config="localConfig"
+          :keys="alertKeys"
         />
         <ConfigFilters
           v-if="shouldShowConfigFilters"
           :tableName="tableName"
           :views="views"
           :config="localConfig"
+          :keys="filterKeys"
         />
         <ConfigOther
           v-if="shouldShowConfigOther"
           :tableName="tableName"
           :views="views"
           :config="localConfig"
+          :keys="otherKeys"
         />
         <button
           type="submit"

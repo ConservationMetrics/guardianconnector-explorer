@@ -3,7 +3,7 @@
     <div class="config-header">
       <h3>{{ $t("media") }} {{ $t("configuration") }}</h3>
     </div>
-    <div v-for="key in mediaKeys" :key="key" class="config-field">
+    <div v-for="key in keys" :key="key" class="config-field">
       <template
         v-if="key === 'MEDIA_BASE_PATH_ALERTS' && views.includes('alerts')"
       >
@@ -36,11 +36,7 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
-  },
-  data() {
-    return {
-      mediaKeys: ["MEDIA_BASE_PATH", "MEDIA_BASE_PATH_ALERTS"],
-    };
+    keys: Array,
   },
 };
 </script>
