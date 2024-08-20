@@ -9,7 +9,6 @@
     <div v-if="!isMinimized" class="card-body">
       <form @submit.prevent="handleSubmit">
         <ConfigViews
-          v-if="shouldShowConfigViews"
           :tableName="tableName"
           :config="config"
           :views="views"
@@ -45,36 +44,6 @@
           :views="views"
           :config="config"
         />
-        <div v-if="hasOtherConfig && views.length" class="config-section">
-          <div class="config-header">
-            <h3>{{ $t("other") }} {{ $t("configuration") }}</h3>
-          </div>
-          <div
-            v-if="isOtherConfigKey(key)"
-            v-for="(value, key) in config"
-            :key="key"
-            class="config-field"
-          >
-            <template>
-              <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
-              <template v-if="key === 'LOGO_URL'">
-                <input
-                  :id="`${tableName}-${key}`"
-                  v-model="config[key]"
-                  class="input-field"
-                  type="url"
-                />
-              </template>
-              <template v-else>
-                <input
-                  :id="`${tableName}-${key}`"
-                  v-model="config[key]"
-                  class="input-field"
-                />
-              </template>
-            </template>
-          </div>
-        </div>
         <button
           type="submit"
           :disabled="!isChanged || !isFormValid"
@@ -159,6 +128,7 @@ export default {
       return ["LOGO_URL"];
     },
     isFormValid() {
+      // Validations for required fields
       return (
         (!this.shouldShowConfigMap ||
           (this.config.MAPBOX_STYLE && this.config.MAPBOX_ACCESS_TOKEN)) &&
@@ -170,39 +140,23 @@ export default {
         JSON.stringify(this.config) !== JSON.stringify(this.originalConfig)
       );
     },
-    shouldShowConfigViews() {
-      return this.hasConfigKey(this.viewsKeys);
-    },
     shouldShowConfigMap() {
-      return (
-        this.hasConfigKey(this.mapConfigKeys) && this.hasView(["alerts", "map"])
-      );
+      return this.hasView(["alerts", "map"]);
     },
     shouldShowConfigMedia() {
-      return (
-        this.hasConfigKey(this.mediaKeys) &&
-        this.hasView(["map", "gallery", "alerts"])
-      );
+      return this.hasView(["map", "gallery", "alerts"]);
     },
     shouldShowConfigAlerts() {
-      return this.hasConfigKey(this.alertKeys) && this.hasView(["alerts"]);
+      return this.hasView(["alerts"]);
     },
     shouldShowConfigFilters() {
-      return (
-        this.hasConfigKey(this.filterKeys) && this.hasView(["map", "gallery"])
-      );
+      return this.hasView(["map", "gallery"])
     },
     shouldShowConfigOther() {
-      return (
-        this.hasConfigKey(this.mediaKeys) &&
-        this.hasView(["map", "gallery", "alerts"])
-      );
+      return this.hasView(["map", "gallery", "alerts"])
     },
   },
   methods: {
-    hasConfigKey(keys) {
-      return keys.some((key) => key in this.config);
-    },
     hasView(views) {
       return views.some((view) => this.views.includes(view));
     },
