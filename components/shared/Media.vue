@@ -14,7 +14,7 @@
           loading="lazy"
         />
       </a>
-      <div class="text-center">
+      <div v-if="filePath" class="text-center">
         <span v-if="filePath.includes('t0.jpg')" class="italic">{{
           $t("before")
         }}</span>
