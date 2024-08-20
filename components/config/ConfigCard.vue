@@ -131,7 +131,7 @@ export default {
       // Validations for required fields
       return (
         (!this.shouldShowConfigMap ||
-          (this.config.MAPBOX_STYLE && this.config.MAPBOX_ACCESS_TOKEN)) &&
+          (this.config.MAPBOX_ACCESS_TOKEN)) &&
         (!this.shouldShowConfigMedia || this.config.MEDIA_BASE_PATH)
       );
     },
