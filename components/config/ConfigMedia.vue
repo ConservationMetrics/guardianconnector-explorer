@@ -16,7 +16,9 @@
         />
       </template>
       <template v-else-if="key === 'MEDIA_BASE_PATH'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`"
+          >{{ $t(key) }} <span style="color: red">*</span></label
+        >
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
@@ -34,6 +36,11 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
+  },
+  computed: {
+    isFormValid() {
+      return this.config.MEDIA_BASE_PATH;
+    },
   },
   data() {
     return {

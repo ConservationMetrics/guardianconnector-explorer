@@ -39,6 +39,12 @@
           :views="views"
           :config="config"
         />
+        <ConfigOther
+          v-if="shouldShowConfigOther"
+          :tableName="tableName"
+          :views="views"
+          :config="config"
+        />
         <div v-if="hasOtherConfig && views.length" class="config-section">
           <div class="config-header">
             <h3>{{ $t("other") }} {{ $t("configuration") }}</h3>
@@ -71,12 +77,12 @@
         </div>
         <button
           type="submit"
-          :disabled="!isChanged"
+          :disabled="!isChanged || !isFormValid"
           :class="[
             'submit-button',
             {
-              'bg-gray-500 cursor-not-allowed': !isChanged,
-              'bg-blue-500 hover:bg-blue-700': isChanged,
+              'bg-gray-500 cursor-not-allowed': !isChanged || !isFormValid,
+              'bg-blue-500 hover:bg-blue-700': isChanged && isFormValid,
             },
           ]"
           class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 md:block"
@@ -94,6 +100,7 @@ import ConfigMap from "./ConfigMap.vue";
 import ConfigMedia from "./ConfigMedia.vue";
 import ConfigAlerts from "./ConfigAlerts.vue";
 import ConfigFilters from "./ConfigFilters.vue";
+import ConfigOther from "./ConfigOther.vue";
 
 export default {
   props: {
@@ -107,6 +114,7 @@ export default {
     ConfigMedia,
     ConfigAlerts,
     ConfigFilters,
+    ConfigOther,
   },
   data() {
     return {
@@ -141,20 +149,21 @@ export default {
     },
     filterKeys() {
       return [
+        "FILTER_OUT_VALUES_FROM_COLUMN",
         "FRONT_END_FILTER_COLUMN",
         "UNWANTED_COLUMNS",
         "UNWANTED_SUBSTRINGS",
       ];
     },
-    hasOtherConfig() {
-      const allKeys = [
-        ...this.viewsKeys,
-        ...this.mapConfigKeys,
-        ...this.filterKeys,
-        ...this.mediaKeys,
-        ...this.alertKeys,
-      ];
-      return Object.keys(this.config).some((key) => !allKeys.includes(key));
+    otherKeys() {
+      return ["LOGO_URL"];
+    },
+    isFormValid() {
+      return (
+        (!this.shouldShowConfigMap ||
+          (this.config.MAPBOX_STYLE && this.config.MAPBOX_ACCESS_TOKEN)) &&
+        (!this.shouldShowConfigMedia || this.config.MEDIA_BASE_PATH)
+      );
     },
     isChanged() {
       return (
@@ -183,6 +192,12 @@ export default {
         this.hasConfigKey(this.filterKeys) && this.hasView(["map", "gallery"])
       );
     },
+    shouldShowConfigOther() {
+      return (
+        this.hasConfigKey(this.mediaKeys) &&
+        this.hasView(["map", "gallery", "alerts"])
+      );
+    },
   },
   methods: {
     hasConfigKey(keys) {
@@ -194,16 +209,6 @@ export default {
     handleSubmit() {
       this.originalConfig = JSON.parse(JSON.stringify(this.config));
       this.$emit("submit-config", this.tableName, this.config);
-    },
-    isOtherConfigKey(key) {
-      const allKeys = [
-        ...this.viewsKeys,
-        ...this.mapConfigKeys,
-        ...this.filterKeys,
-        ...this.mediaKeys,
-        ...this.alertKeys,
-      ];
-      return !allKeys.includes(key);
     },
     updateViews(newViews) {
       this.views = newViews;
@@ -225,14 +230,21 @@ export default {
 }
 
 .card-header {
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #ddd;
+  background-color: #d3bce3;
+  border-bottom: 1px solid #b399c1;
   padding: 0.75em 1em;
   height: 3em;
   font-size: 1.25em;
   font-weight: bold;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-body {
+  margin-top: 2em;
 }
 
 .table-name {
@@ -243,14 +255,29 @@ export default {
 .hamburger {
   background: none;
   border: none;
-  font-size: 1em;
+  font-size: 1.5em;
   cursor: pointer;
-  margin-left: auto;
-  float: right;
 }
 
-.card-body {
+.config-section {
+  background-color: #f1f1f1;
+  margin-bottom: 1.5em;
   padding: 1em;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+}
+
+.config-header {
+  margin-bottom: 1em;
+}
+
+.config-header h3 {
+  margin: 0;
+  padding: 0.5em 0;
+  font-size: 1.15em;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  color: #333;
 }
 
 .config-field {
@@ -286,25 +313,12 @@ export default {
   margin-right: 0.5em;
 }
 
+select {
+  background-color: #fff;
+}
+
 .tag-field {
   min-width: 100%;
-}
-
-.config-section {
-  margin-bottom: 2em;
-}
-
-.config-header {
-  margin-bottom: 1em;
-}
-
-.config-header h3 {
-  margin: 0;
-  padding: 0.5em 0;
-  font-size: 1.15em;
-  font-weight: bold;
-  border-bottom: 1px solid #ddd;
-  color: #333;
 }
 
 .table-item {

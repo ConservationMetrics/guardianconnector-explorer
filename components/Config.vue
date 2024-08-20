@@ -1,6 +1,6 @@
 <template>
   <div class="container relative">
-    <div class="absolute top-0 right-0 flex justify-end space-x-4 mb-4">
+    <div class="absolute top-0 right-4 flex justify-end space-x-4 mb-4">
       <LanguagePicker />
     </div>
     <h1>{{ $t("availableViews") }}: {{ $t("configuration") }}</h1>

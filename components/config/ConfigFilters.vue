@@ -12,6 +12,14 @@
           class="input-field"
         />
       </template>
+      <template v-else-if="key === 'FILTER_OUT_VALUES_FROM_COLUMN'">
+        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <input
+          :id="`${tableName}-${key}`"
+          v-model="config[key]"
+          class="input-field"
+        />
+      </template>
       <template
         v-else-if="key === 'UNWANTED_COLUMNS' || key === 'UNWANTED_SUBSTRINGS'"
       >
@@ -59,6 +67,7 @@ export default {
           : [],
       },
       filterKeys: [
+        "FILTER_OUT_VALUES_FROM_COLUMN",
         "FRONT_END_FILTER_COLUMN",
         "UNWANTED_COLUMNS",
         "UNWANTED_SUBSTRINGS",

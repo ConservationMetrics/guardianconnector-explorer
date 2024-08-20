@@ -5,11 +5,21 @@
     </div>
     <div v-for="key in alertKeys" :key="key" class="config-field">
       <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
-      <template v-if="key === 'MAPEO_CATEGORY_IDS' || 'MAPEO_TABLE'">
+      <template v-if="key === 'MAPEO_TABLE'">
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
           class="input-field"
+        />
+      </template>
+      <template v-else-if="key === 'MAPEO_CATEGORY_IDS'">
+        <component
+          class="tag-field"
+          :is="isClient ? 'vue-tags-input' : 'div'"
+          v-if="isClient"
+          v-model="tagInputs[key]"
+          :tags="tags[key]"
+          @tags-changed="updateTags(key, $event)"
         />
       </template>
     </div>
@@ -22,6 +32,9 @@ export default {
     tableName: String,
     config: Object,
     views: Array,
+  },
+  components: {
+    VueTagsInput: () => import("@johmun/vue-tags-input"),
   },
   data() {
     return {
