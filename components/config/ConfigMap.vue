@@ -5,9 +5,7 @@
     </div>
     <div v-for="key in keys" :key="key" class="config-field">
       <template v-if="key === 'MAPBOX_STYLE'">
-        <label :for="`${tableName}-${key}`"
-          >{{ $t(key) }}</label
-        >
+        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"

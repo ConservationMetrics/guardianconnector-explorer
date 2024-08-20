@@ -16,9 +16,7 @@
         />
       </template>
       <template v-else-if="key === 'MEDIA_BASE_PATH'">
-        <label :for="`${tableName}-${key}`"
-          >{{ $t(key) }}</label
-        >
+        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"

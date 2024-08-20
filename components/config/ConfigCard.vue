@@ -103,7 +103,9 @@ export default {
       this.localConfig = JSON.parse(JSON.stringify(this.config));
     }
     this.originalConfig = JSON.parse(JSON.stringify(this.localConfig));
-    this.views = this.localConfig?.VIEWS ? this.localConfig.VIEWS.split(",") : [];
+    this.views = this.localConfig?.VIEWS
+      ? this.localConfig.VIEWS.split(",")
+      : [];
   },
   computed: {
     viewsKeys() {
@@ -143,23 +145,27 @@ export default {
     },
     isChanged() {
       const localConfigFiltered = Object.fromEntries(
-        Object.entries(this.localConfig).filter(([key, value]) => value !== "")
+        Object.entries(this.localConfig).filter(([key, value]) => value !== ""),
       );
       const originalConfigFiltered = Object.fromEntries(
-        Object.entries(this.originalConfig).filter(([key, value]) => value !== "")
+        Object.entries(this.originalConfig).filter(
+          ([key, value]) => value !== "",
+        ),
       );
       return (
-        JSON.stringify(localConfigFiltered) !== JSON.stringify(originalConfigFiltered)
+        JSON.stringify(localConfigFiltered) !==
+        JSON.stringify(originalConfigFiltered)
       );
     },
     isFormValid() {
       // Validations for required fields
-      const isMapConfigValid = this.shouldShowConfigMap 
-      ? this.localConfig.MAPBOX_ACCESS_TOKEN?.trim() !== "" && this.localConfig.MAPBOX_ACCESS_TOKEN != null
-      : true;
+      const isMapConfigValid = this.shouldShowConfigMap
+        ? this.localConfig.MAPBOX_ACCESS_TOKEN?.trim() !== "" &&
+          this.localConfig.MAPBOX_ACCESS_TOKEN != null
+        : true;
 
       return isMapConfigValid;
-    },    
+    },
     shouldShowConfigMap() {
       return this.hasView(["alerts", "map"]);
     },
@@ -170,10 +176,10 @@ export default {
       return this.hasView(["alerts"]);
     },
     shouldShowConfigFilters() {
-      return this.hasView(["map", "gallery"])
+      return this.hasView(["map", "gallery"]);
     },
     shouldShowConfigOther() {
-      return this.hasView(["map", "gallery", "alerts"])
+      return this.hasView(["map", "gallery", "alerts"]);
     },
   },
   methods: {
