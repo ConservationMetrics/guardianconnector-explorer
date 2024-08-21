@@ -160,7 +160,6 @@ const prepareMapData = (
 // Prepare data for the alerts view
 const prepareAlertData = (
   data: Array<Record<string, any>>,
-  embedMedia: boolean,
 ): {
   mostRecentAlerts: Array<Record<string, any>>;
   previousAlerts: Array<Record<string, any>>;
@@ -168,7 +167,6 @@ const prepareAlertData = (
   const transformChangeDetectionItem = (
     item: Record<string, any>,
     formattedMonth: string,
-    embedMedia: boolean,
   ): Record<string, any> => {
     const transformedItem: Record<string, any> = {};
 
@@ -215,14 +213,12 @@ const prepareAlertData = (
     transformedItem["satelliteUsedForDetection"] =
       satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
 
-    if (embedMedia) {
-      transformedItem["t0_url"] =
-        `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T0_${item._id}.jpg`;
-      transformedItem["t1_url"] =
-        `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T1_${item._id}.jpg`;
-      transformedItem["previewImagerySource"] =
-        satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
-    }
+    transformedItem["t0_url"] =
+      `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T0_${item._id}.jpg`;
+    transformedItem["t1_url"] =
+      `alerts/${item.territory_id}/${item.year_detec}/${formattedMonth}/${item._id}/images/${item.sat_viz_prefix}_T1_${item._id}.jpg`;
+    transformedItem["previewImagerySource"] =
+      satelliteLookup[item.sat_viz_prefix] || item.sat_viz_prefix;
 
     return transformedItem;
   };
@@ -254,11 +250,7 @@ const prepareAlertData = (
 
     const monthYearStr = `${formattedMonth}-${item.year_detec}`;
 
-    const transformedItem = transformChangeDetectionItem(
-      item,
-      formattedMonth,
-      embedMedia,
-    );
+    const transformedItem = transformChangeDetectionItem(item, formattedMonth);
 
     // Segregate data based on the latest month detected
     if (monthYearStr === latestMonthStr) {

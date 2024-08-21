@@ -1,17 +1,17 @@
 <template>
   <div>
     <Gallery
-      v-if="embedMedia && dataFetched"
+      v-if="mediaBasePath && dataFetched"
       :audio-extensions="audioExtensions"
       :data="galleryData"
-      :embed-media="embedMedia"
-      :filter-data="filterData"
       :filter-column="filterColumn"
       :image-extensions="imageExtensions"
       :media-base-path="mediaBasePath"
       :video-extensions="videoExtensions"
     />
-    <h3 v-if="!embedMedia && dataFetched">{{ $t("galleryNotAvailable") }}.</h3>
+    <h3 v-if="!mediaBasePath && dataFetched">
+      {{ $t("galleryNotAvailable") }}.
+    </h3>
   </div>
 </template>
 
@@ -49,8 +49,6 @@ export default {
       return {
         audioExtensions: response.audioExtensions,
         dataFetched: true,
-        embedMedia: response.embedMedia,
-        filterData: response.filterData,
         filterColumn: response.filterColumn,
         galleryData: response.data,
         imageExtensions: response.imageExtensions,

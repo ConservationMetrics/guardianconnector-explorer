@@ -6,7 +6,6 @@ interface EnvVars {
   DB_PORT: string;
   DB_SSL: string;
   IS_SQLITE: string;
-  MAPBOX_ACCESS_TOKEN: string;
   NUXT_ENV_AUTH_STRATEGY: string;
   PASSWORD: string;
   PORT: string;
@@ -46,7 +45,6 @@ const IS_SQLITE = getEnvVar(
   "NO",
   (val) => val.toUpperCase() === "YES",
 ) as unknown as boolean;
-const MAPBOX_ACCESS_TOKEN = getEnvVar("MAPBOX_ACCESS_TOKEN", "pk.ey") as string;
 const PASSWORD = getEnvVar("PASSWORD");
 const SECRET_JWT_KEY = getEnvVar("SECRET_JWT_KEY", "secret-jwt-key") as string;
 const SQLITE_DB_PATH = getEnvVar("SQLITE_DB_PATH");
@@ -61,7 +59,6 @@ export {
   DB_PORT,
   DB_SSL,
   IS_SQLITE,
-  MAPBOX_ACCESS_TOKEN,
   PASSWORD,
   SECRET_JWT_KEY,
   SQLITE_DB_PATH,

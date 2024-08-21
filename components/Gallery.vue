@@ -5,7 +5,7 @@
   >
     <div class="sticky top-10 right-10 z-10">
       <DataFilter
-        v-if="filterData === true"
+        v-if="filterColumn"
         :data="data"
         :filter-column="filterColumn"
         @filter="filter"
@@ -14,7 +14,6 @@
     <Feature
       v-for="(feature, index) in paginatedData"
       :audio-extensions="audioExtensions"
-      :embed-media="embedMedia"
       :feature="feature"
       :file-paths="getFilePathsWithExtension(feature, allExtensions)"
       :image-extensions="imageExtensions"
@@ -35,8 +34,6 @@ export default {
   props: [
     "audioExtensions",
     "data",
-    "embedMedia",
-    "filterData",
     "filterColumn",
     "imageExtensions",
     "mediaBasePath",

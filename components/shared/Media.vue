@@ -14,7 +14,7 @@
           loading="lazy"
         />
       </a>
-      <div v-if="alertResources" class="text-center">
+      <div v-if="filePath" class="text-center">
         <span v-if="filePath.includes('t0.jpg')" class="italic">{{
           $t("before")
         }}</span>
@@ -50,7 +50,6 @@ export default {
     "audioExtensions",
     "filePath",
     "imageExtensions",
-    "alertResources",
     "mediaBasePath",
     "videoExtensions",
   ],
