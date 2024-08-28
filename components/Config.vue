@@ -13,11 +13,29 @@
         :isMinimized="minimizedCards[tableName]"
         @toggle-minimize="toggleMinimize"
         @submit-config="handleSubmit"
+        @delete-config="handleDelete"
       />
     </div>
     <div v-if="showModal" class="overlay"></div>
     <div v-if="showModal" class="modal">
-      {{ modalMessage }}
+      <p>
+        {{ modalMessage }}: <strong> {{ this.tableNameToDelete }}</strong
+        >?
+      </p>
+      <div v-if="showDeleteModal" class="mt-4">
+        <button
+          @click="confirmDelete"
+          class="text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+        >
+          {{ $t("confirm") }}
+        </button>
+        <button
+          @click="cancelDelete"
+          class="text-white font-bold bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+        >
+          {{ $t("cancel") }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -37,6 +55,7 @@ export default {
   data() {
     return {
       showModal: false,
+      showDeleteModal: false,
       minimizedCards: this.initializeMinimizedCards(),
     };
   },
@@ -51,6 +70,23 @@ export default {
     },
   },
   methods: {
+    handleDelete(tableName) {
+      this.modalMessage = this.$t("deleteViewAreYouSure");
+      this.showModal = true;
+      this.showDeleteModal = true;
+      this.tableNameToDelete = tableName;
+    },
+    confirmDelete() {
+      this.$emit("delete-config", this.tableNameToDelete);
+      this.showModal = false;
+      this.showDeleteModal = false;
+    },
+    cancelDelete() {
+      this.modalMessage = "";
+      this.tableNameToDelete = "";
+      this.showModal = false;
+      this.showDeleteModal = false;
+    },
     initializeMinimizedCards() {
       const minimized = {};
       for (const tableName in this.viewsConfig) {

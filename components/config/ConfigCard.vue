@@ -60,13 +60,14 @@
               'bg-blue-500 hover:bg-blue-700': isChanged && isFormValid,
             },
           ]"
-          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 block md:inline mb-2 md:mb-0"
+          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("submit") }}
         </button>
         <button
           type="button"
-          class="delete-button text-white font-bold py-2 px-4 rounded transition-colors duration-200 block bg-red-500 hover:bg-red-700 md:inline md:ml-2 ml-0"
+          class="delete-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 md:ml-2 ml-0"
+          @click="$emit('delete-config', tableName)"
         >
           {{ $t("deleteView") }}
         </button>

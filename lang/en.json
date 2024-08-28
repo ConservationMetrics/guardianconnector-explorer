@@ -26,7 +26,7 @@
   "dataProvider": "Data provider",
   "dataProviders": "Data provider(s)",
   "deleteView": "Delete view",
-  "deleteViewAreYouSure": "Are you sure you want to delete this view?",
+  "deleteViewAreYouSure": "Are you sure you want to delete this view",
   "downloadCSV": "Download CSV",
   "downloadGeoJSON": "Download GeoJSON",
   "downloadKML": "Download KML",
