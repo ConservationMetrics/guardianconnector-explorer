@@ -1,5 +1,3 @@
-import mapboxgl from "mapbox-gl";
-
 interface Basemap {
   id: string;
   style?: string;
