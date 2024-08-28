@@ -207,3 +207,35 @@ export const updateConfig = async (
     }
   });
 };
+
+export const deleteView = async (
+  db: any,
+  tableName: string,
+  isSQLite: boolean | undefined,
+): Promise<void> => {
+  const query = isSQLite
+    ? `DELETE FROM config WHERE table_name = ?`
+    : `DELETE FROM config WHERE table_name = $1`;
+
+  return new Promise((resolve, reject) => {
+    if (isSQLite) {
+      db.run(query, [tableName], (err: Error) => {
+        if (err) {
+          console.error("SQLite Error:", err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    } else {
+      db.query(query, [tableName], (err: Error) => {
+        if (err) {
+          console.error("PostgreSQL Error:", err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    }
+  });
+};

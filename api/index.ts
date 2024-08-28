@@ -4,7 +4,12 @@ import {
   setupDatabaseConnection,
   createDatabaseIfNotExists,
 } from "./database/dbConnection";
-import { fetchData, fetchConfig, updateConfig } from "./database/dbOperations";
+import {
+  fetchData,
+  fetchConfig,
+  updateConfig,
+  deleteView,
+} from "./database/dbOperations";
 import {
   filterUnwantedKeys,
   filterOutUnwantedValues,
@@ -396,6 +401,28 @@ app.post(
       });
     } catch (error: any) {
       console.error("Error updating config:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
+
+// DELETE a view from the configuration
+app.delete(
+  "/config/:tableName",
+  async (req: express.Request, res: express.Response) => {
+    const { tableName } = req.params;
+
+    try {
+      await deleteView(configDb, tableName, IS_SQLITE);
+      res.json({ message: "View deleted from configuration" });
+
+      // Reinitialize viewsConfig with updated config
+      await getViewsConfig();
+      initializeViewsConfig().catch((error) => {
+        console.error("Error reinitializing views config:", error.message);
+      });
+    } catch (error: any) {
+      console.error("Error deleting view:", error.message);
       res.status(500).json({ error: error.message });
     }
   },
