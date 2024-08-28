@@ -19,8 +19,7 @@
     <div v-if="showModal" class="overlay"></div>
     <div v-if="showModal" class="modal">
       <p>
-        {{ modalMessage }}: <strong> {{ this.tableNameToDelete }}</strong
-        >?
+        {{ modalMessage }}
       </p>
       <div v-if="showDeleteModal" class="mt-4">
         <button
@@ -71,15 +70,20 @@ export default {
   },
   methods: {
     handleDelete(tableName) {
-      this.modalMessage = this.$t("deleteViewAreYouSure");
+      this.modalMessage =
+        this.$t("deleteViewAreYouSure") + ": " + tableName + "?";
       this.showModal = true;
       this.showDeleteModal = true;
       this.tableNameToDelete = tableName;
     },
     confirmDelete() {
       this.$emit("delete-config", this.tableNameToDelete);
-      this.showModal = false;
+      this.modalMessage = this.$t("viewDeleted") + "!";
       this.showDeleteModal = false;
+      setTimeout(() => {
+        this.showModal = false;
+        location.reload();
+      }, 3000);
     },
     cancelDelete() {
       this.modalMessage = "";

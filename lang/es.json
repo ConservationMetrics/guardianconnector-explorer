@@ -77,6 +77,7 @@
   "type": "Tipo",
   "typeOfAlerts": "Tipo de alertas",
   "version": "Versión",
+  "viewDeleted": "Vista eliminada",
   "views": "Vistas",
   "viewOnGoogleMaps": "ver en Google Maps",
   "yourMapboxStyleDefault": "Mapbox - su estilo (predeterminado)"

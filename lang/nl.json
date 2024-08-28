@@ -19,6 +19,7 @@
   "changeDetectionAlerts": "Veranderingsdetectie waarschuwingen",
   "confidenceLevel": "Betrouwbaarheidsniveau",
   "configuration": "Instellingen",
+  "configDeleted": "Instellingen verwijderd",
   "configUpdated": "Instellingen bijgewerkt",
   "confirm": "Bevestigen",
   "created": "Gemaakt",
@@ -77,6 +78,7 @@
   "type": "Type",
   "typeOfAlerts": "Type alerts",
   "version": "Versie",
+  "viewDeleted": "Weergave verwijderd",
   "views": "Weergaven",
   "viewOnGoogleMaps": "bekijk op Google Maps",
   "yourMapboxStyleDefault": "Mapbox - uw stijl (standaard)"
