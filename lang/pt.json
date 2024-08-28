@@ -1,4 +1,5 @@
 {
+  "addNewView": "Adicionar nova visualização",
   "after": "Depois",
   "alertAreaHectares": "Área de alerta (hectares)",
   "alertDetectionRange": "Faixa de detecção de alerta",
@@ -22,6 +23,8 @@
   "dataCollectedOn": "Dados coletados em",
   "dataProvider": "Provedor de dados",
   "dataProviders": "Provedor(es) de dados",
+  "deleteView": "Excluir visualização",
+  "deleteViewAreYouSure": "Tem certeza de que deseja excluir esta visualização?",
   "downloadCSV": "Baixar CSV",
   "downloadGeoJSON": "Baixar GeoJSON",
   "downloadKML": "Baixar KML",

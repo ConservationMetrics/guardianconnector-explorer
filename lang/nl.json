@@ -1,4 +1,5 @@
 {
+  "addNewView": "Voeg nieuwe weergave toe",
   "after": "Na",
   "alertAreaHectares": "Alert gebied in hectaren",
   "alertDetectionRange": "Alert detectie periode",
@@ -22,6 +23,8 @@
   "dataCollectedOn": "Data verzameld op",
   "dataProvider": "Data provider",
   "dataProviders": "Data provider(s)",
+  "deleteView": "Verwijder weergave",
+  "deleteViewAreYouSure": "Weet u zeker dat u deze weergave wilt verwijderen?",
   "downloadCSV": "Download CSV",
   "downloadGeoJSON": "Download GeoJSON",
   "downloadKML": "Download KML",
