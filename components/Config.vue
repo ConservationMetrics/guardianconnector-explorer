@@ -13,23 +13,21 @@
         :isMinimized="minimizedCards[tableName]"
         @toggle-minimize="toggleMinimize"
         @submit-config="handleSubmit"
-        @delete-config="handleDelete"
+        @remove-table-from-config="handleRemove"
       />
     </div>
     <div v-if="showModal" class="overlay"></div>
     <div v-if="showModal" class="modal">
-      <p>
-        {{ modalMessage }}
-      </p>
-      <div v-if="showDeleteModal" class="mt-4">
+      <p v-html="modalMessage"></p>
+      <div v-if="showRemoveTableButtons" class="mt-4">
         <button
-          @click="confirmDelete"
+          @click="confirmRemove"
           class="text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("confirm") }}
         </button>
         <button
-          @click="cancelDelete"
+          @click="cancelRemove"
           class="text-white font-bold bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("cancel") }}
@@ -54,7 +52,7 @@ export default {
   data() {
     return {
       showModal: false,
-      showDeleteModal: false,
+      showRemoveTableButtons: false,
       minimizedCards: this.initializeMinimizedCards(),
     };
   },
@@ -69,27 +67,32 @@ export default {
     },
   },
   methods: {
-    handleDelete(tableName) {
+    handleRemove(tableName) {
       this.modalMessage =
-        this.$t("deleteViewAreYouSure") + ": " + tableName + "?";
+        this.$t("removeTableAreYouSure") +
+        ": <strong>" +
+        tableName +
+        "</strong>?<br><br><em>" +
+        this.$t("tableRemovedNote") +
+        ".</em>";
       this.showModal = true;
-      this.showDeleteModal = true;
-      this.tableNameToDelete = tableName;
+      this.showRemoveTableButtons = true;
+      this.tableNameToRemove = tableName;
     },
-    confirmDelete() {
-      this.$emit("delete-config", this.tableNameToDelete);
-      this.modalMessage = this.$t("viewDeleted") + "!";
-      this.showDeleteModal = false;
+    confirmRemove() {
+      this.$emit("remove-table-from-config", this.tableNameToRemove);
+      this.modalMessage = this.$t("tableRemovedFromViews") + "!";
+      this.showRemoveTableButtons = false;
       setTimeout(() => {
         this.showModal = false;
         location.reload();
       }, 3000);
     },
-    cancelDelete() {
+    cancelRemove() {
       this.modalMessage = "";
-      this.tableNameToDelete = "";
+      this.tableNameToRemove = "";
       this.showModal = false;
-      this.showDeleteModal = false;
+      this.showRemoveTableButtons = false;
     },
     initializeMinimizedCards() {
       const minimized = {};

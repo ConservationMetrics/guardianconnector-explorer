@@ -8,7 +8,7 @@ import {
   fetchData,
   fetchConfig,
   updateConfig,
-  deleteView,
+  removeTableFromConfig,
 } from "./database/dbOperations";
 import {
   filterUnwantedKeys,
@@ -406,15 +406,15 @@ app.post(
   },
 );
 
-// DELETE a view from the configuration
+// DELETE a table from configuration
 app.delete(
   "/config/:tableName",
   async (req: express.Request, res: express.Response) => {
     const { tableName } = req.params;
 
     try {
-      await deleteView(configDb, tableName, IS_SQLITE);
-      res.json({ message: "View deleted from configuration" });
+      await removeTableFromConfig(configDb, tableName, IS_SQLITE);
+      res.json({ message: "Table removed from views configuration." });
 
       // Reinitialize viewsConfig with updated config
       await getViewsConfig();
@@ -422,7 +422,7 @@ app.delete(
         console.error("Error reinitializing views config:", error.message);
       });
     } catch (error: any) {
-      console.error("Error deleting view:", error.message);
+      console.error("Error removing table from config:", error.message);
       res.status(500).json({ error: error.message });
     }
   },

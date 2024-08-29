@@ -208,7 +208,7 @@ export const updateConfig = async (
   });
 };
 
-export const deleteView = async (
+export const removeTableFromConfig = async (
   db: any,
   tableName: string,
   isSQLite: boolean | undefined,

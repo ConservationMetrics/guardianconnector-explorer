@@ -4,7 +4,7 @@
       v-if="dataFetched"
       :views-config="viewsConfig"
       @submit-config="submitConfig"
-      @delete-config="deleteConfig"
+      @remove-table-from-config="removeTableFromConfig"
     />
   </div>
 </template>
@@ -86,7 +86,7 @@ export default {
         console.error("Error updating config:", error);
       }
     },
-    async deleteConfig(tableName) {
+    async removeTableFromConfig(tableName) {
       try {
         // Set up the headers for the request
         let headers = {
@@ -110,7 +110,7 @@ export default {
           throw new Error("Network response was not ok");
         }
       } catch (error) {
-        console.error("Error deleting config:", error);
+        console.error("Error removing table from config:", error);
       }
     },
   },

@@ -66,10 +66,10 @@
         </button>
         <button
           type="button"
-          class="delete-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 md:ml-2 ml-0"
-          @click="$emit('delete-config', tableName)"
+          class="remove-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 md:ml-2 ml-0"
+          @click="$emit('remove-table-from-config', tableName)"
         >
-          {{ $t("deleteView") }}
+          {{ $t("removeTable") }}
         </button>
       </form>
     </div>
