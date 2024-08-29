@@ -77,10 +77,10 @@ const config: NuxtConfig = {
     },
   },
 
-  axios: {
-    baseURL: "http://127.0.0.1:8080",
-    browserBaseURL: "/",
-  },
+  axios: process.env.NODE_ENV === 'development' ? {} : {
+      baseURL: "http://127.0.0.1:8080",
+      browserBaseURL: "/",
+    },
 
   publicRuntimeConfig: {
     auth: {
