@@ -5,7 +5,7 @@
     </div>
     <h1>{{ $t("availableViews") }}</h1>
     <div
-      v-for="(config, tableName) in viewsConfig"
+      v-for="(config, tableName) in filteredSortedViewsConfig"
       :key="tableName"
       class="table-item"
     >
@@ -33,6 +33,17 @@ export default {
     return {
       viewsConfig: [],
     };
+  },
+  computed: {
+    filteredSortedViewsConfig() {
+      return Object.keys(this.viewsConfig)
+        .filter(key => Object.keys(this.viewsConfig[key]).length > 0)
+        .sort()
+        .reduce((acc, key) => {
+          acc[key] = this.viewsConfig[key];
+          return acc;
+        }, {});
+    },
   },
   async mounted() {
     try {
