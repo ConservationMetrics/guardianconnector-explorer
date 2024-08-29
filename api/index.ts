@@ -406,7 +406,7 @@ app.post(
   },
 );
 
-// REMOVE a table from configuration
+// DELETE a table record from configuration
 app.delete(
   "/config/:tableName",
   async (req: express.Request, res: express.Response) => {
