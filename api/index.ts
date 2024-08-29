@@ -7,6 +7,7 @@ import {
 import {
   fetchData,
   fetchConfig,
+  addNewTableToConfig,
   updateConfig,
   removeTableFromConfig,
 } from "./database/dbOperations";
@@ -393,6 +394,28 @@ app.post(
     try {
       await updateConfig(configDb, tableName, config, IS_SQLITE);
       res.json({ message: "Configuration updated successfully" });
+
+      // Reinitialize viewsConfig with updated config
+      await getViewsConfig();
+      initializeViewsConfig().catch((error) => {
+        console.error("Error reinitializing views config:", error.message);
+      });
+    } catch (error: any) {
+      console.error("Error updating config:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
+
+// POST a new table to config
+app.post(
+  "/config/new-table/:tableName",
+  async (req: express.Request, res: express.Response) => {
+    const { tableName } = req.params;
+
+    try {
+      await addNewTableToConfig(configDb, tableName, IS_SQLITE);
+      res.json({ message: "New table added successfully" });
 
       // Reinitialize viewsConfig with updated config
       await getViewsConfig();

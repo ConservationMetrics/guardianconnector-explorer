@@ -99,6 +99,9 @@ export default {
         this.$emit("remove-table-from-config", this.tableNameToRemove);
         this.modalMessage = this.$t("tableRemovedFromViews") + "!";
       } else if (this.currentModalAction === "addTable") {
+        // TODO: Get table name from dropdown
+        this.tableNameToAdd = "table_" + Math.floor(Math.random() * 1000);
+        this.$emit("add-table-to-config", this.tableNameToAdd);
         this.modalMessage = this.$t("tableAddedToViews") + "!";
       }
       this.showModalButtons = false;

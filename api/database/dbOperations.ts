@@ -208,6 +208,38 @@ export const updateConfig = async (
   });
 };
 
+export const addNewTableToConfig = async (
+  db: any,
+  tableName: string,
+  isSQLite: boolean | undefined,
+): Promise<void> => {
+  const query = isSQLite
+    ? `INSERT INTO config (table_name, views_config) VALUES (?, ?)`
+    : `INSERT INTO config (table_name, views_config) VALUES ($1, $2)`;
+
+  return new Promise((resolve, reject) => {
+    if (isSQLite) {
+      db.run(query, [tableName, '{}'], (err: Error) => {
+        if (err) {
+          console.error("SQLite Error:", err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    } else {
+      db.query(query, [tableName, '{}'], (err: Error) => {
+        if (err) {
+          console.error("PostgreSQL Error:", err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    }
+  });
+};
+
 export const removeTableFromConfig = async (
   db: any,
   tableName: string,
