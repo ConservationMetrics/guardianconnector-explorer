@@ -13,21 +13,27 @@
         :isMinimized="minimizedCards[tableName]"
         @toggle-minimize="toggleMinimize"
         @submit-config="handleSubmit"
-        @remove-table-from-config="handleRemove"
+        @remove-table-from-config="handleRemoveTableFromConfig"
       />
     </div>
+      <button 
+        @click="handleAddNewTable"
+        class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200"
+      >
+        + {{ $t("addNewTable") }}
+      </button>   
     <div v-if="showModal" class="overlay"></div>
     <div v-if="showModal" class="modal">
       <p v-html="modalMessage"></p>
-      <div v-if="showRemoveTableButtons" class="mt-4">
+      <div v-if="showModalButtons" class="mt-4">
         <button
-          @click="confirmRemove"
+          @click="handleConfirmButton"
           class="text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("confirm") }}
         </button>
         <button
-          @click="cancelRemove"
+          @click="handleCancelButton"
           class="text-white font-bold bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("cancel") }}
@@ -51,8 +57,10 @@ export default {
   },
   data() {
     return {
+      currentModalAction: null,
       showModal: false,
-      showRemoveTableButtons: false,
+      showModalButtons: false,
+      showNewTableDropdown: false,
       minimizedCards: this.initializeMinimizedCards(),
     };
   },
@@ -67,7 +75,13 @@ export default {
     },
   },
   methods: {
-    handleRemove(tableName) {
+    handleAddNewTable() {
+      this.modalMessage = this.$t("selectTableToAdd");
+      this.currentModalAction = "addTable";
+      this.showModal = true;
+      this.showModalButtons = true;
+    },
+    handleRemoveTableFromConfig(tableName) {
       this.modalMessage =
         this.$t("removeTableAreYouSure") +
         ": <strong>" +
@@ -75,24 +89,31 @@ export default {
         "</strong>?<br><br><em>" +
         this.$t("tableRemovedNote") +
         ".</em>";
+      this.currentModalAction = "removeTable";
       this.showModal = true;
-      this.showRemoveTableButtons = true;
+      this.showModalButtons = true;
       this.tableNameToRemove = tableName;
     },
-    confirmRemove() {
-      this.$emit("remove-table-from-config", this.tableNameToRemove);
-      this.modalMessage = this.$t("tableRemovedFromViews") + "!";
-      this.showRemoveTableButtons = false;
+    handleConfirmButton() {
+      if (this.currentModalAction === "removeTable") {
+        this.$emit("remove-table-from-config", this.tableNameToRemove);
+        this.modalMessage = this.$t("tableRemovedFromViews") + "!";
+      } else if (this.currentModalAction === "addTable") {
+        this.modalMessage = this.$t("tableAddedToViews") + "!";
+      }
+      this.showModalButtons = false;
       setTimeout(() => {
         this.showModal = false;
+        this.currentModalAction = null;
         location.reload();
       }, 3000);
     },
-    cancelRemove() {
+    handleCancelButton() {
       this.modalMessage = "";
       this.tableNameToRemove = "";
       this.showModal = false;
-      this.showRemoveTableButtons = false;
+      this.showModalButtons = false;
+      this.currentModalAction = null;
     },
     initializeMinimizedCards() {
       const minimized = {};
@@ -145,6 +166,6 @@ export default {
   gap: 1em;
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 0 auto 1em auto;
 }
 </style>
