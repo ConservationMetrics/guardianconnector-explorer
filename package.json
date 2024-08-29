@@ -4,12 +4,12 @@
   "type": "module",
   "description": "A Nuxt app to visualize GuardianConnector data in different views",
   "scripts": {
-    "dev": "./node_modules/.bin/nuxt",
-    "build": "./node_modules/.bin/nuxt build",
-    "start": "./node_modules/.bin/nuxt start",
-    "generate": "./node_modules/.bin/nuxt generate",
+    "dev": "npx nuxt",
+    "build": "npx nuxt build",
+    "start": "npx nuxt start",
+    "generate": "npx nuxt generate",
     "lint": "prettier --write ./ --ignore-path .prettierignore",
-    "prepare": "[ -f ./node_modules/.bin/husky ] && husky install || echo 'Skipping husky install'"
+    "prepare": "husky install || echo 'Skipping husky install'"
   },
   "dependencies": {
     "@johmun/vue-tags-input": "^2.1.0",
@@ -51,14 +51,9 @@
     "prettier": "^3.2.5",
     "typescript": "^5.3.3"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "src/**/*.{js,jsx,ts,tsx,json,css,vue}": [
-      "prettier --write ./"
+      "prettier --write"
     ]
   },
   "engines": {
