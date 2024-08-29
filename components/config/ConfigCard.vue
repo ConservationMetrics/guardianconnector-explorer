@@ -60,9 +60,16 @@
               'bg-blue-500 hover:bg-blue-700': isChanged && isFormValid,
             },
           ]"
-          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 md:block"
+          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("submit") }}
+        </button>
+        <button
+          type="button"
+          class="remove-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 md:ml-2 ml-0"
+          @click="$emit('remove-table-from-config', tableName)"
+        >
+          {{ $t("removeTable") }}
         </button>
       </form>
     </div>

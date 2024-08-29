@@ -13,11 +13,26 @@
         :isMinimized="minimizedCards[tableName]"
         @toggle-minimize="toggleMinimize"
         @submit-config="handleSubmit"
+        @remove-table-from-config="handleRemove"
       />
     </div>
     <div v-if="showModal" class="overlay"></div>
     <div v-if="showModal" class="modal">
-      {{ modalMessage }}
+      <p v-html="modalMessage"></p>
+      <div v-if="showRemoveTableButtons" class="mt-4">
+        <button
+          @click="confirmRemove"
+          class="text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+        >
+          {{ $t("confirm") }}
+        </button>
+        <button
+          @click="cancelRemove"
+          class="text-white font-bold bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+        >
+          {{ $t("cancel") }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -37,6 +52,7 @@ export default {
   data() {
     return {
       showModal: false,
+      showRemoveTableButtons: false,
       minimizedCards: this.initializeMinimizedCards(),
     };
   },
@@ -51,6 +67,33 @@ export default {
     },
   },
   methods: {
+    handleRemove(tableName) {
+      this.modalMessage =
+        this.$t("removeTableAreYouSure") +
+        ": <strong>" +
+        tableName +
+        "</strong>?<br><br><em>" +
+        this.$t("tableRemovedNote") +
+        ".</em>";
+      this.showModal = true;
+      this.showRemoveTableButtons = true;
+      this.tableNameToRemove = tableName;
+    },
+    confirmRemove() {
+      this.$emit("remove-table-from-config", this.tableNameToRemove);
+      this.modalMessage = this.$t("tableRemovedFromViews") + "!";
+      this.showRemoveTableButtons = false;
+      setTimeout(() => {
+        this.showModal = false;
+        location.reload();
+      }, 3000);
+    },
+    cancelRemove() {
+      this.modalMessage = "";
+      this.tableNameToRemove = "";
+      this.showModal = false;
+      this.showRemoveTableButtons = false;
+    },
     initializeMinimizedCards() {
       const minimized = {};
       for (const tableName in this.viewsConfig) {
