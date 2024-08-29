@@ -18,23 +18,45 @@
     </div>
       <button 
         @click="handleAddNewTable"
-        class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200"
+        class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200 mb-6"
       >
         + {{ $t("addNewTable") }}
       </button>   
     <div v-if="showModal" class="overlay"></div>
     <div v-if="showModal" class="modal">
       <p v-html="modalMessage"></p>
+      <div v-if="showModalDropdown">
+        <select
+          v-model="selectedTable"
+          class="mt-4"
+        >
+          <option
+            v-for="table in tables"
+            :key="table"
+            :value="table"
+          >
+            {{ table }}
+          </option>
+        </select>
+      </div>
       <div v-if="showModalButtons" class="mt-4">
         <button
           @click="handleConfirmButton"
+          :disabled="confirmButtonDisabled"
+          :class="[
+            'submit-button',
+            {
+              'bg-gray-500 cursor-not-allowed': confirmButtonDisabled,
+              'bg-red-500 hover:bg-red-700': !confirmButtonDisabled,
+            },
+          ]"
           class="text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("confirm") }}
         </button>
         <button
           @click="handleCancelButton"
-          class="text-white font-bold bg-gray-500 hover:bg-gray-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+          class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("cancel") }}
         </button>
@@ -58,9 +80,13 @@ export default {
   data() {
     return {
       currentModalAction: null,
+      modalMessage: "",
+      tableNameToRemove: "",
       showModal: false,
       showModalButtons: false,
+      showModalDropdown: false,
       showNewTableDropdown: false,
+      confirmButtonDisabled: false,
       minimizedCards: this.initializeMinimizedCards(),
     };
   },
@@ -76,10 +102,12 @@ export default {
   },
   methods: {
     handleAddNewTable() {
-      this.modalMessage = this.$t("selectTableToAdd");
+      this.modalMessage = this.$t("selectTableToAdd") + ":";
       this.currentModalAction = "addTable";
       this.showModal = true;
+      this.showModalDropdown = true;
       this.showModalButtons = true;
+      this.confirmButtonDisabled = true;
     },
     handleRemoveTableFromConfig(tableName) {
       this.modalMessage =
@@ -103,6 +131,7 @@ export default {
         this.tableNameToAdd = "table_" + Math.floor(Math.random() * 1000);
         this.$emit("add-table-to-config", this.tableNameToAdd);
         this.modalMessage = this.$t("tableAddedToViews") + "!";
+        this.showModalDropdown = false;
       }
       this.showModalButtons = false;
       setTimeout(() => {
@@ -115,7 +144,9 @@ export default {
       this.modalMessage = "";
       this.tableNameToRemove = "";
       this.showModal = false;
+      this.showModalDropdown = false;
       this.showModalButtons = false;
+      this.confirmButtonDisabled = false;
       this.currentModalAction = null;
     },
     initializeMinimizedCards() {
