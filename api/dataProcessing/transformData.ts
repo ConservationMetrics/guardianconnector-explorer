@@ -226,8 +226,10 @@ const prepareAlertData = (
   let latestDate = new Date(0);
   let latestMonthStr = "";
 
+  const validGeoData = data.filter(isValidGeolocation);
+
   // First pass to find the latest date
-  data.forEach((item) => {
+  validGeoData.forEach((item) => {
     const formattedMonth =
       item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
     const monthYearStr = `${formattedMonth}-${item.year_detec}`;
@@ -243,7 +245,7 @@ const prepareAlertData = (
   const previousAlerts: Array<Record<string, any>> = [];
 
   // Second pass to segregate the data
-  data.forEach((item) => {
+  validGeoData.forEach((item) => {
     // Prepend 0 to single-digit months, if found
     const formattedMonth =
       item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
@@ -520,6 +522,65 @@ const transformToGeojson = (
     type: "FeatureCollection",
     features: features,
   };
+};
+
+// Validate geolocation data
+const isValidGeolocation = (item: Record<string, any>): boolean => {
+  const validGeoTypes = [
+    "LineString",
+    "MultiLineString",
+    "Point",
+    "Polygon",
+    "MultiPolygon",
+  ];
+
+  const isValidCoordinates = (type: string, coordinates: any): boolean => {
+    if (typeof coordinates === "string") {
+      try {
+        coordinates = JSON.parse(coordinates);
+      } catch (error) {
+        return false;
+      }
+    }
+
+    if (type === "Point") {
+      return (
+        Array.isArray(coordinates) &&
+        coordinates.length === 2 &&
+        coordinates.every(Number.isFinite)
+      );
+    } else if (type === "LineString" || type === "MultiLineString") {
+      return (
+        Array.isArray(coordinates) &&
+        coordinates.every(
+          (coord) =>
+            Array.isArray(coord) &&
+            coord.length === 2 &&
+            coord.every(Number.isFinite),
+        )
+      );
+    } else if (type === "Polygon" || type === "MultiPolygon") {
+      return (
+        Array.isArray(coordinates) &&
+        coordinates.every(
+          (ring) =>
+            Array.isArray(ring) &&
+            ring.every(
+              (coord) =>
+                Array.isArray(coord) &&
+                coord.length === 2 &&
+                coord.every(Number.isFinite),
+            ),
+        )
+      );
+    }
+    return false;
+  };
+
+  return (
+    validGeoTypes.includes(item.g__type) &&
+    isValidCoordinates(item.g__type, item.g__coordinates)
+  );
 };
 
 export {
