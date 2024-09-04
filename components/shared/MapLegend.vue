@@ -76,7 +76,7 @@ export default {
   position: absolute;
   bottom: 30px;
   right: 10px;
-  max-width: 300px;
+  max-width: 450px;
   background-color: #fff;
   padding: 20px;
   line-height: 18px;
