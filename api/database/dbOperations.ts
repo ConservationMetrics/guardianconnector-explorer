@@ -1,3 +1,5 @@
+import { Views } from "../types";
+
 const checkTableExists = (
   db: any,
   table: string | undefined,
@@ -96,33 +98,28 @@ export const fetchData = async (
   return { mainData, columnsData, metadata };
 };
 
-interface ViewConfig {
-  VIEWS: string;
-  FILTER_BY_COLUMN: string;
-  FILTER_OUT_VALUES_FROM_COLUMN: string;
-  FRONT_END_FILTER_COLUMN: string;
-  MAPBOX_STYLE: string;
-  MAPBOX_PROJECTION: string;
-  MAPBOX_CENTER_LATITUDE: string;
-  MAPBOX_CENTER_LONGITUDE: string;
-  MAPBOX_ZOOM: string;
-  MAPBOX_PITCH: string;
-  MAPBOX_BEARING: string;
-  MAPBOX_3D: string;
-  MAPEO_TABLE: string;
-  MAPEO_CATEGORY_IDS: string;
-  MAP_LEGEND_LAYER_IDS: string;
-  MEDIA_BASE_PATH: string;
-  MEDIA_BASE_PATH_ALERTS: string;
-  LOGO_URL: string;
-  PLANET_API_KEY: string;
-  UNWANTED_COLUMNS?: string;
-  UNWANTED_SUBSTRINGS?: string;
-}
+export const fetchTableNames = async (
+  db: any,
+  isSQLite: boolean | undefined,
+): Promise<string[]> => {
+  const query = isSQLite
+    ? `SELECT name FROM sqlite_master WHERE type='table'`
+    : `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`;
 
-interface Views {
-  [key: string]: ViewConfig;
-}
+  return new Promise((resolve, reject) => {
+    if (isSQLite) {
+      db.all(query, (err: Error, rows: any[]) => {
+        if (err) reject(err);
+        resolve(rows.map((row) => row.name));
+      });
+    } else {
+      db.query(query, (err: Error, result: { rows: any[] }) => {
+        if (err) reject(err);
+        resolve(result.rows.map((row) => row.table_name));
+      });
+    }
+  });
+};
 
 export const fetchConfig = async (
   db: any,
@@ -219,7 +216,7 @@ export const addNewTableToConfig = async (
 
   return new Promise((resolve, reject) => {
     if (isSQLite) {
-      db.run(query, [tableName, '{}'], (err: Error) => {
+      db.run(query, [tableName, "{}"], (err: Error) => {
         if (err) {
           console.error("SQLite Error:", err);
           reject(err);
@@ -228,7 +225,7 @@ export const addNewTableToConfig = async (
         }
       });
     } else {
-      db.query(query, [tableName, '{}'], (err: Error) => {
+      db.query(query, [tableName, "{}"], (err: Error) => {
         if (err) {
           console.error("PostgreSQL Error:", err);
           reject(err);

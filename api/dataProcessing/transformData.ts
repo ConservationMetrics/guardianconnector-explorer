@@ -1,4 +1,4 @@
-import { AlertRecord, Metadata, AlertsPerMonth } from "./types";
+import { AlertRecord, Metadata, AlertsPerMonth } from "../types";
 import {
   capitalizeFirstLetter,
   getRandomColor,

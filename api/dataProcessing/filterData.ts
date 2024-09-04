@@ -1,4 +1,4 @@
-import { Column } from "./types";
+import { Column } from "../types";
 import { hasValidCoordinates } from "./helpers";
 
 // Filter out unwanted columns and substrings
