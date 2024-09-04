@@ -4,7 +4,7 @@
       <h3>{{ $t("alerts") }} {{ $t("configuration") }}</h3>
     </div>
     <div v-for="key in keys" :key="key" class="config-field">
-      <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+      <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
       <template v-if="key === 'MAPEO_TABLE'">
         <input
           :id="`${tableName}-${key}`"
@@ -14,9 +14,9 @@
       </template>
       <template v-else-if="key === 'MAPEO_CATEGORY_IDS'">
         <component
+          v-if="isClient"
           class="tag-field"
           :is="isClient ? 'vue-tags-input' : 'div'"
-          v-if="isClient"
           v-model="tagInputs[key]"
           :tags="tags[key]"
           @tags-changed="updateTags(key, $event)"
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { toCamelCase } from "@/src/utils.ts";
 export default {
   props: {
     tableName: String,
@@ -53,6 +54,7 @@ export default {
     };
   },
   methods: {
+    toCamelCase: toCamelCase,
     updateTags(key, newTags) {
       this.tags[key] = newTags;
       this.config[key] = newTags.map((tag) => tag.text).join(",");
