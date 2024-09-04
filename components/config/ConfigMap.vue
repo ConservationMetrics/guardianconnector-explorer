@@ -37,8 +37,8 @@
           key === 'MAPBOX_ZOOM'
         "
       >
-      <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
-      <input
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
+        <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
           class="input-field"

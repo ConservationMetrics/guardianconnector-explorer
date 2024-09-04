@@ -40,6 +40,6 @@ export default {
   },
   methods: {
     toCamelCase: toCamelCase,
-  }
+  },
 };
 </script>
