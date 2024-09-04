@@ -3,6 +3,7 @@
     <Config
       v-if="dataFetched"
       :views-config="viewsConfig"
+      :table-names="tableNames"
       @submit-config="submitConfig"
       @remove-table-from-config="removeTableFromConfig"
       @add-table-to-config="addTableToConfig"
@@ -43,7 +44,8 @@ export default {
 
       // Set the viewsConfig data
       return {
-        viewsConfig: response.data,
+        viewsConfig: response.data[0],
+        tableNames: response.data[1],
         dataFetched: true,
       };
     } catch (error) {
@@ -56,6 +58,7 @@ export default {
   data() {
     return {
       viewsConfig: {},
+      tableNames: [],
       dataFetched: false,
     };
   },
@@ -102,11 +105,15 @@ export default {
         }
 
         // Make the API call using Axios
-        const response = await axios.post(`/api/config/new-table/${tableName}`, {
-          tableName,
-        }, {
-          headers,
-        });
+        const response = await axios.post(
+          `/api/config/new-table/${tableName}`,
+          {
+            tableName,
+          },
+          {
+            headers,
+          },
+        );
 
         // Check if the response is OK
         if (response.status !== 200) {
@@ -114,7 +121,7 @@ export default {
         }
       } catch (error) {
         console.error("Error adding table to config:", error);
-      }      
+      }
     },
     async removeTableFromConfig(tableName) {
       try {

@@ -16,25 +16,21 @@
         @remove-table-from-config="handleRemoveTableFromConfig"
       />
     </div>
-      <button 
-        @click="handleAddNewTable"
-        class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200 mb-6"
-      >
-        + {{ $t("addNewTable") }}
-      </button>   
+    <button
+      @click="handleAddNewTable"
+      class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200 mb-6"
+    >
+      + {{ $t("addNewTable") }}
+    </button>
     <div v-if="showModal" class="overlay"></div>
     <div v-if="showModal" class="modal">
       <p v-html="modalMessage"></p>
       <div v-if="showModalDropdown">
         <select
-          v-model="selectedTable"
-          class="mt-4"
+          v-model="tableNameToAdd"
+          class="mt-4 p-2 border border-gray-300 rounded"
         >
-          <option
-            v-for="table in tables"
-            :key="table"
-            :value="table"
-          >
+          <option v-for="table in tableNames" :key="table" :value="table">
             {{ table }}
           </option>
         </select>
@@ -47,10 +43,13 @@
             'submit-button',
             {
               'bg-gray-500 cursor-not-allowed': confirmButtonDisabled,
-              'bg-red-500 hover:bg-red-700': !confirmButtonDisabled,
+              'bg-red-500 hover:bg-red-700':
+                currentModalAction !== 'addTable' && !confirmButtonDisabled,
+              'bg-blue-500 hover:bg-blue-700':
+                currentModalAction === 'addTable' && !confirmButtonDisabled,
             },
           ]"
-          class="text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
         >
           {{ $t("confirm") }}
         </button>
@@ -76,12 +75,14 @@ export default {
   },
   props: {
     viewsConfig: Object,
+    tableNames: Array,
   },
   data() {
     return {
       currentModalAction: null,
       modalMessage: "",
       tableNameToRemove: "",
+      tableNameToAdd: null,
       showModal: false,
       showModalButtons: false,
       showModalDropdown: false,
@@ -127,8 +128,7 @@ export default {
         this.$emit("remove-table-from-config", this.tableNameToRemove);
         this.modalMessage = this.$t("tableRemovedFromViews") + "!";
       } else if (this.currentModalAction === "addTable") {
-        // TODO: Get table name from dropdown
-        this.tableNameToAdd = "table_" + Math.floor(Math.random() * 1000);
+        this.tableNameToAdd = this.tableNameToAdd.trim();
         this.$emit("add-table-to-config", this.tableNameToAdd);
         this.modalMessage = this.$t("tableAddedToViews") + "!";
         this.showModalDropdown = false;
@@ -147,6 +147,9 @@ export default {
       this.showModalDropdown = false;
       this.showModalButtons = false;
       this.confirmButtonDisabled = false;
+      if (this.currentModalAction === "addTable") {
+        this.tableNameToAdd = null;
+      }
       this.currentModalAction = null;
     },
     initializeMinimizedCards() {
@@ -171,6 +174,11 @@ export default {
         this.$set(this.minimizedCards, key, true);
       }
       this.$set(this.minimizedCards, tableName, !isCurrentlyMinimized);
+    },
+  },
+  watch: {
+    tableNameToAdd(newVal) {
+      this.confirmButtonDisabled = !newVal;
     },
   },
 };
