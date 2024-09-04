@@ -20,7 +20,7 @@
         </p>
         <div
           class="mb-2"
-          v-if="statistics.typeOfAlerts && stastistics.typeOfAlerts.length"
+          v-if="statistics.typeOfAlerts && statistics.typeOfAlerts.length"
         >
           <span class="font-bold">{{ $t("typeOfAlerts") }}:</span>
           {{ statistics.typeOfAlerts.join(", ") }}
