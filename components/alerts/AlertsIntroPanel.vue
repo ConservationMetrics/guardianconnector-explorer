@@ -18,11 +18,17 @@
             ><strong>{{ $t("red") }}</strong></span
           >.
         </p>
-        <div class="mb-2">
+        <div
+          class="mb-2"
+          v-if="statistics.typeOfAlerts && stastistics.typeOfAlerts.length"
+        >
           <span class="font-bold">{{ $t("typeOfAlerts") }}:</span>
           {{ statistics.typeOfAlerts.join(", ") }}
         </div>
-        <div class="mb-2">
+        <div
+          class="mb-2"
+          v-if="statistics.dataProviders && statistics.dataProviders.length"
+        >
           <span class="font-bold">{{ $t("dataProviders") }}:</span>
           {{ statistics.dataProviders.join(", ") }}
         </div>

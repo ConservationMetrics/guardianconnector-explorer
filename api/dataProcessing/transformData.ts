@@ -275,12 +275,26 @@ const prepareAlertStatistics = (
     data[0].territory_name.slice(1);
 
   const typeOfAlerts = Array.from(
-    new Set(data.map((item) => item.alert_type.replace(/_/g, " "))),
+    new Set(
+      data
+        .map((item) =>
+          item.alert_type ? item.alert_type.replace(/_/g, " ") : null,
+        )
+        .filter(Boolean),
+    ),
   );
 
   const dataProviders = Array.from(
-    new Set(data.map((item) => item._topic.replace(/_/g, " "))),
-  ).map((provider) => provider.replace(/\b\w/g, (char) => char.toUpperCase()));
+    new Set(
+      data
+        .map((item) => (item._topic ? item._topic.replace(/_/g, " ") : null))
+        .filter(Boolean),
+    ),
+  )
+    .map((provider) =>
+      provider ? provider.replace(/\b\w/g, (char) => char.toUpperCase()) : null,
+    )
+    .filter(Boolean);
 
   // Create Date objects for sorting and comparisons
   const formattedDates = data.map((item) => ({
