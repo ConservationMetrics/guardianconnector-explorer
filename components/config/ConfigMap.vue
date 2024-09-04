@@ -11,6 +11,7 @@
           v-model="config[key]"
           class="input-field"
           pattern="^mapbox:\/\/styles\/[^\/]+\/[^\/]+$"
+          placeholder="mapbox://styles/user/styleId"
           :title="
             $t('pleaseMatchFormat') + ': mapbox://styles/username/styleid'
           "
@@ -25,7 +26,8 @@
           v-model="config[key]"
           class="input-field"
           pattern="^pk\.ey.*"
-          :title="$t('pleaseMatchFormat') + ': pk.ey... '"
+          placeholder="pk.ey…"
+          :title="$t('pleaseMatchFormat') + ': pk.ey… '"
         />
       </template>
       <template
@@ -67,7 +69,7 @@
                   : key === 'MAPBOX_PITCH'
                     ? 85
                     : key === 'MAPBOX_ZOOM'
-                      ? 23
+                      ? 22
                       : 0
           "
         />

@@ -14,9 +14,9 @@
       </template>
       <template v-else-if="key === 'MAPEO_CATEGORY_IDS'">
         <component
+          v-if="isClient"
           class="tag-field"
           :is="isClient ? 'vue-tags-input' : 'div'"
-          v-if="isClient"
           v-model="tagInputs[key]"
           :tags="tags[key]"
           @tags-changed="updateTags(key, $event)"

@@ -12,16 +12,12 @@
           class="input-field"
         />
       </template>
-      <template v-else-if="key === 'FILTER_OUT_VALUES_FROM_COLUMN'">
-        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
-        <input
-          :id="`${tableName}-${key}`"
-          v-model="config[key]"
-          class="input-field"
-        />
-      </template>
       <template
-        v-else-if="key === 'UNWANTED_COLUMNS' || key === 'UNWANTED_SUBSTRINGS'"
+        v-else-if="
+          key === 'FILTER_OUT_VALUES_FROM_COLUMN' ||
+          key === 'UNWANTED_COLUMNS' ||
+          key === 'UNWANTED_SUBSTRINGS'
+        "
       >
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
 
@@ -53,10 +49,16 @@ export default {
   data() {
     return {
       tagInputs: {
+        FILTER_OUT_VALUES_FROM_COLUMN: "",
         UNWANTED_COLUMNS: "",
         UNWANTED_SUBSTRINGS: "",
       },
       tags: {
+        FILTER_OUT_VALUES_FROM_COLUMN: this.config.FILTER_OUT_VALUES_FROM_COLUMN
+          ? this.config.FILTER_OUT_VALUES_FROM_COLUMN.split(",").map((tag) => ({
+              text: tag,
+            }))
+          : [],
         UNWANTED_COLUMNS: this.config.UNWANTED_COLUMNS
           ? this.config.UNWANTED_COLUMNS.split(",").map((tag) => ({
               text: tag,

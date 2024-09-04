@@ -12,6 +12,7 @@
           :id="`${tableName}-${key}`"
           v-model="config[key]"
           class="input-field"
+          placeholder="https://…"
           type="url"
         />
       </template>
@@ -21,6 +22,7 @@
           :id="`${tableName}-${key}`"
           v-model="config[key]"
           class="input-field"
+          placeholder="https://…"
           type="url"
         />
       </template>
