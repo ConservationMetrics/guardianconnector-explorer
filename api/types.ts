@@ -9,10 +9,10 @@ export type AlertRecord = {
   month_detec: string;
   year_detec: string;
   area_alert_ha: string;
-  _topic: string;
 };
 
 export type Metadata = {
+  alert_source: string;
   type_alert: string;
   month: number;
   year: number;

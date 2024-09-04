@@ -270,6 +270,8 @@ const prepareAlertStatistics = (
   data: AlertRecord[],
   metadata: Metadata[] | null,
 ): Record<string, any> => {
+  let dataProviders: string[] = [];
+
   const territory =
     data[0].territory_name.charAt(0).toUpperCase() +
     data[0].territory_name.slice(1);
@@ -283,18 +285,6 @@ const prepareAlertStatistics = (
         .filter(Boolean),
     ),
   );
-
-  const dataProviders = Array.from(
-    new Set(
-      data
-        .map((item) => (item._topic ? item._topic.replace(/_/g, " ") : null))
-        .filter(Boolean),
-    ),
-  )
-    .map((provider) =>
-      provider ? provider.replace(/\b\w/g, (char) => char.toUpperCase()) : null,
-    )
-    .filter(Boolean);
 
   // Create Date objects for sorting and comparisons
   const formattedDates = data.map((item) => ({
@@ -327,6 +317,11 @@ const prepareAlertStatistics = (
 
     earliestDateStr = `${String(earliestMetadata.month).padStart(2, "0")}-${earliestMetadata.year}`;
     latestDateStr = `${String(latestMetadata.month).padStart(2, "0")}-${latestMetadata.year}`;
+
+    // Set alert_source
+    dataProviders = Array.from(
+      new Set(metadata.map((item) => item.alert_source)),
+    );
   } else {
     // If metadata is null, calculate earliest and latest dates from data
     const formattedDates = data.map((item) => ({
