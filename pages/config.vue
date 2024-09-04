@@ -3,8 +3,10 @@
     <Config
       v-if="dataFetched"
       :views-config="viewsConfig"
+      :table-names="tableNames"
       @submit-config="submitConfig"
       @remove-table-from-config="removeTableFromConfig"
+      @add-table-to-config="addTableToConfig"
     />
   </div>
 </template>
@@ -42,7 +44,8 @@ export default {
 
       // Set the viewsConfig data
       return {
-        viewsConfig: response.data,
+        viewsConfig: response.data[0],
+        tableNames: response.data[1],
         dataFetched: true,
       };
     } catch (error) {
@@ -55,6 +58,7 @@ export default {
   data() {
     return {
       viewsConfig: {},
+      tableNames: [],
       dataFetched: false,
     };
   },
@@ -84,6 +88,39 @@ export default {
         }
       } catch (error) {
         console.error("Error updating config:", error);
+      }
+    },
+    async addTableToConfig(tableName) {
+      try {
+        // Set up the headers for the request
+        let headers = {
+          "x-api-key": this.$config.apiKey.replace(/['"]+/g, ""),
+          "x-auth-strategy": this.$auth.strategy.name,
+        };
+
+        // If the authentication strategy is 'local', include the token in the headers
+        if (this.$auth.strategy.name === "local") {
+          const token = this.$auth.strategy.token.get();
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        // Make the API call using Axios
+        const response = await axios.post(
+          `/api/config/new-table/${tableName}`,
+          {
+            tableName,
+          },
+          {
+            headers,
+          },
+        );
+
+        // Check if the response is OK
+        if (response.status !== 200) {
+          throw new Error("Network response was not ok");
+        }
+      } catch (error) {
+        console.error("Error adding table to config:", error);
       }
     },
     async removeTableFromConfig(tableName) {

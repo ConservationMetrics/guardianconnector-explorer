@@ -6,7 +6,9 @@ import {
 } from "./database/dbConnection";
 import {
   fetchData,
+  fetchTableNames,
   fetchConfig,
+  addNewTableToConfig,
   updateConfig,
   removeTableFromConfig,
 } from "./database/dbOperations";
@@ -36,6 +38,7 @@ import {
   IS_SQLITE,
   SQLITE_DB_PATH,
 } from "./config";
+import { Views } from "./types";
 
 let configDb: any;
 let db: any;
@@ -50,12 +53,25 @@ app.post("/login", postLogin);
 // Apply middleware to views routes
 app.use(checkAuthStrategy);
 
-let viewsConfig: any = {};
+let viewsConfig: Views = {};
 
 // Fetch views config
 const getViewsConfig = async () => {
   viewsConfig = await fetchConfig(configDb, IS_SQLITE);
   return viewsConfig;
+};
+
+// Fetch table names
+const getTableNames = async () => {
+  let tableNames = await fetchTableNames(db, IS_SQLITE);
+  // Filter out anything with metadata, columns, and anything PostGIS related
+  tableNames = tableNames.filter(
+    (name) =>
+      !name.includes("metadata") &&
+      !name.includes("columns") &&
+      !name.includes("spatial_ref_sys"),
+  );
+  return tableNames;
 };
 
 // Initialize views using config
@@ -77,7 +93,7 @@ const initializeViewsConfig = async () => {
   tableNames.forEach((table) => {
     // Check if viewsConfig[table].viewsConfig is not set
     if (!viewsConfig[table].VIEWS) {
-      console.log(`viewsConfig not defined for ${table}, skipping...`);
+      console.warn(`viewsConfig not defined for ${table}, skipping...`);
       return;
     }
 
@@ -376,7 +392,14 @@ const setupAndInitialize = async () => {
 // GET views configuration
 app.get("/config", async (_req: express.Request, res: express.Response) => {
   try {
-    res.json(await getViewsConfig());
+    let tableNames = await getTableNames();
+
+    // Filter out any tables that are already in viewsConfig
+    tableNames = tableNames.filter(
+      (name) => !Object.keys(viewsConfig).includes(name),
+    );
+
+    res.json([viewsConfig, tableNames]);
   } catch (error: any) {
     console.error("Error fetching views configuration:", error.message);
     res.status(500).json({ error: error.message });
@@ -393,6 +416,28 @@ app.post(
     try {
       await updateConfig(configDb, tableName, config, IS_SQLITE);
       res.json({ message: "Configuration updated successfully" });
+
+      // Reinitialize viewsConfig with updated config
+      await getViewsConfig();
+      initializeViewsConfig().catch((error) => {
+        console.error("Error reinitializing views config:", error.message);
+      });
+    } catch (error: any) {
+      console.error("Error updating config:", error.message);
+      res.status(500).json({ error: error.message });
+    }
+  },
+);
+
+// POST a new table to config
+app.post(
+  "/config/new-table/:tableName",
+  async (req: express.Request, res: express.Response) => {
+    const { tableName } = req.params;
+
+    try {
+      await addNewTableToConfig(configDb, tableName, IS_SQLITE);
+      res.json({ message: "New table added successfully" });
 
       // Reinitialize viewsConfig with updated config
       await getViewsConfig();

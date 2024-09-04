@@ -5,7 +5,8 @@
     </div>
     <h1>{{ $t("availableViews") }}</h1>
     <div
-      v-for="(config, tableName) in viewsConfig"
+      v-if="viewsConfig"
+      v-for="(config, tableName) in filteredSortedViewsConfig"
       :key="tableName"
       class="table-item"
     >
@@ -34,6 +35,17 @@ export default {
       viewsConfig: [],
     };
   },
+  computed: {
+    filteredSortedViewsConfig() {
+      return Object.keys(this.viewsConfig)
+        .filter((key) => Object.keys(this.viewsConfig[key]).length > 0)
+        .sort()
+        .reduce((acc, key) => {
+          acc[key] = this.viewsConfig[key];
+          return acc;
+        }, {});
+    },
+  },
   async mounted() {
     try {
       // Set up the headers for the request
@@ -57,7 +69,7 @@ export default {
       }
 
       // Set the viewsConfig data
-      this.viewsConfig = response.data;
+      this.viewsConfig = response.data[0];
     } catch (error) {
       console.error("Error fetching views config from API:", error);
     }
