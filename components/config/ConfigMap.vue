@@ -5,7 +5,7 @@
     </div>
     <div v-for="key in keys" :key="key" class="config-field">
       <template v-if="key === 'MAPBOX_STYLE'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t("mapboxStyle") }}</label>
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
@@ -18,7 +18,7 @@
       </template>
       <template v-if="key === 'MAPBOX_ACCESS_TOKEN'">
         <label :for="`${tableName}-${key}`"
-          >{{ $t(key) }} <span style="color: red">*</span></label
+          >{{ $t(toCamelCase(key)) }} <span style="color: red">*</span></label
         >
         <input
           :id="`${tableName}-${key}`"
@@ -37,8 +37,8 @@
           key === 'MAPBOX_ZOOM'
         "
       >
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
-        <input
+      <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
+      <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
           class="input-field"
@@ -73,7 +73,7 @@
         />
       </template>
       <template v-else-if="key === 'MAPBOX_PROJECTION'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <select
           :id="`${tableName}-${key}`"
           v-model="config[key]"
@@ -90,7 +90,7 @@
         </select>
       </template>
       <template v-else-if="key === 'MAPBOX_3D'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <label :for="`${tableName}-${key}`" class="checkbox-label">
           <input
             type="checkbox"
@@ -101,7 +101,7 @@
         </label>
       </template>
       <template v-else-if="key === 'MAP_LEGEND_LAYER_IDS'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <component
           class="tag-field"
           :is="isClient ? 'vue-tags-input' : 'div'"
@@ -112,7 +112,7 @@
         />
       </template>
       <template v-else-if="key === 'PLANET_API_KEY'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
@@ -124,6 +124,8 @@
 </template>
 
 <script>
+import { toCamelCase } from "@/src/utils.ts";
+
 export default {
   props: {
     tableName: String,
@@ -150,6 +152,7 @@ export default {
     };
   },
   methods: {
+    toCamelCase: toCamelCase,
     updateTags(key, newTags) {
       this.tags[key] = newTags;
       this.config[key] = newTags.map((tag) => tag.text).join(",");

@@ -31,3 +31,10 @@ export function getFilePathsWithExtension(
   });
   return filePaths;
 }
+
+export function toCamelCase(key: string): string {
+  return key
+    .toLowerCase()
+    .replace(/_([a-z0-9])/g, (_, p1) => p1.toUpperCase())
+    .replace(/(^\w)/, (match) => match.toLowerCase());
+}

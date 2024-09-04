@@ -5,7 +5,7 @@
     </div>
     <div v-for="key in keys" :key="key" class="config-field">
       <template v-if="key === 'FRONT_END_FILTER_COLUMN'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
@@ -13,7 +13,7 @@
         />
       </template>
       <template v-else-if="key === 'FILTER_OUT_VALUES_FROM_COLUMN'">
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <input
           :id="`${tableName}-${key}`"
           v-model="config[key]"
@@ -23,7 +23,7 @@
       <template
         v-else-if="key === 'UNWANTED_COLUMNS' || key === 'UNWANTED_SUBSTRINGS'"
       >
-        <label :for="`${tableName}-${key}`">{{ $t(key) }}</label>
+        <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
 
         <component
           class="tag-field"
@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { toCamelCase } from "@/src/utils.ts";
 export default {
   props: {
     tableName: String,
@@ -71,6 +72,7 @@ export default {
     };
   },
   methods: {
+    toCamelCase: toCamelCase,
     updateTags(key, newTags) {
       this.tags[key] = newTags;
       this.config[key] = newTags.map((tag) => tag.text).join(",");
