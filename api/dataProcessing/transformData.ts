@@ -200,7 +200,7 @@ const prepareAlertData = (
       `${item.date_start_t1} to ${item.date_end_t1}`;
     transformedItem["monthDetected"] = `${formattedMonth}-${item.year_detec}`;
     transformedItem["YYYYMM"] = `${item.year_detec}${formattedMonth}`;
-    transformedItem["dataProvider"] = capitalizeFirstLetter(`${item._topic}`);
+    transformedItem["dataProvider"] = capitalizeFirstLetter(`${item.alert_source}`);
     transformedItem["confidenceLevel"] = item.confidence;
     transformedItem["alertType"] = item.alert_type?.replace(/_/g, " ") ?? "";
     transformedItem["alertAreaHectares"] =
