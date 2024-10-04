@@ -35,7 +35,7 @@
   "filterOutValuesFromColumn": "Which values to filter out from the column",
   "frontEndFilterColumn": "Column to filter values from",
   "gallery": "Gallery",
-  "galleryNotAvailable": "GuardianConnector Views Gallery is not available. Please activate media embedding",
+  "galleryNotAvailable": "GuardianConnector Explorer Gallery is not available. Please activate media embedding",
   "geocoordinates": "Coordinates",
   "geographicCentroid": "Geographic centroid",
   "geotype": "Geotype",

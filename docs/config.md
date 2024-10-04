@@ -1,6 +1,6 @@
-# Views configuration
+# Explorer configuration
 
-The configuration for views in a *GuardianConnector Views* deployment is done by setting config for database tables in the `/config` route.
+The configuration for views in a _GuardianConnector Explorer_ deployment is done by setting config for database tables in the `/config` route.
 
 ## Views Configuration Settings
 
@@ -8,14 +8,14 @@ Each table view can be configured using the following settings:
 
 #### `VIEWS` (required)
 
-Specify the views for each table, separated by commas. The table will be accessible in the specified views. 
+Specify the views for each table, separated by commas. The table will be accessible in the specified views.
 
 Currently available options:
 
-* `map` 
-* `gallery`
-* `alerts`
-  
+- `map`
+- `gallery`
+- `alerts`
+
 The routes for all views are listed on the index.html route (`/`).
 
 #### `MEDIA_BASE_PATH` (optional)
@@ -26,7 +26,7 @@ For alerts, you need to provide a separate base path for alerts. Append your `ME
 
 #### `FILTER_BY_COLUMN` (optional)
 
-Provides a column by which to filter out unwanted values. 
+Provides a column by which to filter out unwanted values.
 
 #### `FILTER_OUT_VALUES_FROM_COLUMN` (optional)
 

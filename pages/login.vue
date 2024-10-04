@@ -1,35 +1,27 @@
 <template>
-  <component :is="loginComponent" />
+  <Auth0Login
+    v-if="loggedIn === false"
+    :errorMessage="errorMessage"
+  ></Auth0Login>
 </template>
 
-<script>
-import Auth0Login from "~/components/auth/Auth0Login.vue";
-import PasswordLogin from "~/components/auth/PasswordLogin.vue";
+<script setup>
+import { ref } from "vue";
+import { useHead, useUserSession } from "#imports";
+import { onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 
-export default {
-  data() {
-    return {
-      authStrategy: "none",
-    };
-  },
-  created() {
-    try {
-      this.authStrategy = this.$config.authStrategy;
-    } catch (error) {
-      console.error(
-        "Error fetching authStrategy config on client side:",
-        error,
-      );
-    }
-  },
-  components: {
-    Auth0Login,
-    PasswordLogin,
-  },
-  computed: {
-    loginComponent() {
-      return this.authStrategy === "auth0" ? Auth0Login : PasswordLogin;
-    },
-  },
-};
+// Set up composables
+const { t } = useI18n();
+const { loggedIn } = useUserSession();
+const errorMessage = ref("");
+
+onMounted(() => {
+  errorMessage.value = useAuth(loggedIn);
+});
+
+// Set up page metadata
+useHead({
+  title: "Frizzle: " + t("login"),
+});
 </script>
