@@ -1,0 +1,130 @@
+import { type Column } from "../types";
+import { hasValidCoordinates } from "./helpers";
+
+// Filter out unwanted columns and substrings
+// Use SQL column mapping if available
+export const filterUnwantedKeys = (
+  data: any[],
+  columns: Column[] | null,
+  unwantedColumnsList: string | undefined,
+  unwantedSubstringsList: string | undefined
+): any[] => {
+  const filterColumns = (
+    originalColumns: Set<string>,
+    unwantedColumns: string[],
+    unwantedSubstrings: string[]
+  ): Set<string> => {
+    return new Set(
+      [...originalColumns].filter((column) => {
+        if (unwantedColumns.includes(column)) return true;
+        if (unwantedSubstrings.some((sub) => column.includes(sub))) return true;
+        return false;
+      })
+    );
+  };
+
+  // Split the unwantedColumns and unwantedSubstrings from .env
+  const unwantedColumns = unwantedColumnsList
+    ? unwantedColumnsList.split(",")
+    : [];
+  const unwantedSubstrings = unwantedSubstringsList
+    ? unwantedSubstringsList.split(",")
+    : [];
+
+  let filteredSqlColumns: Set<string>;
+
+  // If there is a __columns table, use that for SQL column mapping and filtering
+  if (columns) {
+    // Create an original-to-SQL column mapping for lookup
+    const columnMapping: { [key: string]: string } = {};
+    columns.forEach((column) => {
+      columnMapping[column.original_column] = column.sql_column;
+    });
+
+    const originalColumnsSet = new Set(
+      columns.map((column) => column.original_column)
+    );
+    const unwantedColumnsSet = filterColumns(
+      originalColumnsSet,
+      unwantedColumns,
+      unwantedSubstrings
+    );
+
+    // Map the unwanted original_column entries to sql_column entries
+    const unwantedSqlColumns = new Set(
+      [...unwantedColumnsSet].map((column) => columnMapping[column])
+    );
+
+    // Filter out the unwanted sql_column entries
+    filteredSqlColumns = new Set(
+      Object.values(columnMapping).filter(
+        (sqlColumn) => !unwantedSqlColumns.has(sqlColumn)
+      )
+    );
+  } else {
+    // If there is no __columns table, then filter based on Object keys of one data entry
+    filteredSqlColumns = new Set(
+      Object.keys(data[0]) // assuming data has at least one item
+        .filter(
+          (key) =>
+            !unwantedColumns.includes(key) &&
+            !unwantedSubstrings.some((sub) => key.includes(sub))
+        )
+    );
+  }
+
+  // Create new filtered dataset
+  const filteredData = data.map((item) =>
+    Object.keys(item)
+      .filter((key) => filteredSqlColumns.has(key))
+      .reduce((obj: any, key) => {
+        obj[key] = item[key];
+        return obj;
+      }, {})
+  );
+
+  return filteredData;
+};
+
+// Filter out data that matches a comma-separated list of values for a given column
+export const filterOutUnwantedValues = (
+  data: any[],
+  filterByColumn: string | undefined,
+  filterOutValues: string | undefined
+): any[] => {
+  if (!filterByColumn || !filterOutValues) {
+    return data;
+  }
+
+  const valuesToFilterOut = new Set(filterOutValues.split(","));
+
+  const filteredData = data.filter((item) => {
+    return !valuesToFilterOut.has(item[filterByColumn]);
+  });
+
+  return filteredData;
+};
+
+// Filter out data without columns storing have valid coordinates
+export const filterGeoData = (
+  data: Array<Record<string, any>>
+): Array<Record<string, any>> => {
+  const geoData = data.filter((feature) => hasValidCoordinates(feature));
+
+  return geoData;
+};
+
+// Filter out data without any columns storing file extensions
+export const filterDataByExtension = (
+  data: Array<Record<string, any>>,
+  extensions: string[]
+): Array<Record<string, any>> => {
+  return data.filter((entry) => {
+    return Object.values(entry).some((value) =>
+      extensions.some(
+        (extension) =>
+          typeof value === "string" && value.toLowerCase().includes(extension)
+      )
+    );
+  });
+};
