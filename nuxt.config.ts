@@ -42,6 +42,15 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    database: "",
+    dbHost: "",
+    dbUser: "",
+    dbPassword: "",
+    dbPort: "5432",
+    dbSsl: "true",
+    dbTable: "",
+    sqLite: false,
+    sqLiteDbPath: "",
     port: "8080",
     public: {
       appApiKey: "",
