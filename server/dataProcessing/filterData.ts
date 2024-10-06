@@ -1,4 +1,4 @@
-import { type Column } from "../types";
+import { type Column, type AllowedFileExtensions } from "../types";
 import { hasValidCoordinates } from "./helpers";
 
 // Filter out unwanted columns and substrings
@@ -117,14 +117,16 @@ export const filterGeoData = (
 // Filter out data without any columns storing file extensions
 export const filterDataByExtension = (
   data: Array<Record<string, any>>,
-  extensions: string[]
+  extensions: AllowedFileExtensions
 ): Array<Record<string, any>> => {
   return data.filter((entry) => {
-    return Object.values(entry).some((value) =>
-      extensions.some(
-        (extension) =>
-          typeof value === "string" && value.toLowerCase().includes(extension)
-      )
-    );
+    return Object.values(entry).some((value) => {
+      return (
+        typeof value === "string" &&
+        (extensions.audio.some((ext) => value.toLowerCase().includes(ext)) ||
+          extensions.image.some((ext) => value.toLowerCase().includes(ext)) ||
+          extensions.video.some((ext) => value.toLowerCase().includes(ext)))
+      );
+    });
   });
 };

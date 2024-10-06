@@ -50,3 +50,9 @@ export interface ViewConfig {
 export interface Views {
   [key: string]: ViewConfig;
 }
+
+export type AllowedFileExtensions = {
+  audio: string[];
+  image: string[];
+  video: string[];
+};

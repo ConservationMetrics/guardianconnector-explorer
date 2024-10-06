@@ -6,18 +6,33 @@ type DatabaseConnection = Client | Database | null;
 let db: DatabaseConnection = null;
 
 export const setupDatabaseConnection = (
-  isSQLite: boolean,
+  isConfigDb: boolean,
+  isSqlite: boolean,
   sqliteDbPath: string | undefined,
+  defaultDb: string | undefined,
   database: string | undefined,
   host: string | undefined,
   user: string | undefined,
   password: string | undefined,
   port: string,
-  ssl: string | undefined,
+  ssl: boolean | string | undefined
 ): DatabaseConnection => {
   console.log("Setting up database connection...");
 
-  if (isSQLite) {
+  if (isConfigDb && !isSqlite) {
+    // create the database if it doesn't exist
+    createDatabaseIfNotExists(
+      database as string,
+      defaultDb as string,
+      host,
+      user,
+      password,
+      port,
+      ssl as string
+    );
+  }
+
+  if (isSqlite) {
     if (sqliteDbPath === undefined) {
       throw new Error("sqliteDbPath is undefined");
     }
@@ -32,7 +47,7 @@ export const setupDatabaseConnection = (
         } else {
           console.log("Connected to the SQLite database");
         }
-      },
+      }
     );
   } else {
     const dbConnection = {
@@ -41,7 +56,7 @@ export const setupDatabaseConnection = (
       host: host,
       password: password,
       port: parseInt(port, 10),
-      ssl: ssl === "true" ? { rejectUnauthorized: false } : false,
+      ssl: ssl === true ? { rejectUnauthorized: false } : false,
     };
     db = new Client(dbConnection);
 
@@ -53,7 +68,7 @@ export const setupDatabaseConnection = (
         db = null;
         if (error.message.includes("self signed certificate")) {
           console.error(
-            "Error connecting to the PostgreSQL database: Self-signed certificate issue.",
+            "Error connecting to the PostgreSQL database: Self-signed certificate issue."
           );
         } else {
           console.error("Error connecting to the PostgreSQL database:", error);
@@ -64,14 +79,14 @@ export const setupDatabaseConnection = (
   return db;
 };
 
-export const createDatabaseIfNotExists = async (
+const createDatabaseIfNotExists = async (
   dbName: string,
   defaultDb: string | undefined,
   host: string | undefined,
   user: string | undefined,
   password: string | undefined,
   port: string,
-  ssl: string | undefined,
+  ssl: string | undefined
 ): Promise<boolean> => {
   if (!dbName) {
     throw new Error("Database name is required");
@@ -90,7 +105,7 @@ export const createDatabaseIfNotExists = async (
     await client.connect();
     const res = await client.query(
       `SELECT 1 FROM pg_database WHERE datname = $1`,
-      [dbName],
+      [dbName]
     );
     if (res.rowCount === 0) {
       await client.query(`CREATE DATABASE ${dbName}`);
@@ -98,7 +113,7 @@ export const createDatabaseIfNotExists = async (
 
       // Grant privileges to the user
       await client.query(
-        `GRANT ALL PRIVILEGES ON DATABASE ${dbName} TO ${user};`,
+        `GRANT ALL PRIVILEGES ON DATABASE ${dbName} TO ${user};`
       );
     } else {
       console.log(`Database ${dbName} already exists.`);
