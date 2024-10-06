@@ -1,7 +1,7 @@
-import { Client } from "pg";
-import { verbose, Database, OPEN_READWRITE, OPEN_CREATE } from "sqlite3";
+import pg from "pg";
+import sqlite3 from "sqlite3";
 
-type DatabaseConnection = Client | Database | null;
+type DatabaseConnection = pg.Client | sqlite3.Database | null;
 
 let db: DatabaseConnection = null;
 
@@ -9,8 +9,8 @@ export const setupDatabaseConnection = (
   isConfigDb: boolean,
   isSqlite: boolean,
   sqliteDbPath: string | undefined,
-  defaultDb: string | undefined,
   database: string | undefined,
+  defaultDb: string | undefined,
   host: string | undefined,
   user: string | undefined,
   password: string | undefined,
@@ -36,10 +36,10 @@ export const setupDatabaseConnection = (
     if (sqliteDbPath === undefined) {
       throw new Error("sqliteDbPath is undefined");
     }
-    const sqlite = verbose();
+    const sqlite = sqlite3.verbose();
     db = new sqlite.Database(
       sqliteDbPath,
-      OPEN_READWRITE | OPEN_CREATE,
+      sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
       (err: Error | null) => {
         if (err) {
           console.error("Error connecting to SQLite database:", err.message);
@@ -58,7 +58,7 @@ export const setupDatabaseConnection = (
       port: parseInt(port, 10),
       ssl: ssl === true ? { rejectUnauthorized: false } : false,
     };
-    db = new Client(dbConnection);
+    db = new pg.Client(dbConnection);
 
     db.connect()
       .then(() => {
@@ -80,24 +80,20 @@ export const setupDatabaseConnection = (
 };
 
 const createDatabaseIfNotExists = async (
-  dbName: string,
+  database: string,
   defaultDb: string | undefined,
   host: string | undefined,
   user: string | undefined,
   password: string | undefined,
   port: string,
-  ssl: string | undefined
+  ssl: boolean | string | undefined
 ): Promise<boolean> => {
-  if (!dbName) {
-    throw new Error("Database name is required");
-  }
-
-  const client = new Client({
+  const client = new pg.Client({
     user: user,
     host: host,
     password: password,
     port: parseInt(port, 10),
-    ssl: ssl === "true" ? { rejectUnauthorized: false } : false,
+    ssl: ssl === true ? { rejectUnauthorized: false } : false,
     database: defaultDb,
   });
 
@@ -105,22 +101,22 @@ const createDatabaseIfNotExists = async (
     await client.connect();
     const res = await client.query(
       `SELECT 1 FROM pg_database WHERE datname = $1`,
-      [dbName]
+      [database]
     );
     if (res.rowCount === 0) {
-      await client.query(`CREATE DATABASE ${dbName}`);
-      console.log(`Database ${dbName} created successfully.`);
+      await client.query(`CREATE DATABASE ${database}`);
+      console.log(`Database ${database} created successfully.`);
 
       // Grant privileges to the user
       await client.query(
-        `GRANT ALL PRIVILEGES ON DATABASE ${dbName} TO ${user};`
+        `GRANT ALL PRIVILEGES ON DATABASE ${database} TO ${user};`
       );
     } else {
-      console.log(`Database ${dbName} already exists.`);
+      console.log(`Database ${database} already exists.`);
     }
     return true;
   } catch (error) {
-    console.error(`Error creating database ${dbName}:`, error);
+    console.error(`Error creating database ${database}:`, error);
     return false;
   } finally {
     await client.end();

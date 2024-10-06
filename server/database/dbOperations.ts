@@ -3,11 +3,11 @@ import { type Views } from "../types";
 const checkTableExists = (
   db: any,
   table: string | undefined,
-  isSQLite: boolean | undefined
+  isSqlite: boolean | undefined
 ): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     let query: string;
-    if (isSQLite) {
+    if (isSqlite) {
       query = `SELECT name FROM sqlite_master WHERE type='table' AND name='${table}'`;
       db.all(query, (err: Error, rows: any[]) => {
         if (err) reject(err);
@@ -26,10 +26,10 @@ const checkTableExists = (
 const fetchDataFromTable = async (
   db: any,
   table: string | undefined,
-  isSQLite: boolean | undefined
+  isSqlite: boolean | undefined
 ): Promise<any[]> => {
   let query: string;
-  if (isSQLite) {
+  if (isSqlite) {
     query = `SELECT * FROM ${table}`;
     return new Promise((resolve, reject) => {
       db.all(query, (err: Error, rows: any[]) => {
@@ -57,7 +57,7 @@ const fetchDataFromTable = async (
 export const fetchData = async (
   db: any,
   table: string | undefined,
-  isSQLite: boolean | undefined
+  isSqlite: boolean | undefined
 ): Promise<{
   mainData: any[];
   columnsData: any[] | null;
@@ -65,20 +65,20 @@ export const fetchData = async (
 }> => {
   console.log("Fetching data from", table, "...");
   // Fetch data
-  const mainDataExists = await checkTableExists(db, table, isSQLite);
+  const mainDataExists = await checkTableExists(db, table, isSqlite);
   let mainData = null;
   if (mainDataExists) {
-    mainData = await fetchDataFromTable(db, table, isSQLite);
+    mainData = await fetchDataFromTable(db, table, isSqlite);
   } else {
     throw new Error("Main table does not exist");
   }
 
   // Fetch mapping columns
   const columnsTable = `${table}__columns`;
-  const columnsTableExists = await checkTableExists(db, columnsTable, isSQLite);
+  const columnsTableExists = await checkTableExists(db, columnsTable, isSqlite);
   let columnsData = null;
   if (columnsTableExists) {
-    columnsData = await fetchDataFromTable(db, columnsTable, isSQLite);
+    columnsData = await fetchDataFromTable(db, columnsTable, isSqlite);
   }
 
   // Fetch metadata
@@ -86,11 +86,11 @@ export const fetchData = async (
   const metadataTableExists = await checkTableExists(
     db,
     metadataTable,
-    isSQLite
+    isSqlite
   );
   let metadata = null;
   if (metadataTableExists) {
-    metadata = await fetchDataFromTable(db, metadataTable, isSQLite);
+    metadata = await fetchDataFromTable(db, metadataTable, isSqlite);
   }
 
   console.log("Successfully fetched data from", table, "!");
@@ -100,14 +100,14 @@ export const fetchData = async (
 
 export const fetchTableNames = async (
   db: any,
-  isSQLite: boolean | undefined
+  isSqlite: boolean | undefined
 ): Promise<string[]> => {
-  const query = isSQLite
+  const query = isSqlite
     ? `SELECT name FROM sqlite_master WHERE type='table'`
     : `SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'`;
 
   return new Promise((resolve, reject) => {
-    if (isSQLite) {
+    if (isSqlite) {
       db.all(query, (err: Error, rows: any[]) => {
         if (err) reject(err);
         resolve(rows.map((row) => row.name));

@@ -26,6 +26,19 @@ export default defineEventHandler(async (event: H3Event) => {
     sqliteDbPath: string;
   };
 
+  const db = setupDatabaseConnection(
+    /* isConfigDb */ false,
+    isSqlite,
+    sqliteDbPath,
+    database,
+    database,
+    dbHost,
+    dbUser,
+    dbPassword,
+    dbPort,
+    dbSsl
+  );
+
   const configDb = setupDatabaseConnection(
     /* isConfigDb */ true,
     isSqlite,
@@ -40,14 +53,14 @@ export default defineEventHandler(async (event: H3Event) => {
   );
   try {
     const viewsConfig = await fetchConfig(configDb, isSqlite);
-    const tableNames = await getFilteredTableNames(database, isSqlite);
+    const tableNames = await getFilteredTableNames(db, isSqlite);
 
     // Filter out any tables that are already in viewsConfig
     const filteredTableNames = tableNames.filter(
       (name) => !Object.keys(viewsConfig).includes(name)
     );
 
-    return { viewsConfig, tableNames: filteredTableNames };
+    return [viewsConfig, filteredTableNames];
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error fetching config on API side:", error.message);
@@ -58,5 +71,3 @@ export default defineEventHandler(async (event: H3Event) => {
     }
   }
 });
-
-// ... existing code ...
