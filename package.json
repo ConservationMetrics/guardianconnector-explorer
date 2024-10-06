@@ -31,7 +31,7 @@
     "vue-router": "latest"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,ts,tsx,json,css,vue}": [
+    "./**/*.{js,jsx,ts,tsx,json,css,vue}": [
       "prettier --write"
     ]
   },
