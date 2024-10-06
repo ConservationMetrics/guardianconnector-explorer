@@ -13,10 +13,8 @@
         />
       </template>
       <template v-else-if="key === 'MAPEO_CATEGORY_IDS'">
-        <component
-          v-if="isClient"
+        <VueTagsInput
           class="tag-field"
-          :is="isClient ? 'vue-tags-input' : 'div'"
           v-model="tagInputs[key]"
           :tags="tags[key]"
           @tags-changed="updateTags(key, $event)"
@@ -27,8 +25,10 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, onMounted, reactive, watch } from "vue";
+import { ref, defineEmits, reactive, watch } from "vue";
 import { toCamelCase } from "@/utils";
+
+import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
 
 // Define props
 const props = defineProps({
@@ -55,18 +55,11 @@ const tags = ref({
     : [],
 });
 
-const isClient = ref(false);
-
 // Methods
 function updateTags(key, newTags) {
   tags.value[key] = newTags;
   localConfig[key] = newTags.map((tag) => tag.text).join(",");
 }
-
-// Lifecycle hooks
-onMounted(() => {
-  isClient.value = true;
-});
 
 // Watch for changes in localConfig and emit updates
 watch(

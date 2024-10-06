@@ -1,13 +1,14 @@
 <template>
   <div>
-    <ConfigDashboard
-      v-if="dataFetched"
-      :views-config="viewsConfig"
-      :table-names="tableNames"
-      @submitConfig="submitConfig"
-      @removeTableFromConfig="removeTableFromConfig"
-      @addTableToConfig="addTableToConfig"
-    />
+    <ClientOnly>
+      <ConfigDashboard
+        v-if="dataFetched"
+        :views-config="viewsConfig"
+        :table-names="tableNames"
+        @submitConfig="submitConfig"
+        @removeTableFromConfig="removeTableFromConfig"
+        @addTableToConfig="addTableToConfig"
+    /></ClientOnly>
   </div>
 </template>
 

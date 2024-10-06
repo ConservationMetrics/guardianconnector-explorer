@@ -104,10 +104,8 @@
       </template>
       <template v-else-if="key === 'MAP_LEGEND_LAYER_IDS'">
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
-        <component
+        <VueTagsInput
           class="tag-field"
-          :is="isClient ? 'vue-tags-input' : 'div'"
-          v-if="isClient"
           v-model="tagInputs[key]"
           :tags="tags[key]"
           @tags-changed="updateTags(key, $event)"
@@ -126,8 +124,10 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, onMounted, reactive, watch } from "vue";
+import { ref, defineEmits, reactive, watch } from "vue";
 import { toCamelCase } from "@/utils";
+
+import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
 
 // Define props
 const props = defineProps({
@@ -142,7 +142,6 @@ const emit = defineEmits(["updateConfig"]);
 
 // Set up reactive state
 const localConfig = reactive({ ...props.config });
-const isClient = ref(false);
 const tagInputs = ref({
   MAP_LEGEND_LAYER_IDS: "",
 });
@@ -160,11 +159,6 @@ function updateTags(key, newTags) {
   tags.value[key] = newTags;
   localConfig[key] = newTags.map((tag) => tag.text).join(",");
 }
-
-// Lifecycle hooks
-onMounted(() => {
-  isClient.value = true;
-});
 
 // Watch for changes in localConfig and emit updates
 watch(

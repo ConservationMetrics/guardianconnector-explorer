@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@turf/turf": "^7.1.0",
+    "@vojtechlanka/vue-tags-input": "^3.1.1",
     "gc-shared-resources": "latest",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.4.0",

@@ -49,13 +49,13 @@
                 currentModalAction === 'addTable' && !confirmButtonDisabled,
             },
           ]"
-          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+          class="text-white font-bold mb-2 mr-2 py-2 px-4 rounded transition-colors duration-200"
         >
           {{ $t("confirm") }}
         </button>
         <button
           @click="handleCancelButton"
-          class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+          class="text-white font-bold bg-blue-500 hover:bg-blue-700 mb-2 py-2 px-4 rounded transition-colors duration-200"
         >
           {{ $t("cancel") }}
         </button>
