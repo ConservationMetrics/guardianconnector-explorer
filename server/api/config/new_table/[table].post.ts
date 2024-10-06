@@ -1,6 +1,6 @@
 import { defineEventHandler, sendError, H3Event } from "h3";
-import { setupDatabaseConnection } from "../../database/dbConnection";
-import { addNewTableToConfig } from "../../database/dbOperations";
+import { setupDatabaseConnection } from "../../../database/dbConnection";
+import { addNewTableToConfig } from "../../../database/dbOperations";
 
 export default defineEventHandler(async (event: H3Event) => {
   const {
@@ -38,8 +38,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbSsl
   );
 
-  const { table } = event.context.params as { table: string };
-
+  const table = event.context?.params?.table as string;
   try {
     await addNewTableToConfig(configDb, table, isSqlite);
     return { message: "New table added successfully" };

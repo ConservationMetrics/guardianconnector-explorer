@@ -1,0 +1,215 @@
+<template>
+  <div class="container relative">
+    <div class="absolute top-0 right-4 flex justify-end space-x-4 mb-4">
+      <LanguagePicker />
+    </div>
+    <h1>{{ $t("availableViews") }}: {{ $t("configuration") }}</h1>
+    <div class="grid-container">
+      <ConfigCard
+        v-for="(config, tableName) in sortedViewsConfig"
+        :key="tableName"
+        :tableName="tableName"
+        :config="config"
+        :isMinimized="minimizedCards[tableName]"
+        @toggleMinimize="toggleMinimize"
+        @submitConfig="handleSubmit"
+        @removeTableFromConfig="handleRemoveTableFromConfig"
+      />
+    </div>
+    <button
+      @click="handleAddNewTable"
+      class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200 mb-6"
+    >
+      + {{ $t("addNewTable") }}
+    </button>
+    <div v-if="showModal" class="overlay"></div>
+    <div v-if="showModal" class="modal">
+      <p v-html="modalMessage"></p>
+      <div v-if="showModalDropdown">
+        <select
+          v-model="tableNameToAdd"
+          class="mt-4 p-2 border border-gray-300 rounded"
+        >
+          <option v-for="table in tableNames" :key="table" :value="table">
+            {{ table }}
+          </option>
+        </select>
+      </div>
+      <div v-if="showModalButtons" class="mt-4">
+        <button
+          @click="handleConfirmButton"
+          :disabled="confirmButtonDisabled"
+          :class="[
+            'submit-button',
+            {
+              'bg-gray-500 cursor-not-allowed': confirmButtonDisabled,
+              'bg-red-500 hover:bg-red-700':
+                currentModalAction !== 'addTable' && !confirmButtonDisabled,
+              'bg-blue-500 hover:bg-blue-700':
+                currentModalAction === 'addTable' && !confirmButtonDisabled,
+            },
+          ]"
+          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+        >
+          {{ $t("confirm") }}
+        </button>
+        <button
+          @click="handleCancelButton"
+          class="text-white font-bold bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+        >
+          {{ $t("cancel") }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, computed, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+// Define props
+const props = defineProps({
+  viewsConfig: Object,
+  tableNames: Array,
+});
+
+// Set up composables
+const emit = defineEmits([
+  "addTableToConfig",
+  "removeTableFromConfig",
+  "submitConfig",
+]);
+const { t } = useI18n();
+
+// Set up reactive state
+const currentModalAction = ref(null);
+const modalMessage = ref("");
+const tableNameToRemove = ref("");
+const tableNameToAdd = ref(null);
+const showModal = ref(false);
+const showModalButtons = ref(false);
+const showModalDropdown = ref(false);
+const confirmButtonDisabled = ref(false);
+const minimizedCards = ref(initializeMinimizedCards());
+
+// Methods
+const sortedViewsConfig = computed(() => {
+  return Object.keys(props.viewsConfig)
+    .sort()
+    .reduce((acc, key) => {
+      acc[key] = props.viewsConfig[key];
+      return acc;
+    }, {});
+});
+
+function handleAddNewTable() {
+  modalMessage.value = t("selectTableToAdd") + ":";
+  currentModalAction.value = "addTable";
+  showModal.value = true;
+  showModalDropdown.value = true;
+  showModalButtons.value = true;
+  confirmButtonDisabled.value = true;
+}
+
+function handleRemoveTableFromConfig(tableName) {
+  modalMessage.value =
+    t("removeTableAreYouSure") +
+    ": <strong>" +
+    tableName +
+    "</strong>?<br><br><em>" +
+    t("tableRemovedNote") +
+    ".</em>";
+  currentModalAction.value = "removeTable";
+  showModal.value = true;
+  showModalButtons.value = true;
+  tableNameToRemove.value = tableName;
+}
+
+function handleConfirmButton() {
+  if (currentModalAction.value === "removeTable") {
+    emit("removeTableFromConfig", tableNameToRemove.value);
+    modalMessage.value = t("tableRemovedFromViews") + "!";
+  } else if (currentModalAction.value === "addTable") {
+    tableNameToAdd.value = tableNameToAdd.value.trim();
+    emit("addTableToConfig", tableNameToAdd.value);
+    modalMessage.value = t("tableAddedToViews") + "!";
+    showModalDropdown.value = false;
+  }
+  showModalButtons.value = false;
+  setTimeout(() => {
+    showModal.value = false;
+    currentModalAction.value = null;
+    location.reload();
+  }, 3000);
+}
+
+function handleCancelButton() {
+  modalMessage.value = "";
+  tableNameToRemove.value = "";
+  showModal.value = false;
+  showModalDropdown.value = false;
+  showModalButtons.value = false;
+  confirmButtonDisabled.value = false;
+  if (currentModalAction.value === "addTable") {
+    tableNameToAdd.value = null;
+  }
+  currentModalAction.value = null;
+}
+
+function initializeMinimizedCards() {
+  const minimized = {};
+  for (const tableName in props.viewsConfig) {
+    minimized[tableName] = true;
+  }
+  return minimized;
+}
+
+async function handleSubmit({ tableName, config }) {
+  emit("submitConfig", { tableName, config });
+  modalMessage.value = t("configUpdated") + "!";
+  showModal.value = true;
+  setTimeout(() => {
+    showModal.value = false;
+    location.reload();
+  }, 3000);
+}
+
+function toggleMinimize({ tableName }) {
+  const isCurrentlyMinimized = minimizedCards.value[tableName];
+  for (let key in minimizedCards.value) {
+    minimizedCards.value[key] = true;
+  }
+  minimizedCards.value[tableName] = !isCurrentlyMinimized;
+}
+
+watch(tableNameToAdd, (newVal) => {
+  confirmButtonDisabled.value = !newVal;
+});
+</script>
+
+<style scoped>
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2em;
+}
+
+.container h1 {
+  color: #333;
+  margin-bottom: 1em;
+  font-size: 2em;
+  font-weight: 900;
+}
+
+.grid-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 1em auto;
+}
+</style>
