@@ -35,7 +35,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   const table = event.context?.params?.table as string;
@@ -46,13 +46,13 @@ export default defineEventHandler(async (event: H3Event) => {
     if (error instanceof Error) {
       console.error(
         "Error adding new table to config on API side:",
-        error.message
+        error.message,
       );
       return sendError(event, new Error(error.message));
     } else {
       console.error(
         "Unknown error adding new table to config on API side:",
-        error
+        error,
       );
       return sendError(event, new Error("An unknown error occurred"));
     }

@@ -49,7 +49,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   const db = setupDatabaseConnection(
@@ -62,7 +62,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   try {
@@ -74,13 +74,13 @@ export default defineEventHandler(async (event: H3Event) => {
       mainData,
       columnsData,
       viewsConfig[table].UNWANTED_COLUMNS,
-      viewsConfig[table].UNWANTED_SUBSTRINGS
+      viewsConfig[table].UNWANTED_SUBSTRINGS,
     );
     // Filter data to remove unwanted values per chosen column
     const dataFilteredByValues = filterOutUnwantedValues(
       filteredData,
       viewsConfig[table].FILTER_BY_COLUMN,
-      viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN
+      viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN,
     );
     // Filter only data with valid geofields
     const filteredGeoData = filterGeoData(dataFilteredByValues);
@@ -89,7 +89,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // Process geodata
     const processedGeoData = prepareMapData(
       transformedData,
-      viewsConfig[table].FRONT_END_FILTER_COLUMN
+      viewsConfig[table].FRONT_END_FILTER_COLUMN,
     );
 
     const response = {

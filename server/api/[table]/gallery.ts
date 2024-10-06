@@ -46,7 +46,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   const db = setupDatabaseConnection(
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   try {
@@ -71,18 +71,18 @@ export default defineEventHandler(async (event: H3Event) => {
       mainData,
       columnsData,
       viewsConfig[table].UNWANTED_COLUMNS,
-      viewsConfig[table].UNWANTED_SUBSTRINGS
+      viewsConfig[table].UNWANTED_SUBSTRINGS,
     );
     // Filter data to remove unwanted values per chosen column
     const dataFilteredByValues = filterOutUnwantedValues(
       filteredData,
       viewsConfig[table].FILTER_BY_COLUMN,
-      viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN
+      viewsConfig[table].FILTER_OUT_VALUES_FROM_COLUMN,
     );
     // Filter only data with media attachments
     const dataWithFilesOnly = filterDataByExtension(
       dataFilteredByValues,
-      allowedFileExtensions
+      allowedFileExtensions,
     );
     // Transform data that was collected using survey apps (e.g. KoBoToolbox, Mapeo)
     const transformedData = transformSurveyData(dataWithFilesOnly);

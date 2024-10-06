@@ -7,7 +7,7 @@ import {
 
 // Transform survey data keys and values
 const transformSurveyData = (
-  filteredData: Array<Record<string, any>>
+  filteredData: Array<Record<string, any>>,
 ): Array<Record<string, any>> => {
   const transformSurveyDataKey = (key: string): string => {
     let transformedKey = key
@@ -45,7 +45,7 @@ const transformSurveyData = (
         const dateMatch = transformedValue.match(dateRegex);
         if (dateMatch) {
           transformedValue = new Date(
-            `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T${dateMatch[4]}:${dateMatch[5]}:${dateMatch[6]}`
+            `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T${dateMatch[4]}:${dateMatch[5]}:${dateMatch[6]}`,
           ).toLocaleDateString();
         }
       }
@@ -81,7 +81,7 @@ const transformSurveyData = (
 // Prepare data for the map view
 const prepareMapData = (
   transformedData: Array<Record<string, any>>,
-  filterColumn: string | undefined
+  filterColumn: string | undefined,
 ): Array<Record<string, any>> => {
   const colorMap = new Map<string, string>();
 
@@ -118,7 +118,7 @@ const prepareMapData = (
   const processedGeoData = transformedData.map((item) => {
     if (!item.geotype) {
       const coordinateKey = Object.keys(item).find((key) =>
-        key.toLowerCase().includes("coordinates")
+        key.toLowerCase().includes("coordinates"),
       );
       if (coordinateKey) {
         const coordinates = JSON.parse(item[coordinateKey]);
@@ -159,14 +159,14 @@ const prepareMapData = (
 
 // Prepare data for the alerts view
 const prepareAlertData = (
-  data: Array<Record<string, any>>
+  data: Array<Record<string, any>>,
 ): {
   mostRecentAlerts: Array<Record<string, any>>;
   previousAlerts: Array<Record<string, any>>;
 } => {
   const transformChangeDetectionItem = (
     item: Record<string, any>,
-    formattedMonth: string
+    formattedMonth: string,
   ): Record<string, any> => {
     const transformedItem: Record<string, any> = {};
 
@@ -193,7 +193,7 @@ const prepareAlertData = (
 
     // Include only the transformed columns
     transformedItem["territory"] = capitalizeFirstLetter(
-      item.territory_name ?? ""
+      item.territory_name ?? "",
     );
     transformedItem["alertID"] = item._id;
     transformedItem["alertDetectionRange"] =
@@ -201,7 +201,7 @@ const prepareAlertData = (
     transformedItem["monthDetected"] = `${formattedMonth}-${item.year_detec}`;
     transformedItem["YYYYMM"] = `${item.year_detec}${formattedMonth}`;
     transformedItem["dataProvider"] = capitalizeFirstLetter(
-      `${item.alert_source}`
+      `${item.alert_source}`,
     );
     transformedItem["confidenceLevel"] = item.confidence;
     transformedItem["alertType"] = item.alert_type?.replace(/_/g, " ") ?? "";
@@ -210,7 +210,7 @@ const prepareAlertData = (
         ? item.area_alert_ha.toFixed(2)
         : item.area_alert_ha;
     transformedItem["geographicCentroid"] = calculateCentroid(
-      item.g__coordinates
+      item.g__coordinates,
     );
     transformedItem["satelliteUsedForDetection"] =
       satelliteLookup[item.sat_detect_prefix] || item.sat_detect_prefix;
@@ -270,7 +270,7 @@ const prepareAlertData = (
 // Prepare statistics for the alerts view intro panel
 const prepareAlertStatistics = (
   data: AlertRecord[],
-  metadata: Metadata[] | null
+  metadata: Metadata[] | null,
 ): Record<string, any> => {
   let dataProviders: string[] = [];
 
@@ -282,16 +282,16 @@ const prepareAlertStatistics = (
     new Set(
       data
         .map((item) =>
-          item.alert_type ? item.alert_type.replace(/_/g, " ") : null
+          item.alert_type ? item.alert_type.replace(/_/g, " ") : null,
         )
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ),
   );
 
   // Create Date objects for sorting and comparisons
   const formattedDates = data.map((item) => ({
     date: new Date(
-      `${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`
+      `${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`,
     ),
     dateString: `${item.month_detec.padStart(2, "0")}-${item.year_detec}`,
   }));
@@ -305,7 +305,7 @@ const prepareAlertStatistics = (
   if (metadata && metadata.length > 0) {
     // Find earliest and latest dates from metadata
     metadata.sort((a, b) =>
-      a.year === b.year ? a.month - b.month : a.year - b.year
+      a.year === b.year ? a.month - b.month : a.year - b.year,
     );
     const earliestMetadata = metadata[0];
     const latestMetadata = metadata[metadata.length - 1];
@@ -313,7 +313,7 @@ const prepareAlertStatistics = (
     earliestDate = new Date(
       earliestMetadata.year,
       earliestMetadata.month - 1,
-      1
+      1,
     );
     latestDate = new Date(latestMetadata.year, latestMetadata.month - 1, 28);
 
@@ -322,13 +322,13 @@ const prepareAlertStatistics = (
 
     // Set alert_source
     dataProviders = Array.from(
-      new Set(metadata.map((item) => item.alert_source))
+      new Set(metadata.map((item) => item.alert_source)),
     );
   } else {
     // If metadata is null, calculate earliest and latest dates from data
     const formattedDates = data.map((item) => ({
       date: new Date(
-        `${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`
+        `${item.year_detec}-${item.month_detec.padStart(2, "0")}-15`,
       ),
       dateString: `${item.month_detec.padStart(2, "0")}-${item.year_detec}`,
     }));
@@ -346,7 +346,7 @@ const prepareAlertStatistics = (
 
   // Create an array of all dates
   const allDates = Array.from(
-    new Set(formattedDates.map((item) => item.dateString))
+    new Set(formattedDates.map((item) => item.dateString)),
   );
 
   // Determine the date 12 months before the latest date
@@ -357,16 +357,16 @@ const prepareAlertStatistics = (
   const last12MonthsData = data
     .filter((item) => {
       const itemDate = new Date(
-        `${item.year_detec}-${item.month_detec.padStart(2, "0")}-01`
+        `${item.year_detec}-${item.month_detec.padStart(2, "0")}-01`,
       );
       return itemDate >= twelveMonthsBefore && itemDate <= latestDate;
     })
     .sort((a, b) => {
       const aDate = new Date(
-        `${a.year_detec}-${a.month_detec.padStart(2, "0")}`
+        `${a.year_detec}-${a.month_detec.padStart(2, "0")}`,
       );
       const bDate = new Date(
-        `${b.year_detec}-${b.month_detec.padStart(2, "0")}`
+        `${b.year_detec}-${b.month_detec.padStart(2, "0")}`,
       );
       return aDate.getTime() - bDate.getTime();
     });
@@ -380,7 +380,7 @@ const prepareAlertStatistics = (
 
     // We have to use UTC here to avoid issues with local time settings
     const currentDate = new Date(
-      Date.UTC(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 15)
+      Date.UTC(latestDate.getUTCFullYear(), latestDate.getUTCMonth(), 15),
     );
 
     for (let i = 0; i < 12; i++) {
@@ -414,7 +414,7 @@ const prepareAlertStatistics = (
   const updateCumulativeData = (
     dataCollection: AlertRecord[],
     accumulatorMap: Record<string, number>,
-    property: "alerts" | "hectares"
+    property: "alerts" | "hectares",
   ) => {
     let cumulativeValue = 0;
     const months = Object.keys(accumulatorMap);
@@ -424,7 +424,7 @@ const prepareAlertStatistics = (
         const monthData = dataCollection.filter(
           (item) =>
             `${item.month_detec.padStart(2, "0")}-${item.year_detec}` ===
-            monthYear
+            monthYear,
         );
         cumulativeValue += monthData.length;
       } else if (property === "hectares") {
@@ -462,7 +462,7 @@ const prepareAlertStatistics = (
   const recentAlertsNumber = data.filter(
     (item) =>
       `${item.month_detec.padStart(2, "0")}-${item.year_detec}` ===
-      recentAlertDate
+      recentAlertDate,
   ).length;
 
   // Calculate total number of alerts
@@ -492,7 +492,7 @@ const prepareAlertStatistics = (
 
 // Transform data to GeoJSON format
 const transformToGeojson = (
-  inputArray: Array<{ [key: string]: any }>
+  inputArray: Array<{ [key: string]: any }>,
 ): {
   type: string;
   features: Array<{
@@ -568,7 +568,7 @@ const isValidGeolocation = (item: Record<string, any>): boolean => {
           (coord) =>
             Array.isArray(coord) &&
             coord.length === 2 &&
-            coord.every(Number.isFinite)
+            coord.every(Number.isFinite),
         )
       );
     } else if (type === "Polygon" || type === "MultiPolygon") {
@@ -581,8 +581,8 @@ const isValidGeolocation = (item: Record<string, any>): boolean => {
               (coord) =>
                 Array.isArray(coord) &&
                 coord.length === 2 &&
-                coord.every(Number.isFinite)
-            )
+                coord.every(Number.isFinite),
+            ),
         )
       );
     }

@@ -53,7 +53,7 @@ export const mapStyles: Record<string, MapStyle> = {
 export function changeMapStyle(
   map: mapboxgl.Map,
   basemap: Basemap,
-  planetApiKey: string
+  planetApiKey: string,
 ) {
   if (basemap.style) {
     map.setStyle(basemap.style);
@@ -62,7 +62,7 @@ export function changeMapStyle(
     planetStyle.sources.planet.tiles[0] =
       planetStyle.sources.planet.tiles[0].replace(
         "monthYear",
-        basemap.monthYear || "2024-01"
+        basemap.monthYear || "2024-01",
       );
     planetStyle.sources.planet.tiles[0] += planetApiKey;
     map.setStyle(planetStyle);
@@ -73,7 +73,7 @@ export function changeMapStyle(
 
 function getMapboxLayersForLegend(
   map: mapboxgl.Map,
-  mapLegendLayerIds: string
+  mapLegendLayerIds: string,
 ): mapboxgl.Layer[] {
   const layerIds = mapLegendLayerIds.split(",");
   const matchingLayers: mapboxgl.Layer[] = [];
@@ -96,7 +96,7 @@ function getMapboxLayersForLegend(
 export function prepareMapLegendLayers(
   map: mapboxgl.Map,
   mapLegendLayerIds: string | null,
-  mapeoLegendColor: string | null
+  mapeoLegendColor: string | null,
 ): unknown[] | undefined {
   if (!mapLegendLayerIds || !map.isStyleLoaded()) {
     return;
@@ -104,7 +104,7 @@ export function prepareMapLegendLayers(
 
   const mapboxLayersForLegend = getMapboxLayersForLegend(
     map,
-    mapLegendLayerIds
+    mapLegendLayerIds,
   );
 
   // Prepare object with type, id, and color for each layer in the map legend
@@ -114,7 +114,7 @@ export function prepareMapLegendLayers(
       const layerType = layer.type;
       let layerColor = map.getPaintProperty(
         layerId,
-        `${layerType}-color` as any
+        `${layerType}-color` as any,
       );
 
       if (!layerColor) {
@@ -151,7 +151,7 @@ export function prepareMapLegendLayers(
 
 // Function to reverse [long, lat] coordinates and remove the brackets
 export function prepareCoordinatesForSelectedFeature(
-  coordinates: string
+  coordinates: string,
 ): string {
   if (typeof coordinates === "object") {
     coordinates = JSON.stringify(coordinates);
@@ -167,7 +167,7 @@ export function prepareCoordinatesForSelectedFeature(
 
 export function toggleLayerVisibility(
   map: mapboxgl.Map,
-  item: { id: string; visible: boolean }
+  item: { id: string; visible: boolean },
 ) {
   const layerId = item.id;
   const visibility = item.visible ? "visible" : "none";

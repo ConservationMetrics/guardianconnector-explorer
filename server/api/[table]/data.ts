@@ -35,7 +35,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   try {

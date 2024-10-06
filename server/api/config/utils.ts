@@ -2,7 +2,7 @@ import { fetchTableNames } from "../../database/dbOperations";
 
 export const getFilteredTableNames = async (
   database: any,
-  isSqlite: boolean
+  isSqlite: boolean,
 ) => {
   let tableNames = await fetchTableNames(database, isSqlite);
   // Filter out anything with metadata, columns, and anything PostGIS related
@@ -10,7 +10,7 @@ export const getFilteredTableNames = async (
     (name) =>
       !name.includes("metadata") &&
       !name.includes("columns") &&
-      !name.includes("spatial_ref_sys")
+      !name.includes("spatial_ref_sys"),
   );
 
   return tableNames;

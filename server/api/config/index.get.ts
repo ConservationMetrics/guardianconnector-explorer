@@ -36,7 +36,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   const configDb = setupDatabaseConnection(
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
   try {
     const viewsConfig = await fetchConfig(configDb, isSqlite);
@@ -57,7 +57,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Filter out any tables that are already in viewsConfig
     const filteredTableNames = tableNames.filter(
-      (name) => !Object.keys(viewsConfig).includes(name)
+      (name) => !Object.keys(viewsConfig).includes(name),
     );
 
     return [viewsConfig, filteredTableNames];

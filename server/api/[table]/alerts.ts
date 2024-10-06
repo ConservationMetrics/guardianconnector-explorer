@@ -52,7 +52,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   const db = setupDatabaseConnection(
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   try {
@@ -89,7 +89,7 @@ export default defineEventHandler(async (event: H3Event) => {
         rawMapeoData.mainData,
         rawMapeoData.columnsData,
         viewsConfig[table].UNWANTED_COLUMNS,
-        viewsConfig[table].UNWANTED_SUBSTRINGS
+        viewsConfig[table].UNWANTED_SUBSTRINGS,
       );
 
       // Filter Mapeo data to only show data where category matches any values in mapeoCategoryIds (a comma-separated string of values)
@@ -98,9 +98,9 @@ export default defineEventHandler(async (event: H3Event) => {
           return Object.keys(row).some(
             (key) =>
               key.includes("category") &&
-              mapeoCategoryIds.split(",").includes(row[key])
+              mapeoCategoryIds.split(",").includes(row[key]),
           );
-        }
+        },
       );
 
       // Filter only data with valid geofields
@@ -110,7 +110,7 @@ export default defineEventHandler(async (event: H3Event) => {
       // Process geodata
       const processedMapeoData = prepareMapData(
         transformedMapeoData,
-        viewsConfig[table].FRONT_END_FILTER_COLUMN
+        viewsConfig[table].FRONT_END_FILTER_COLUMN,
       );
 
       mapeoData = processedMapeoData;
@@ -122,7 +122,7 @@ export default defineEventHandler(async (event: H3Event) => {
     // Convert alert data to GeoJSON format
     const geojsonData = {
       mostRecentAlerts: transformToGeojson(
-        changeDetectionData.mostRecentAlerts
+        changeDetectionData.mostRecentAlerts,
       ),
       previousAlerts: transformToGeojson(changeDetectionData.previousAlerts),
     };

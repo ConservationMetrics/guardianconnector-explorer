@@ -42,6 +42,6 @@ watch(
   (newValue) => {
     emit("updateConfig", newValue);
   },
-  { deep: true }
+  { deep: true },
 );
 </script>

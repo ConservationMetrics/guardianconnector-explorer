@@ -15,7 +15,7 @@ export const setupDatabaseConnection = (
   user: string | undefined,
   password: string | undefined,
   port: string,
-  ssl: boolean | string | undefined
+  ssl: boolean | string | undefined,
 ): DatabaseConnection => {
   console.log("Setting up database connection...");
 
@@ -28,7 +28,7 @@ export const setupDatabaseConnection = (
       user,
       password,
       port,
-      ssl as string
+      ssl as string,
     );
   }
 
@@ -47,7 +47,7 @@ export const setupDatabaseConnection = (
         } else {
           console.log("Connected to the SQLite database");
         }
-      }
+      },
     );
   } else {
     const dbConnection = {
@@ -68,7 +68,7 @@ export const setupDatabaseConnection = (
         db = null;
         if (error.message.includes("self signed certificate")) {
           console.error(
-            "Error connecting to the PostgreSQL database: Self-signed certificate issue."
+            "Error connecting to the PostgreSQL database: Self-signed certificate issue.",
           );
         } else {
           console.error("Error connecting to the PostgreSQL database:", error);
@@ -86,7 +86,7 @@ const createDatabaseIfNotExists = async (
   user: string | undefined,
   password: string | undefined,
   port: string,
-  ssl: boolean | string | undefined
+  ssl: boolean | string | undefined,
 ): Promise<boolean> => {
   const client = new pg.Client({
     user: user,
@@ -101,7 +101,7 @@ const createDatabaseIfNotExists = async (
     await client.connect();
     const res = await client.query(
       `SELECT 1 FROM pg_database WHERE datname = $1`,
-      [database]
+      [database],
     );
     if (res.rowCount === 0) {
       await client.query(`CREATE DATABASE ${database}`);
@@ -109,7 +109,7 @@ const createDatabaseIfNotExists = async (
 
       // Grant privileges to the user
       await client.query(
-        `GRANT ALL PRIVILEGES ON DATABASE ${database} TO ${user};`
+        `GRANT ALL PRIVILEGES ON DATABASE ${database} TO ${user};`,
       );
     } else {
       console.log(`Database ${database} already exists.`);

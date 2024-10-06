@@ -14,7 +14,8 @@
     "lint": "npm run lint:prettier && npm run lint:eslint",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepare": "husky"
   },
   "dependencies": {
     "@turf/turf": "^7.1.0",

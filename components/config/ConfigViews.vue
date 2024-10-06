@@ -62,7 +62,7 @@ watch(
   (newViews) => {
     localViews.value = [...newViews];
   },
-  { deep: true }
+  { deep: true },
 );
 
 // Methods

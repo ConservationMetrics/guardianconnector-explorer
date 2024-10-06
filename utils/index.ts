@@ -1,13 +1,13 @@
 // Function to get file paths from a feature object
 export function getFilePathsWithExtension(
   feature: { [key: string]: unknown },
-  allExtensions: string[]
+  allExtensions: string[],
 ): string[] {
   if (!feature) return [];
 
   // Get the value of the uuidKey or set it to null if it doesn't exist
   const uuidKey = Object.keys(feature).find((key) =>
-    key.toLowerCase().includes("uuid")
+    key.toLowerCase().includes("uuid"),
   );
   const uuid = uuidKey ? feature[uuidKey] : null;
 

@@ -35,7 +35,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbUser,
     dbPassword,
     dbPort,
-    dbSsl
+    dbSsl,
   );
 
   const table = event.context?.params?.table as string;
@@ -47,13 +47,13 @@ export default defineEventHandler(async (event: H3Event) => {
     if (error instanceof Error) {
       console.error(
         "Error removing table from config on API side:",
-        error.message
+        error.message,
       );
       return sendError(event, new Error(error.message));
     } else {
       console.error(
         "Unknown error removing table from config on API side:",
-        error
+        error,
       );
       return sendError(event, new Error("An unknown error occurred"));
     }

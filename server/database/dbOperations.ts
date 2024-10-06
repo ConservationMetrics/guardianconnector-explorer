@@ -3,7 +3,7 @@ import { type Views } from "../types";
 const checkTableExists = (
   db: any,
   table: string | undefined,
-  isSqlite: boolean | undefined
+  isSqlite: boolean | undefined,
 ): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     let query: string;
@@ -26,7 +26,7 @@ const checkTableExists = (
 const fetchDataFromTable = async (
   db: any,
   table: string | undefined,
-  isSqlite: boolean | undefined
+  isSqlite: boolean | undefined,
 ): Promise<any[]> => {
   let query: string;
   if (isSqlite) {
@@ -57,7 +57,7 @@ const fetchDataFromTable = async (
 export const fetchData = async (
   db: any,
   table: string | undefined,
-  isSqlite: boolean | undefined
+  isSqlite: boolean | undefined,
 ): Promise<{
   mainData: any[];
   columnsData: any[] | null;
@@ -86,7 +86,7 @@ export const fetchData = async (
   const metadataTableExists = await checkTableExists(
     db,
     metadataTable,
-    isSqlite
+    isSqlite,
   );
   let metadata = null;
   if (metadataTableExists) {
@@ -100,7 +100,7 @@ export const fetchData = async (
 
 export const fetchTableNames = async (
   db: any,
-  isSqlite: boolean | undefined
+  isSqlite: boolean | undefined,
 ): Promise<string[]> => {
   const query = isSqlite
     ? `SELECT name FROM sqlite_master WHERE type='table'`
@@ -123,7 +123,7 @@ export const fetchTableNames = async (
 
 export const fetchConfig = async (
   db: any,
-  isSQLite: boolean | undefined
+  isSQLite: boolean | undefined,
 ): Promise<Views> => {
   // Create the config table if it does not exist
   const createConfigTable = `CREATE TABLE IF NOT EXISTS config (
@@ -174,7 +174,7 @@ export const updateConfig = async (
   db: any,
   tableName: string,
   config: any,
-  isSQLite: boolean | undefined
+  isSQLite: boolean | undefined,
 ): Promise<void> => {
   const configString = JSON.stringify(config);
 
@@ -208,7 +208,7 @@ export const updateConfig = async (
 export const addNewTableToConfig = async (
   db: any,
   tableName: string,
-  isSQLite: boolean | undefined
+  isSQLite: boolean | undefined,
 ): Promise<void> => {
   const query = isSQLite
     ? `INSERT INTO config (table_name, views_config) VALUES (?, ?)`
@@ -240,7 +240,7 @@ export const addNewTableToConfig = async (
 export const removeTableFromConfig = async (
   db: any,
   tableName: string,
-  isSQLite: boolean | undefined
+  isSQLite: boolean | undefined,
 ): Promise<void> => {
   const query = isSQLite
     ? `DELETE FROM config WHERE table_name = ?`
