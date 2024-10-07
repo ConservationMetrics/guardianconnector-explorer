@@ -55,7 +55,7 @@ export default defineNuxtConfig({
     port: "8080",
     public: {
       allowedFileExtensions: {
-        images: ["jpg", "jpeg", "png", "webp"],
+        image: ["jpg", "jpeg", "png", "webp"],
         audio: ["mp3", "ogg", "wav"],
         video: ["mov", "mp4", "avi", "mkv"],
       },

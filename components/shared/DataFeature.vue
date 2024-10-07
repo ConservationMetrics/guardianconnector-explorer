@@ -1,0 +1,110 @@
+<template>
+  <div class="feature p-4 rounded-lg shadow-lg">
+    <div v-for="(value, key) in sortedFeature" :key="key">
+      <div v-if="key.toLowerCase().includes('data source')" class="mt-4">
+        <h1 class="text-2xl font-bold">{{ value }} data</h1>
+      </div>
+    </div>
+    <div v-if="setMediaBasePath()" :class="{ 'flex-container': isAlert }">
+      <MediaFile
+        v-for="filePath in filePaths"
+        :audio-extensions="audioExtensions"
+        :filePath="filePath"
+        :image-extensions="imageExtensions"
+        :key="filePath"
+        :mediaBasePath="setMediaBasePath()"
+        :video-extensions="videoExtensions"
+      />
+    </div>
+    <div class="mt-4" v-for="(value, key) in sortedFeature" :key="key">
+      <div
+        v-if="
+          value !== null &&
+          value !== '' &&
+          key.toLowerCase() !== 'uuid' &&
+          !key.toLowerCase().includes('photo') &&
+          key.toLowerCase() !== 'audio' &&
+          !key.toLowerCase().includes('data source')
+        "
+        class="mb-2"
+      >
+        <span class="font-bold">
+          <!-- Translate keys only when it's an alert to avoid performance issues with translating all keys -->
+          {{
+            isAlert
+              ? $t(key).charAt(0).toUpperCase() + $t(key).slice(1)
+              : key.charAt(0).toUpperCase() + key.slice(1)
+          }}</span
+        >:
+        <span
+          v-if="key !== 'geographicCentroid' && key !== 'geocoordinates'"
+          class="break-words"
+          >{{ value }}</span
+        >
+        <span v-else>
+          {{ value }}
+          <!-- guide on Google search URL construction here: https://developers.google.com/maps/documentation/urls/get-started-->
+          <a
+            :href="'https://www.google.com/maps/search/?api=1&query=' + value"
+            target="_blank"
+            >({{ $t("viewOnGoogleMaps") }})</a
+          >
+        </span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed } from "vue";
+
+import MediaFile from "@/components/shared/MediaFile.vue";
+
+// Define props
+const props = defineProps({
+  audioExtensions: Array,
+  feature: Object,
+  filePaths: Array,
+  imageExtensions: Array,
+  isAlert: Boolean,
+  mediaBasePath: String,
+  mediaBasePathAlerts: String,
+  videoExtensions: Array,
+});
+
+// Set up computed properties
+const sortedFeature = computed(() => {
+  return Object.keys(props.feature)
+    .sort()
+    .reduce((obj, key) => {
+      obj[key] = props.feature[key];
+      return obj;
+    }, {});
+});
+
+// Define methods
+function setMediaBasePath() {
+  if (props.isAlert && props.mediaBasePathAlerts) {
+    return props.mediaBasePathAlerts;
+  } else if (!props.isAlert && props.mediaBasePath) {
+    return props.mediaBasePath;
+  } else {
+    return false;
+  }
+}
+</script>
+
+<style scoped>
+a {
+  text-decoration: underline;
+}
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+.flex-container > img {
+  flex: 1 0 45%;
+  max-width: calc(50% - 10px);
+}
+</style>
