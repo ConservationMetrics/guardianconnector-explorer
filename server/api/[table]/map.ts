@@ -93,24 +93,22 @@ export default defineEventHandler(async (event: H3Event) => {
     );
 
     const response = {
-      audioExtensions: allowedFileExtensions.audio,
+      allowedFileExtensions: allowedFileExtensions,
       data: processedGeoData,
       filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
-      imageExtensions: allowedFileExtensions.image,
       mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
-      mapbox3d: viewsConfig[table].MAPBOX_3D,
+      mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
       mapboxAccessToken: viewsConfig[table].MAPBOX_ACCESS_TOKEN,
-      mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
-      mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
-      mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
-      mapboxPitch: viewsConfig[table].MAPBOX_PITCH,
+      mapboxBearing: Number(viewsConfig[table].MAPBOX_BEARING),
+      mapboxLatitude: Number(viewsConfig[table].MAPBOX_CENTER_LATITUDE),
+      mapboxLongitude: Number(viewsConfig[table].MAPBOX_CENTER_LONGITUDE),
+      mapboxPitch: Number(viewsConfig[table].MAPBOX_PITCH),
       mapboxProjection: viewsConfig[table].MAPBOX_PROJECTION,
       mapboxStyle: viewsConfig[table].MAPBOX_STYLE,
       mapboxZoom: viewsConfig[table].MAPBOX_ZOOM,
       mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
       planetApiKey: viewsConfig[table].PLANET_API_KEY,
       table: table,
-      videoExtensions: allowedFileExtensions.video,
     };
 
     return response;
