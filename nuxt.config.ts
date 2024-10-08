@@ -1,19 +1,23 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-09-10",
+  compatibilityDate: "2024-10-08",
 
-  // Global page headers: https://nuxt.com/docs/getting-started/seo-meta
   app: {
     head: {
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1",
+      script: [{ src: "/lightbox/lightbox-plus-jquery.js", defer: true }],
+      meta: [
+        { charset: "utf-8" },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { hid: "description", name: "description", content: "" },
+        { name: "format-detection", content: "telephone=no" },
+      ],
       link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
     },
   },
 
   devtools: { enabled: true },
 
-  // Modules: https://nuxt.com/docs/guide/concepts/modules
   modules: [
     "gc-shared-resources",
     "nuxt-auth-utils",
@@ -21,6 +25,8 @@ export default defineNuxtConfig({
     "@nuxt/test-utils/module",
     "nuxt-windicss",
   ],
+
+  css: ["public/lightbox/lightbox.min.css"],
 
   i18n: {
     locales: [
