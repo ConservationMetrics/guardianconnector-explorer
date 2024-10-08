@@ -31,7 +31,9 @@
           {{
             isAlert
               ? $t(key).charAt(0).toUpperCase() + $t(key).slice(1)
-              : key.charAt(0).toUpperCase() + key.slice(1)
+              : key === "dataCollectedOn"
+                ? $t(key)
+                : key.charAt(0).toUpperCase() + key.slice(1)
           }}</span
         >:
         <span

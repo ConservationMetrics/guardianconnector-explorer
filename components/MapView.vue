@@ -7,6 +7,16 @@
     :show-colored-dot="true"
     @filter="filterValues"
   />
+  <ViewSidebar
+    :allowed-file-extensions="allowedFileExtensions"
+    :feature="selectedFeature"
+    :file-paths="
+      getFilePathsWithExtension(selectedFeature, allowedFileExtensions)
+    "
+    :media-base-path="mediaBasePath"
+    :show-sidebar="showSidebar"
+    @close="showSidebar = false"
+  />
   <MapLegend
     v-if="mapLegendContent && mapData"
     :map-legend-content="mapLegendContent"
@@ -19,7 +29,6 @@
     :planet-api-key="planetApiKey"
     @basemapSelected="handleBasemapChange"
   />
-  <!-- Add Sidebar -->
 </template>
 
 <script setup>
@@ -37,7 +46,7 @@ import {
 } from "@/utils/mapFunctions.ts";
 
 import DataFilter from "@/components/shared/DataFilter.vue";
-// import Sidebar from "@/components/shared/Sidebar.vue";
+import ViewSidebar from "@/components/shared/ViewSidebar.vue";
 import MapLegend from "@/components/shared/MapLegend.vue";
 import BasemapSelector from "@/components/shared/BasemapSelector.vue";
 
