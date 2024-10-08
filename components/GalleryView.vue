@@ -4,11 +4,11 @@
     class="gallery p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
   >
     <div class="sticky top-10 right-10 z-10" v-if="filterColumn">
-      <!-- <DataFilter
-        :galleryData="galleryData"
+      <DataFilter
+        :data="galleryData"
         :filter-column="filterColumn"
         @filter="filter"
-      /> -->
+      />
     </div>
     <DataFeature
       v-for="(feature, index) in paginatedData"
@@ -27,6 +27,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { getFilePathsWithExtension } from "@/utils";
 
+import DataFilter from "@/components/shared/DataFilter.vue";
 import DataFeature from "@/components/shared/DataFeature.vue";
 
 // Define props

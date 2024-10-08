@@ -1,17 +1,19 @@
 <template>
   <div>
-    <GalleryView
-      v-if="mediaBasePath && dataFetched"
-      :audio-extensions="audioExtensions"
-      :gallery-data="galleryData"
-      :filter-column="filterColumn"
-      :image-extensions="imageExtensions"
-      :media-base-path="mediaBasePath"
-      :video-extensions="videoExtensions"
-    />
-    <h3 v-if="!mediaBasePath && dataFetched">
-      {{ $t("galleryNotAvailable") }}.
-    </h3>
+    <ClientOnly>
+      <GalleryView
+        v-if="mediaBasePath && dataFetched"
+        :audio-extensions="audioExtensions"
+        :gallery-data="galleryData"
+        :filter-column="filterColumn"
+        :image-extensions="imageExtensions"
+        :media-base-path="mediaBasePath"
+        :video-extensions="videoExtensions"
+      />
+      <h3 v-if="!mediaBasePath && dataFetched">
+        {{ $t("galleryNotAvailable") }}.
+      </h3>
+    </ClientOnly>
   </div>
 </template>
 

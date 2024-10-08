@@ -29,7 +29,8 @@
     "sqlite3": "^5.1.7",
     "tokml": "^0.4.0",
     "vue": "latest",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "vue3-select-component": "^0.6.1"
   },
   "lint-staged": {
     "./**/*.{js,jsx,ts,tsx,json,css,vue}": [

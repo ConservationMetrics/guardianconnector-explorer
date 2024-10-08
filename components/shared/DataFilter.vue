@@ -3,24 +3,17 @@
     <h4>
       {{ $t("filterDataByColumn") }}: <strong>{{ filterColumn }}</strong>
     </h4>
-    <v-select
-      multiple
+    <VueSelect
+      :is-multi="true"
       :options="uniqueValues"
-      @input="emitFilter"
-      label="label"
+      @option-selected="emitFilter()"
+      @option-deselected="emitFilter()"
       v-model="selectedValue"
+      :key="uniqueValues"
     >
-      <!-- These are the options in the dropdown -->
-      <template v-slot:option="option">
-        <span
-          class="colored-dot"
-          v-if="showColoredDot"
-          :style="{ backgroundColor: option.color }"
-        ></span>
-        {{ option.label }}
-      </template>
       <!-- This is what shows in the listbox when selected -->
-      <template v-slot:selected-option="option">
+      <!-- Pending support for tags https://github.com/TotomInc/vue3-select-component/pull/129 -->
+      <template #tag="{ option }">
         <span
           class="colored-dot"
           v-if="showColoredDot"
@@ -28,14 +21,22 @@
         ></span>
         {{ option.label }}
       </template>
-    </v-select>
+      <!-- These are the options in the dropdown -->
+      <template #option="{ option }">
+        <span
+          class="colored-dot"
+          v-if="showColoredDot"
+          :style="{ backgroundColor: option.color }"
+        ></span>
+        {{ option.label }}
+      </template>
+    </VueSelect>
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
+import VueSelect from "vue3-select-component";
 
 // Define props
 const props = defineProps({
@@ -43,6 +44,9 @@ const props = defineProps({
   filterColumn: String,
   showColoredDot: Boolean,
 });
+
+// Define emits
+const emit = defineEmits(["filter"]);
 
 // Set up reactive state
 const defaultColor = "#ffffff";
@@ -61,20 +65,21 @@ const uniqueValues = computed(() => {
         item.value !== null && item.value !== "" && item.value !== undefined,
     );
 
-  // Filter out the selected values
-  const filteredValues = values.filter(
-    (value) => !selectedValue.value.map((v) => v.value).includes(value.value),
-  );
+  // Use a Map to ensure unique values based on the 'value' property
+  const uniqueMap = new Map();
+  values.forEach((item) => {
+    if (!uniqueMap.has(item.value)) {
+      uniqueMap.set(item.value, item);
+    }
+  });
 
-  return [
-    ...new Map(filteredValues.map((item) => [item.value, item])).values(),
-  ];
+  return Array.from(uniqueMap.values());
 });
 
 // Define methods
 function emitFilter() {
   if (selectedValue.value.length > 0) {
-    const labels = selectedValue.value.map((item) => item.label);
+    const labels = selectedValue.value;
     emit("filter", labels);
   } else {
     emit("filter", "null");
@@ -92,7 +97,8 @@ function emitFilter() {
   background: #f5f5f5;
   padding: 10px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  border-radius: 10px; /* Rounded corners */
+  border-radius: 10px;
+  /* Rounded corners */
   z-index: 1000;
 
   h4 {
@@ -101,7 +107,7 @@ function emitFilter() {
     color: #333;
   }
 
-  .v-select {
+  .vue-select {
     width: 100%;
     margin: 5px 0;
     padding: 5px;
@@ -114,6 +120,7 @@ function emitFilter() {
       border-radius: 50%;
       display: inline-block;
       margin-right: 5px;
+      margin-top: 5px;
     }
   }
 
