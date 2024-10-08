@@ -105,7 +105,7 @@ export default defineEventHandler(async (event: H3Event) => {
       mapboxPitch: Number(viewsConfig[table].MAPBOX_PITCH),
       mapboxProjection: viewsConfig[table].MAPBOX_PROJECTION,
       mapboxStyle: viewsConfig[table].MAPBOX_STYLE,
-      mapboxZoom: viewsConfig[table].MAPBOX_ZOOM,
+      mapboxZoom: Number(viewsConfig[table].MAPBOX_ZOOM),
       mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
       planetApiKey: viewsConfig[table].PLANET_API_KEY,
       table: table,

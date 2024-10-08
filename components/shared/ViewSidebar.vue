@@ -2,16 +2,16 @@
   <div v-if="showSidebar" class="sidebar" @scroll="handleScroll">
     <div class="scroll-indicator" v-if="!scrolled">&#x2193;</div>
     <button class="close-btn" @click="$emit('close')">X</button>
-    <!-- <AlertsIntroPanel
+    <AlertsIntroPanel
       v-if="showIntroPanel"
       :calculate-hectares="calculateHectares"
       :date-options="dateOptions"
       :geojson-selection="geojsonSelection"
       :logo-url="logoUrl"
       :show-slider="showSlider"
-      :statistics="statistics"
+      :alerts-statistics="alertsStatistics"
       @date-range-changed="$emit('date-range-changed', $event)"
-    /> -->
+    />
     <DataFeature
       v-if="feature"
       :allowed-file-extensions="allowedFileExtensions"
@@ -21,24 +21,25 @@
       :media-base-path="mediaBasePath"
       :media-base-path-alerts="mediaBasePathAlerts"
     />
-    <!-- <DownloadMapData
+    <DownloadMapData
       v-if="downloadAlert"
       :geojson="featureGeojson"
       :type-of-data="'alert'"
-    /> -->
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, watch } from "vue";
-// import DownloadMapData from "~/components/shared/DownloadMapData.vue";
-import DataFeature from "~/components/shared/DataFeature.vue";
-// import AlertsIntroPanel from "~/components/alerts/AlertsIntroPanel.vue";
+import DownloadMapData from "@/components/shared/DownloadMapData.vue";
+import DataFeature from "@/components/shared/DataFeature.vue";
+import AlertsIntroPanel from "@/components/alerts/AlertsIntroPanel.vue";
 
 // Define props
 const props = defineProps({
+  alertsStatistics: Object,
   allowedFileExtensions: Object,
-  calculateHectares: Function,
+  calculateHectares: Boolean,
   dateOptions: Array,
   downloadAlert: Boolean,
   feature: Object,
@@ -52,7 +53,6 @@ const props = defineProps({
   showIntroPanel: Boolean,
   showSidebar: Boolean,
   showSlider: Boolean,
-  statistics: Object,
 });
 
 // Set up reactive state

@@ -3,7 +3,7 @@ import { setupDatabaseConnection } from "../../database/dbConnection";
 import { fetchConfig, fetchData } from "../../database/dbOperations";
 import {
   prepareAlertData,
-  prepareAlertStatistics,
+  prepareAlertsStatistics,
   transformToGeojson,
   prepareMapData,
   transformSurveyData,
@@ -13,7 +13,6 @@ import {
   filterGeoData,
 } from "../../dataProcessing/filterData";
 import { type AllowedFileExtensions } from "../../types";
-import { setup } from "@nuxt/test-utils";
 
 export default defineEventHandler(async (event: H3Event) => {
   const { table } = event.context.params as { table: string };
@@ -117,7 +116,7 @@ export default defineEventHandler(async (event: H3Event) => {
     }
 
     // Prepare statistics data for the alerts view
-    const statistics = prepareAlertStatistics(mainData, metadata);
+    const alertsStatistics = prepareAlertsStatistics(mainData, metadata);
 
     // Convert alert data to GeoJSON format
     const geojsonData = {
@@ -129,23 +128,23 @@ export default defineEventHandler(async (event: H3Event) => {
 
     const response = {
       alertsData: geojsonData,
-      imageExtensions: allowedFileExtensions.image,
+      alertsStatistics: alertsStatistics,
+      allowedFileExtensions: allowedFileExtensions,
       logoUrl: viewsConfig[table].LOGO_URL,
       mapLegendLayerIds: viewsConfig[table].MAP_LEGEND_LAYER_IDS,
-      mapbox3d: viewsConfig[table].MAPBOX_3D,
+      mapbox3d: viewsConfig[table].MAPBOX_3D === "YES",
       mapboxAccessToken: viewsConfig[table].MAPBOX_ACCESS_TOKEN,
-      mapboxBearing: viewsConfig[table].MAPBOX_BEARING,
-      mapboxLatitude: viewsConfig[table].MAPBOX_CENTER_LATITUDE,
-      mapboxLongitude: viewsConfig[table].MAPBOX_CENTER_LONGITUDE,
-      mapboxPitch: viewsConfig[table].MAPBOX_PITCH,
+      mapboxBearing: Number(viewsConfig[table].MAPBOX_BEARING),
+      mapboxLatitude: Number(viewsConfig[table].MAPBOX_CENTER_LATITUDE),
+      mapboxLongitude: Number(viewsConfig[table].MAPBOX_CENTER_LONGITUDE),
+      mapboxPitch: Number(viewsConfig[table].MAPBOX_PITCH),
       mapboxProjection: viewsConfig[table].MAPBOX_PROJECTION,
       mapboxStyle: viewsConfig[table].MAPBOX_STYLE,
-      mapboxZoom: viewsConfig[table].MAPBOX_ZOOM,
+      mapboxZoom: Number(viewsConfig[table].MAPBOX_ZOOM),
       mapeoData: mapeoData,
       mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
       mediaBasePathAlerts: viewsConfig[table].MEDIA_BASE_PATH_ALERTS,
       planetApiKey: viewsConfig[table].PLANET_API_KEY,
-      statistics: statistics,
       table: table,
     };
 

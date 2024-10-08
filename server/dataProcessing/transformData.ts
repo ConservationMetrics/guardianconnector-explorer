@@ -268,7 +268,7 @@ const prepareAlertData = (
 };
 
 // Prepare statistics for the alerts view intro panel
-const prepareAlertStatistics = (
+const prepareAlertsStatistics = (
   data: AlertRecord[],
   metadata: Metadata[] | null,
 ): Record<string, any> => {
@@ -599,6 +599,6 @@ export {
   transformSurveyData,
   prepareMapData,
   prepareAlertData,
-  prepareAlertStatistics,
+  prepareAlertsStatistics,
   transformToGeojson,
 };

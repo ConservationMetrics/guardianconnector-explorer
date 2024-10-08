@@ -20,6 +20,7 @@
   "dependencies": {
     "@turf/turf": "^7.1.0",
     "@vojtechlanka/vue-tags-input": "^3.1.1",
+    "chart.js": "^4.4.4",
     "gc-shared-resources": "latest",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.4.0",
@@ -29,6 +30,8 @@
     "sqlite3": "^5.1.7",
     "tokml": "^0.4.0",
     "vue": "latest",
+    "vue-3-slider-component": "^1.0.1",
+    "vue-chartjs": "^5.3.1",
     "vue-datepicker-next": "^1.0.3",
     "vue-router": "latest",
     "vue3-select-component": "^0.6.1"

@@ -20,7 +20,6 @@
   <MapLegend
     v-if="mapLegendContent && mapData"
     :map-legend-content="mapLegendContent"
-    :resetLegend="resetLegend"
     @toggle-layer-visibility="toggleLayerVisibility"
   />
   <BasemapSelector
@@ -70,15 +69,14 @@ const props = defineProps({
 });
 
 // Set up reactive state
-const map = ref(null);
+const currentBasemap = ref(props.mapboxStyle);
 const filteredData = ref([...props.mapData]);
 const processedData = ref([...props.mapData]);
+const map = ref(null);
+const mapLegendContent = ref(null);
 const selectedFeature = ref(null);
 const showSidebar = ref(false);
 const showBasemapSelector = ref(false);
-const mapLegendContent = ref(null);
-const currentBasemap = ref(props.mapboxStyle);
-const resetLegend = ref(false);
 
 // Define methods
 const addDataToMap = () => {
@@ -245,14 +243,6 @@ const toggleLayerVisibility = (item) => {
   utilsToggleLayerVisibility(map.value, item);
 };
 
-const resetLegendVisibility = () => {
-  resetLegend.value = true;
-  // Reset the flag after the reset is handled
-  setTimeout(() => {
-    resetLegend.value = false;
-  }, 0);
-};
-
 // Lifecycle hooks
 onMounted(() => {
   mapboxgl.accessToken = props.mapboxAccessToken;
@@ -280,15 +270,18 @@ onMounted(() => {
 
     prepareMapCanvasContent();
 
+    // Navigation Control (zoom buttons and compass)
     const nav = new mapboxgl.NavigationControl();
     map.value.addControl(nav, "top-right");
 
+    // Scale Control
     const scale = new mapboxgl.ScaleControl({
       maxWidth: 80,
       unit: "metric",
     });
     map.value.addControl(scale, "bottom-left");
 
+    // Fullscreen Control
     const fullscreenControl = new mapboxgl.FullscreenControl();
     map.value.addControl(fullscreenControl, "top-right");
 
