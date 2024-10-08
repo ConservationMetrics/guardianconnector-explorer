@@ -12,13 +12,11 @@
     </div>
     <DataFeature
       v-for="(feature, index) in paginatedData"
-      :audio-extensions="audioExtensions"
+      :allowed-file-extensions="allowedFileExtensions"
       :feature="feature"
-      :file-paths="getFilePathsWithExtension(feature, allExtensions)"
-      :image-extensions="imageExtensions"
+      :file-paths="getFilePathsWithExtension(feature, allowedFileExtensions)"
       :key="index"
       :media-base-path="mediaBasePath"
-      :video-extensions="videoExtensions"
     />
   </div>
 </template>
@@ -32,12 +30,10 @@ import DataFeature from "@/components/shared/DataFeature.vue";
 
 // Define props
 const props = defineProps({
-  audioExtensions: Array,
+  allowedFileExtensions: Object,
   filterColumn: String,
   galleryData: Object,
-  imageExtensions: Array,
   mediaBasePath: String,
-  videoExtensions: Array,
 });
 
 // Set up reactive state
@@ -51,12 +47,6 @@ const paginatedData = computed(() => {
   const end = currentPage.value * itemsPerPage;
   return filteredData.value.slice(start, end);
 });
-
-const allExtensions = computed(() => [
-  ...props.imageExtensions,
-  ...props.audioExtensions,
-  ...props.videoExtensions,
-]);
 
 // Define methods
 function handleScroll() {

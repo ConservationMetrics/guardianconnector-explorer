@@ -8,12 +8,10 @@
     <div v-if="setMediaBasePath()" :class="{ 'flex-container': isAlert }">
       <MediaFile
         v-for="filePath in filePaths"
-        :audio-extensions="audioExtensions"
-        :filePath="filePath"
-        :image-extensions="imageExtensions"
+        :allowed-file-extensions="allowedFileExtensions"
+        :file-path="filePath"
         :key="filePath"
-        :mediaBasePath="setMediaBasePath()"
-        :video-extensions="videoExtensions"
+        :media-base-path="setMediaBasePath()"
       />
     </div>
     <div class="mt-4" v-for="(value, key) in sortedFeature" :key="key">
@@ -62,14 +60,12 @@ import MediaFile from "@/components/shared/MediaFile.vue";
 
 // Define props
 const props = defineProps({
-  audioExtensions: Array,
+  allowedFileExtensions: Object,
   feature: Object,
   filePaths: Array,
-  imageExtensions: Array,
   isAlert: Boolean,
   mediaBasePath: String,
   mediaBasePathAlerts: String,
-  videoExtensions: Array,
 });
 
 // Set up computed properties

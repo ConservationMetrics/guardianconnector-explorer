@@ -1,7 +1,7 @@
 // Function to get file paths from a feature object
 export function getFilePathsWithExtension(
   feature: { [key: string]: unknown },
-  allExtensions: string[],
+  allExtensions: { [category: string]: string[] },
 ): string[] {
   if (!feature) return [];
 
@@ -17,8 +17,13 @@ export function getFilePathsWithExtension(
     if (feature[key].includes("attachment")) return;
     const files = feature[key].split(",");
     files.forEach((file: string) => {
-      // Check if the file has any extension listed in allExtensions array
-      if (allExtensions.some((ext: string) => file.trim().endsWith(ext))) {
+      // Check if the file has any extension listed in allExtensions object
+      const hasValidExtension = Object.values(allExtensions).some(
+        (extensions) =>
+          extensions.some((ext: string) => file.trim().endsWith(ext)),
+      );
+
+      if (hasValidExtension) {
         const cleanedFile = file
           .trim()
           .replace(/ /g, "_")

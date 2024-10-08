@@ -88,13 +88,11 @@ export default defineEventHandler(async (event: H3Event) => {
     const transformedData = transformSurveyData(dataWithFilesOnly);
 
     const response = {
-      audioExtensions: allowedFileExtensions.audio,
+      allowedFileExtensions: allowedFileExtensions,
       data: transformedData,
       filterColumn: viewsConfig[table].FRONT_END_FILTER_COLUMN,
-      imageExtensions: allowedFileExtensions.image,
       mediaBasePath: viewsConfig[table].MEDIA_BASE_PATH,
       table: table,
-      videoExtensions: allowedFileExtensions.video,
     };
 
     return response;

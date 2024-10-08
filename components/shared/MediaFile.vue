@@ -44,37 +44,36 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: [
-    "audioExtensions",
-    "filePath",
-    "imageExtensions",
-    "mediaBasePath",
-    "videoExtensions",
-  ],
-  computed: {
-    isAudio() {
-      return this.checkExtension(this.audioExtensions);
-    },
-    isImage() {
-      return this.checkExtension(this.imageExtensions);
-    },
-    isVideo() {
-      return this.checkExtension(this.videoExtensions);
-    },
-  },
-  methods: {
-    checkExtension(extensions) {
-      if (!extensions) return false;
-      const extension = this.getExtension(this.filePath);
-      return extensions.includes(extension);
-    },
-    getExtension(filePath) {
-      return filePath.split(".").pop().toLowerCase();
-    },
-  },
-};
+<script setup>
+import { computed } from "vue";
+
+// Define props
+const props = defineProps({
+  allowedFileExtensions: Object,
+  filePath: String,
+  mediaBasePath: String,
+});
+
+// Set up computed properties
+function getExtension(filePath) {
+  return filePath.split(".").pop().toLowerCase();
+}
+
+function checkExtension(extensions) {
+  if (!extensions) return false;
+  const extension = getExtension(props.filePath);
+  return extensions.includes(extension);
+}
+
+const isAudio = computed(() =>
+  checkExtension(props.allowedFileExtensions.audio),
+);
+const isImage = computed(() =>
+  checkExtension(props.allowedFileExtensions.image),
+);
+const isVideo = computed(() =>
+  checkExtension(props.allowedFileExtensions.video),
+);
 </script>
 
 <style scoped></style>
