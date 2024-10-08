@@ -29,6 +29,7 @@
     "sqlite3": "^5.1.7",
     "tokml": "^0.4.0",
     "vue": "latest",
+    "vue-datepicker-next": "^1.0.3",
     "vue-router": "latest",
     "vue3-select-component": "^0.6.1"
   },
