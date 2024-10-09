@@ -6,6 +6,7 @@ export default defineEventHandler(async (event: H3Event) => {
   const { table } = event.context.params as { table: string };
 
   const {
+    configDatabase,
     database,
     dbHost,
     dbUser,
@@ -15,6 +16,7 @@ export default defineEventHandler(async (event: H3Event) => {
     isSqlite,
     sqliteDbPath,
   } = useRuntimeConfig() as unknown as {
+    configDatabase: string;
     database: string;
     dbHost: string;
     dbUser: string;
@@ -25,7 +27,24 @@ export default defineEventHandler(async (event: H3Event) => {
     sqliteDbPath: string;
   };
 
-  const db = setupDatabaseConnection(
+  const configDb = await setupDatabaseConnection(
+    /* isConfigDb */ true,
+    isSqlite,
+    sqliteDbPath,
+    configDatabase,
+    database,
+    dbHost,
+    dbUser,
+    dbPassword,
+    dbPort,
+    dbSsl,
+  );
+
+  if (!configDb) {
+    throw new Error("Failed to connect to configDb");
+  }
+
+  const db = await setupDatabaseConnection(
     /* isConfigDb */ false,
     isSqlite,
     sqliteDbPath,

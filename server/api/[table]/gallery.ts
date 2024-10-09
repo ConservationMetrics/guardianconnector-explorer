@@ -36,7 +36,7 @@ export default defineEventHandler(async (event: H3Event) => {
     sqliteDbPath: string;
   };
 
-  const configDb = setupDatabaseConnection(
+  const configDb = await setupDatabaseConnection(
     /* isConfigDb */ true,
     isSqlite,
     sqliteDbPath,
@@ -49,7 +49,11 @@ export default defineEventHandler(async (event: H3Event) => {
     dbSsl,
   );
 
-  const db = setupDatabaseConnection(
+  if (!configDb) {
+    throw new Error("Failed to connect to configDb");
+  }
+
+  const db = await setupDatabaseConnection(
     /* isConfigDb */ false,
     isSqlite,
     sqliteDbPath,
