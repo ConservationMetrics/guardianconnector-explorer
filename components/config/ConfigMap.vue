@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits, reactive, watch } from "vue";
+import { ref, reactive, watch } from "vue";
 
 import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
 

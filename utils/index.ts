@@ -1,8 +1,8 @@
 // Function to get file paths from a feature object
-export function getFilePathsWithExtension(
+export const getFilePathsWithExtension = (
   feature: { [key: string]: unknown },
   allExtensions: { [category: string]: string[] },
-): string[] {
+): string[] => {
   if (!feature) return [];
 
   // Get the value of the uuidKey or set it to null if it doesn't exist
@@ -35,11 +35,11 @@ export function getFilePathsWithExtension(
     });
   });
   return filePaths;
-}
+};
 
-export function toCamelCase(key: string): string {
+export const toCamelCase = (key: string): string => {
   return key
     .toLowerCase()
     .replace(/_([a-z0-9])/g, (_, p1) => p1.toUpperCase())
     .replace(/(^\w)/, (match) => match.toLowerCase());
-}
+};

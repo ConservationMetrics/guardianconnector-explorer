@@ -1,5 +1,5 @@
 <script setup>
-import { defineEmits, watch, reactive } from "vue";
+import { watch, reactive } from "vue";
 
 import { toCamelCase } from "@/utils";
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, defineEmits, watch } from "vue";
+import { ref, computed, watch } from "vue";
 
 import Datepicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";

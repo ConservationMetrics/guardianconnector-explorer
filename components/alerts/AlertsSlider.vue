@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, defineEmits } from "vue";
+import { ref, watch, onMounted } from "vue";
 import VueSlider from "vue-3-slider-component";
 
 const props = defineProps({

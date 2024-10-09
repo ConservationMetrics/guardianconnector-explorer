@@ -1,5 +1,5 @@
 <script setup>
-import { defineEmits, ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 
 const props = defineProps({
   tableName: String,
