@@ -100,7 +100,6 @@ const handleSubmit = async ({ tableName, config }) => {
 };
 
 // Helpers for minimizing cards
-const minimizedCards = ref(initializeMinimizedCards());
 const initializeMinimizedCards = () => {
   const minimized = {};
   for (const tableName in props.viewsConfig) {
@@ -108,6 +107,7 @@ const initializeMinimizedCards = () => {
   }
   return minimized;
 };
+const minimizedCards = ref(initializeMinimizedCards());
 
 const toggleMinimize = ({ tableName }) => {
   const isCurrentlyMinimized = minimizedCards.value[tableName];
