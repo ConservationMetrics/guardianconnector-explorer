@@ -1,20 +1,3 @@
-<template>
-  <div>
-    <ClientOnly>
-      <GalleryView
-        v-if="mediaBasePath && dataFetched"
-        :allowed-file-extensions="allowedFileExtensions"
-        :gallery-data="galleryData"
-        :filter-column="filterColumn"
-        :media-base-path="mediaBasePath"
-      />
-      <h3 v-if="!mediaBasePath && dataFetched">
-        {{ $t("galleryNotAvailable") }}.
-      </h3>
-    </ClientOnly>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { useHead, useFetch, useRuntimeConfig } from "#app";
@@ -66,3 +49,20 @@ useHead({
   title: "GuardianConnector Explorer" + t("gallery"),
 });
 </script>
+
+<template>
+  <div>
+    <ClientOnly>
+      <GalleryView
+        v-if="mediaBasePath && dataFetched"
+        :allowed-file-extensions="allowedFileExtensions"
+        :gallery-data="galleryData"
+        :filter-column="filterColumn"
+        :media-base-path="mediaBasePath"
+      />
+      <h3 v-if="!mediaBasePath && dataFetched">
+        {{ $t("galleryNotAvailable") }}.
+      </h3>
+    </ClientOnly>
+  </div>
+</template>

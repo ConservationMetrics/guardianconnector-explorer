@@ -1,34 +1,3 @@
-<template>
-  <div v-if="showSidebar" class="sidebar" @scroll="handleScroll">
-    <div class="scroll-indicator" v-if="!scrolled">&#x2193;</div>
-    <button class="close-btn" @click="$emit('close')">X</button>
-    <AlertsIntroPanel
-      v-if="showIntroPanel"
-      :calculate-hectares="calculateHectares"
-      :date-options="dateOptions"
-      :geojson-selection="geojsonSelection"
-      :logo-url="logoUrl"
-      :show-slider="showSlider"
-      :alerts-statistics="alertsStatistics"
-      @date-range-changed="$emit('date-range-changed', $event)"
-    />
-    <DataFeature
-      v-if="feature"
-      :allowed-file-extensions="allowedFileExtensions"
-      :feature="filteredFeature"
-      :file-paths="filePaths"
-      :is-alert="isAlert"
-      :media-base-path="mediaBasePath"
-      :media-base-path-alerts="mediaBasePathAlerts"
-    />
-    <DownloadMapData
-      v-if="downloadAlert"
-      :geojson="featureGeojson"
-      :type-of-data="'alert'"
-    />
-  </div>
-</template>
-
 <script setup>
 import { ref, computed, watch } from "vue";
 import DownloadMapData from "@/components/shared/DownloadMapData.vue";
@@ -90,6 +59,37 @@ watch(
   },
 );
 </script>
+
+<template>
+  <div v-if="showSidebar" class="sidebar" @scroll="handleScroll">
+    <div class="scroll-indicator" v-if="!scrolled">&#x2193;</div>
+    <button class="close-btn" @click="$emit('close')">X</button>
+    <AlertsIntroPanel
+      v-if="showIntroPanel"
+      :calculate-hectares="calculateHectares"
+      :date-options="dateOptions"
+      :geojson-selection="geojsonSelection"
+      :logo-url="logoUrl"
+      :show-slider="showSlider"
+      :alerts-statistics="alertsStatistics"
+      @date-range-changed="$emit('date-range-changed', $event)"
+    />
+    <DataFeature
+      v-if="feature"
+      :allowed-file-extensions="allowedFileExtensions"
+      :feature="filteredFeature"
+      :file-paths="filePaths"
+      :is-alert="isAlert"
+      :media-base-path="mediaBasePath"
+      :media-base-path-alerts="mediaBasePathAlerts"
+    />
+    <DownloadMapData
+      v-if="downloadAlert"
+      :geojson="featureGeojson"
+      :type-of-data="'alert'"
+    />
+  </div>
+</template>
 
 <style scoped>
 .sidebar {

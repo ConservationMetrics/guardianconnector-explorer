@@ -1,3 +1,40 @@
+<script setup>
+import { computed } from "vue";
+
+import MediaFile from "@/components/shared/MediaFile.vue";
+
+// Define props
+const props = defineProps({
+  allowedFileExtensions: Object,
+  feature: Object,
+  filePaths: Array,
+  isAlert: Boolean,
+  mediaBasePath: String,
+  mediaBasePathAlerts: String,
+});
+
+// Set up computed properties
+const sortedFeature = computed(() => {
+  return Object.keys(props.feature)
+    .sort()
+    .reduce((obj, key) => {
+      obj[key] = props.feature[key];
+      return obj;
+    }, {});
+});
+
+// Define methods
+function setMediaBasePath() {
+  if (props.isAlert && props.mediaBasePathAlerts) {
+    return props.mediaBasePathAlerts;
+  } else if (!props.isAlert && props.mediaBasePath) {
+    return props.mediaBasePath;
+  } else {
+    return false;
+  }
+}
+</script>
+
 <template>
   <div class="feature p-4 rounded-lg shadow-lg">
     <div v-for="(value, key) in sortedFeature" :key="key">
@@ -54,43 +91,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from "vue";
-
-import MediaFile from "@/components/shared/MediaFile.vue";
-
-// Define props
-const props = defineProps({
-  allowedFileExtensions: Object,
-  feature: Object,
-  filePaths: Array,
-  isAlert: Boolean,
-  mediaBasePath: String,
-  mediaBasePathAlerts: String,
-});
-
-// Set up computed properties
-const sortedFeature = computed(() => {
-  return Object.keys(props.feature)
-    .sort()
-    .reduce((obj, key) => {
-      obj[key] = props.feature[key];
-      return obj;
-    }, {});
-});
-
-// Define methods
-function setMediaBasePath() {
-  if (props.isAlert && props.mediaBasePathAlerts) {
-    return props.mediaBasePathAlerts;
-  } else if (!props.isAlert && props.mediaBasePath) {
-    return props.mediaBasePath;
-  } else {
-    return false;
-  }
-}
-</script>
 
 <style scoped>
 a {

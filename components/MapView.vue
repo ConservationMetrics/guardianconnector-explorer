@@ -1,35 +1,3 @@
-<template>
-  <div id="map"></div>
-  <DataFilter
-    v-if="filterColumn"
-    :data="mapData"
-    :filter-column="filterColumn"
-    :show-colored-dot="true"
-    @filter="filterValues"
-  />
-  <ViewSidebar
-    :allowed-file-extensions="allowedFileExtensions"
-    :feature="selectedFeature"
-    :file-paths="
-      getFilePathsWithExtension(selectedFeature, allowedFileExtensions)
-    "
-    :media-base-path="mediaBasePath"
-    :show-sidebar="showSidebar"
-    @close="showSidebar = false"
-  />
-  <MapLegend
-    v-if="mapLegendContent && mapData"
-    :map-legend-content="mapLegendContent"
-    @toggle-layer-visibility="toggleLayerVisibility"
-  />
-  <BasemapSelector
-    v-if="showBasemapSelector"
-    :mapbox-style="mapboxStyle"
-    :planet-api-key="planetApiKey"
-    @basemapSelected="handleBasemapChange"
-  />
-</template>
-
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from "vue";
 
@@ -295,6 +263,38 @@ onBeforeUnmount(() => {
   }
 });
 </script>
+
+<template>
+  <div id="map"></div>
+  <DataFilter
+    v-if="filterColumn"
+    :data="mapData"
+    :filter-column="filterColumn"
+    :show-colored-dot="true"
+    @filter="filterValues"
+  />
+  <ViewSidebar
+    :allowed-file-extensions="allowedFileExtensions"
+    :feature="selectedFeature"
+    :file-paths="
+      getFilePathsWithExtension(selectedFeature, allowedFileExtensions)
+    "
+    :media-base-path="mediaBasePath"
+    :show-sidebar="showSidebar"
+    @close="showSidebar = false"
+  />
+  <MapLegend
+    v-if="mapLegendContent && mapData"
+    :map-legend-content="mapLegendContent"
+    @toggle-layer-visibility="toggleLayerVisibility"
+  />
+  <BasemapSelector
+    v-if="showBasemapSelector"
+    :mapbox-style="mapboxStyle"
+    :planet-api-key="planetApiKey"
+    @basemapSelected="handleBasemapChange"
+  />
+</template>
 
 <style scoped>
 body {

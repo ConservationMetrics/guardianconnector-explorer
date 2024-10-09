@@ -1,25 +1,3 @@
-<template>
-  <div class="mt-4 mb-10">
-    <h3 class="text-2xl font-semibold mb-2">
-      {{ $t("selectAlertDateRange") }}
-    </h3>
-    <div class="mb-6">
-      <VueSlider
-        class="date-slider"
-        v-model="selectedRange"
-        :contained="true"
-        :data="dateOptions"
-        :height="8"
-        :hide-label="true"
-        :marks="true"
-        :tooltip="'always'"
-        :tooltipPlacement="'bottom'"
-        @drag-start="userInteracted = true"
-      />
-    </div>
-  </div>
-</template>
-
 <script setup>
 import VueSlider from "vue-3-slider-component";
 
@@ -54,3 +32,25 @@ watch(selectedRange, (newRange) => {
   }
 });
 </script>
+
+<template>
+  <div class="mt-4 mb-10">
+    <h3 class="text-2xl font-semibold mb-2">
+      {{ $t("selectAlertDateRange") }}
+    </h3>
+    <div class="mb-6">
+      <VueSlider
+        class="date-slider"
+        v-model="selectedRange"
+        :contained="true"
+        :data="dateOptions"
+        :height="8"
+        :hide-label="true"
+        :marks="true"
+        :tooltip="'always'"
+        :tooltipPlacement="'bottom'"
+        @drag-start="userInteracted = true"
+      />
+    </div>
+  </div>
+</template>

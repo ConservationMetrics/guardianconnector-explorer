@@ -1,86 +1,3 @@
-<template>
-  <div class="table-item card">
-    <h2 class="card-header">
-      <p class="table-name">{{ tableName }}</p>
-      <button class="hamburger" @click="$emit('toggleMinimize', { tableName })">
-        ☰
-      </button>
-    </h2>
-    <div v-if="!isMinimized" class="card-body">
-      <form @submit.prevent="handleSubmit">
-        <ConfigViews
-          :tableName="tableName"
-          :config="localConfig"
-          :views="views"
-          :keys="viewsKeys"
-          @update:views="updateViews"
-        />
-        <ConfigMap
-          v-if="shouldShowConfigMap"
-          :tableName="tableName"
-          :views="views"
-          :config="localConfig"
-          :keys="mapConfigKeys"
-          @updateConfig="handleConfigUpdate"
-        />
-        <ConfigMedia
-          v-if="shouldShowConfigMedia"
-          :tableName="tableName"
-          :views="views"
-          :config="localConfig"
-          :keys="mediaKeys"
-          @updateConfig="handleConfigUpdate"
-        />
-        <ConfigAlerts
-          v-if="shouldShowConfigAlerts"
-          :tableName="tableName"
-          :views="views"
-          :config="localConfig"
-          :keys="alertKeys"
-          @updateConfig="handleConfigUpdate"
-        />
-        <ConfigFilters
-          v-if="shouldShowConfigFilters"
-          :tableName="tableName"
-          :views="views"
-          :config="localConfig"
-          :keys="filterKeys"
-          @updateConfig="handleConfigUpdate"
-        />
-        <ConfigOther
-          v-if="shouldShowConfigOther"
-          :tableName="tableName"
-          :views="views"
-          :config="localConfig"
-          :keys="otherKeys"
-          @updateConfig="handleConfigUpdate"
-        />
-        <button
-          type="submit"
-          :disabled="!isChanged || !isFormValid"
-          :class="[
-            'submit-button',
-            {
-              'bg-gray-500 cursor-not-allowed': !isChanged || !isFormValid,
-              'bg-blue-500 hover:bg-blue-700': isChanged && isFormValid,
-            },
-          ]"
-          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mr-2 mb-2 md:mb-0"
-        >
-          {{ $t("submit") }}
-        </button>
-        <button
-          type="button"
-          class="remove-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200"
-          @click="$emit('removeTableFromConfig', tableName)"
-        >
-          {{ $t("removeTable") }}
-        </button>
-      </form>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { defineEmits, ref, computed, onMounted } from "vue";
 
@@ -190,6 +107,89 @@ function updateViews(newViews) {
   localConfig.value.VIEWS = newViews.join(",");
 }
 </script>
+
+<template>
+  <div class="table-item card">
+    <h2 class="card-header">
+      <p class="table-name">{{ tableName }}</p>
+      <button class="hamburger" @click="$emit('toggleMinimize', { tableName })">
+        ☰
+      </button>
+    </h2>
+    <div v-if="!isMinimized" class="card-body">
+      <form @submit.prevent="handleSubmit">
+        <ConfigViews
+          :tableName="tableName"
+          :config="localConfig"
+          :views="views"
+          :keys="viewsKeys"
+          @update:views="updateViews"
+        />
+        <ConfigMap
+          v-if="shouldShowConfigMap"
+          :tableName="tableName"
+          :views="views"
+          :config="localConfig"
+          :keys="mapConfigKeys"
+          @updateConfig="handleConfigUpdate"
+        />
+        <ConfigMedia
+          v-if="shouldShowConfigMedia"
+          :tableName="tableName"
+          :views="views"
+          :config="localConfig"
+          :keys="mediaKeys"
+          @updateConfig="handleConfigUpdate"
+        />
+        <ConfigAlerts
+          v-if="shouldShowConfigAlerts"
+          :tableName="tableName"
+          :views="views"
+          :config="localConfig"
+          :keys="alertKeys"
+          @updateConfig="handleConfigUpdate"
+        />
+        <ConfigFilters
+          v-if="shouldShowConfigFilters"
+          :tableName="tableName"
+          :views="views"
+          :config="localConfig"
+          :keys="filterKeys"
+          @updateConfig="handleConfigUpdate"
+        />
+        <ConfigOther
+          v-if="shouldShowConfigOther"
+          :tableName="tableName"
+          :views="views"
+          :config="localConfig"
+          :keys="otherKeys"
+          @updateConfig="handleConfigUpdate"
+        />
+        <button
+          type="submit"
+          :disabled="!isChanged || !isFormValid"
+          :class="[
+            'submit-button',
+            {
+              'bg-gray-500 cursor-not-allowed': !isChanged || !isFormValid,
+              'bg-blue-500 hover:bg-blue-700': isChanged && isFormValid,
+            },
+          ]"
+          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mr-2 mb-2 md:mb-0"
+        >
+          {{ $t("submit") }}
+        </button>
+        <button
+          type="button"
+          class="remove-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200"
+          @click="$emit('removeTableFromConfig', tableName)"
+        >
+          {{ $t("removeTable") }}
+        </button>
+      </form>
+    </div>
+  </div>
+</template>
 
 <style>
 .table-item.card {

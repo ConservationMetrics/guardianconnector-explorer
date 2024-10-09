@@ -1,3 +1,35 @@
+<script setup>
+import { ref, watch, defineEmits } from "vue";
+
+// Define props
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  views: Array,
+  keys: Array,
+});
+
+// Set up composables
+const emit = defineEmits(["update:views"]);
+
+// Set up local state
+const localViews = ref([...props.views]);
+
+// Watch for changes to views
+watch(
+  () => props.views,
+  (newViews) => {
+    localViews.value = [...newViews];
+  },
+  { deep: true },
+);
+
+// Methods
+function updateViews() {
+  emit("update:views", localViews.value);
+}
+</script>
+
 <template>
   <div class="config-section">
     <div v-for="key in keys" :key="key" class="config-field">
@@ -38,35 +70,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, watch, defineEmits } from "vue";
-
-// Define props
-const props = defineProps({
-  tableName: String,
-  config: Object,
-  views: Array,
-  keys: Array,
-});
-
-// Set up composables
-const emit = defineEmits(["update:views"]);
-
-// Set up local state
-const localViews = ref([...props.views]);
-
-// Watch for changes to views
-watch(
-  () => props.views,
-  (newViews) => {
-    localViews.value = [...newViews];
-  },
-  { deep: true },
-);
-
-// Methods
-function updateViews() {
-  emit("update:views", localViews.value);
-}
-</script>

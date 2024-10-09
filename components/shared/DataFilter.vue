@@ -1,39 +1,3 @@
-<template>
-  <div class="filter-modal">
-    <h4>
-      {{ $t("filterDataByColumn") }}: <strong>{{ filterColumn }}</strong>
-    </h4>
-    <VueSelect
-      :is-multi="true"
-      :options="uniqueValues"
-      @option-selected="emitFilter()"
-      @option-deselected="emitFilter()"
-      v-model="selectedValue"
-      :key="uniqueValues"
-    >
-      <!-- This is what shows in the listbox when selected -->
-      <!-- Pending support for tags https://github.com/TotomInc/vue3-select-component/pull/129 -->
-      <template #tag="{ option }">
-        <span
-          class="colored-dot"
-          v-if="showColoredDot"
-          :style="{ backgroundColor: option.color }"
-        ></span>
-        {{ option.label }}
-      </template>
-      <!-- These are the options in the dropdown -->
-      <template #option="{ option }">
-        <span
-          class="colored-dot"
-          v-if="showColoredDot"
-          :style="{ backgroundColor: option.color }"
-        ></span>
-        {{ option.label }}
-      </template>
-    </VueSelect>
-  </div>
-</template>
-
 <script setup>
 import { ref, computed } from "vue";
 import VueSelect from "vue3-select-component";
@@ -86,6 +50,42 @@ function emitFilter() {
   }
 }
 </script>
+
+<template>
+  <div class="filter-modal">
+    <h4>
+      {{ $t("filterDataByColumn") }}: <strong>{{ filterColumn }}</strong>
+    </h4>
+    <VueSelect
+      :is-multi="true"
+      :options="uniqueValues"
+      @option-selected="emitFilter()"
+      @option-deselected="emitFilter()"
+      v-model="selectedValue"
+      :key="uniqueValues"
+    >
+      <!-- This is what shows in the listbox when selected -->
+      <!-- Pending support for tags https://github.com/TotomInc/vue3-select-component/pull/129 -->
+      <template #tag="{ option }">
+        <span
+          class="colored-dot"
+          v-if="showColoredDot"
+          :style="{ backgroundColor: option.color }"
+        ></span>
+        {{ option.label }}
+      </template>
+      <!-- These are the options in the dropdown -->
+      <template #option="{ option }">
+        <span
+          class="colored-dot"
+          v-if="showColoredDot"
+          :style="{ backgroundColor: option.color }"
+        ></span>
+        {{ option.label }}
+      </template>
+    </VueSelect>
+  </div>
+</template>
 
 <style scoped>
 .filter-modal {

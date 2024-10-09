@@ -1,3 +1,50 @@
+<script setup>
+import { ref, defineEmits, reactive, watch } from "vue";
+import { toCamelCase } from "@/utils";
+
+import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
+
+// Define props
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  views: Array,
+  keys: Array,
+});
+
+// Set up composables
+const emit = defineEmits(["updateConfig"]);
+
+// Set up reactive state
+const localConfig = reactive({ ...props.config });
+const tagInputs = ref({
+  MAP_LEGEND_LAYER_IDS: "",
+});
+
+const tags = ref({
+  MAP_LEGEND_LAYER_IDS: props.config.MAP_LEGEND_LAYER_IDS
+    ? props.config.MAP_LEGEND_LAYER_IDS.split(",").map((tag) => ({
+        text: tag,
+      }))
+    : [],
+});
+
+// Methods
+function updateTags(key, newTags) {
+  tags.value[key] = newTags;
+  localConfig[key] = newTags.map((tag) => tag.text).join(",");
+}
+
+// Watch for changes in localConfig and emit updates
+watch(
+  localConfig,
+  (newValue) => {
+    emit("updateConfig", newValue);
+  },
+  { deep: true },
+);
+</script>
+
 <template>
   <div class="config-section">
     <div class="config-header">
@@ -122,50 +169,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, defineEmits, reactive, watch } from "vue";
-import { toCamelCase } from "@/utils";
-
-import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
-
-// Define props
-const props = defineProps({
-  tableName: String,
-  config: Object,
-  views: Array,
-  keys: Array,
-});
-
-// Set up composables
-const emit = defineEmits(["updateConfig"]);
-
-// Set up reactive state
-const localConfig = reactive({ ...props.config });
-const tagInputs = ref({
-  MAP_LEGEND_LAYER_IDS: "",
-});
-
-const tags = ref({
-  MAP_LEGEND_LAYER_IDS: props.config.MAP_LEGEND_LAYER_IDS
-    ? props.config.MAP_LEGEND_LAYER_IDS.split(",").map((tag) => ({
-        text: tag,
-      }))
-    : [],
-});
-
-// Methods
-function updateTags(key, newTags) {
-  tags.value[key] = newTags;
-  localConfig[key] = newTags.map((tag) => tag.text).join(",");
-}
-
-// Watch for changes in localConfig and emit updates
-watch(
-  localConfig,
-  (newValue) => {
-    emit("updateConfig", newValue);
-  },
-  { deep: true },
-);
-</script>

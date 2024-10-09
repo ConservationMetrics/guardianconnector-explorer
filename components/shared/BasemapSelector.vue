@@ -1,78 +1,3 @@
-<template>
-  <div>
-    <div
-      class="basemap-toggle rounded shadow"
-      :class="{ active: showBasemapWindow }"
-      @click="toggleBasemapWindow"
-    >
-      <img src="/map.svg" alt="Map Icon" />
-    </div>
-    <div v-if="showBasemapWindow" class="basemap-window rounded shadow">
-      <div class="basemap-window-content">
-        <h3 class="font-semibold mb-2">{{ $t("selectBasemap") }}</h3>
-        <label>
-          <input
-            type="radio"
-            :value="{ id: 'custom', style: mapboxStyle }"
-            name="basemap"
-            v-model="selectedBasemap"
-            @change="emitBasemapChange"
-          />
-          {{ $t("yourMapboxStyleDefault") }}
-        </label>
-        <label>
-          <input
-            type="radio"
-            :value="{
-              id: 'satellite-streets',
-              style: 'mapbox://styles/mapbox/satellite-streets-v12',
-            }"
-            name="basemap"
-            v-model="selectedBasemap"
-            @change="emitBasemapChange"
-          />
-          {{ $t("mapboxSatelliteUpTo2019") }}
-        </label>
-        <label>
-          <input
-            type="radio"
-            :value="{
-              id: 'streets',
-              style: 'mapbox://styles/mapbox/streets-v12',
-            }"
-            name="basemap"
-            v-model="selectedBasemap"
-            @change="emitBasemapChange"
-          />
-          {{ $t("mapboxStreets") }}
-        </label>
-        <label v-if="planetApiKey">
-          <input
-            type="radio"
-            :value="{ id: 'planet', monthYear: monthYear }"
-            name="basemap"
-            v-model="selectedBasemap"
-            @change="emitBasemapChange"
-          />
-          {{ $t("planetMonthlyVisualBasemap") }}
-        </label>
-        <label v-if="selectedBasemap.id === 'planet'">
-          <Datepicker
-            v-model:value="monthYear"
-            format="YYYY-MM"
-            value-type="YYYY-MM"
-            type="month"
-            :default-value="maxMonth"
-            :disabled-date="setPlanetDateRange"
-            :clearable="false"
-            @selected="updatePlanetBasemap"
-          ></Datepicker>
-        </label>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref, computed, defineEmits, watch } from "vue";
 
@@ -148,6 +73,81 @@ watch(monthYear, (newVal, oldVal) => {
   }
 });
 </script>
+
+<template>
+  <div>
+    <div
+      class="basemap-toggle rounded shadow"
+      :class="{ active: showBasemapWindow }"
+      @click="toggleBasemapWindow"
+    >
+      <img src="/map.svg" alt="Map Icon" />
+    </div>
+    <div v-if="showBasemapWindow" class="basemap-window rounded shadow">
+      <div class="basemap-window-content">
+        <h3 class="font-semibold mb-2">{{ $t("selectBasemap") }}</h3>
+        <label>
+          <input
+            type="radio"
+            :value="{ id: 'custom', style: mapboxStyle }"
+            name="basemap"
+            v-model="selectedBasemap"
+            @change="emitBasemapChange"
+          />
+          {{ $t("yourMapboxStyleDefault") }}
+        </label>
+        <label>
+          <input
+            type="radio"
+            :value="{
+              id: 'satellite-streets',
+              style: 'mapbox://styles/mapbox/satellite-streets-v12',
+            }"
+            name="basemap"
+            v-model="selectedBasemap"
+            @change="emitBasemapChange"
+          />
+          {{ $t("mapboxSatelliteUpTo2019") }}
+        </label>
+        <label>
+          <input
+            type="radio"
+            :value="{
+              id: 'streets',
+              style: 'mapbox://styles/mapbox/streets-v12',
+            }"
+            name="basemap"
+            v-model="selectedBasemap"
+            @change="emitBasemapChange"
+          />
+          {{ $t("mapboxStreets") }}
+        </label>
+        <label v-if="planetApiKey">
+          <input
+            type="radio"
+            :value="{ id: 'planet', monthYear: monthYear }"
+            name="basemap"
+            v-model="selectedBasemap"
+            @change="emitBasemapChange"
+          />
+          {{ $t("planetMonthlyVisualBasemap") }}
+        </label>
+        <label v-if="selectedBasemap.id === 'planet'">
+          <Datepicker
+            v-model:value="monthYear"
+            format="YYYY-MM"
+            value-type="YYYY-MM"
+            type="month"
+            :default-value="maxMonth"
+            :disabled-date="setPlanetDateRange"
+            :clearable="false"
+            @selected="updatePlanetBasemap"
+          ></Datepicker>
+        </label>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .basemap-toggle {

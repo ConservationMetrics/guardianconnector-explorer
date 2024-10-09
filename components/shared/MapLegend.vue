@@ -1,40 +1,3 @@
-<template>
-  <div class="map-legend feature p-4 rounded-lg shadow-lg">
-    <h2 class="text-2xl font-semibold mb-2">{{ $t("mapLegend") }}</h2>
-    <div
-      v-for="item in localMapLegendContent"
-      :key="item.id"
-      class="legend-item"
-    >
-      <input
-        class="mr-2"
-        type="checkbox"
-        :id="item.id"
-        v-model="item.visible"
-        @change="toggleLayerVisibility(item)"
-        :checked="item.visible"
-      />
-      <label :for="item.id">
-        <div
-          :class="['color-box', getTypeClass(item)]"
-          :style="{ backgroundColor: item.color }"
-        ></div>
-        <span>
-          {{
-            item.name === "Mapeo data"
-              ? $t("mapeoData")
-              : item.name === "Most recent alerts"
-                ? $t("mostRecentAlerts")
-                : item.name === "Previous alerts"
-                  ? $t("previousAlerts")
-                  : item.name
-          }}
-        </span>
-      </label>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref, watch, onMounted } from "vue";
 
@@ -85,6 +48,43 @@ onMounted(() => {
   }));
 });
 </script>
+
+<template>
+  <div class="map-legend feature p-4 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold mb-2">{{ $t("mapLegend") }}</h2>
+    <div
+      v-for="item in localMapLegendContent"
+      :key="item.id"
+      class="legend-item"
+    >
+      <input
+        class="mr-2"
+        type="checkbox"
+        :id="item.id"
+        v-model="item.visible"
+        @change="toggleLayerVisibility(item)"
+        :checked="item.visible"
+      />
+      <label :for="item.id">
+        <div
+          :class="['color-box', getTypeClass(item)]"
+          :style="{ backgroundColor: item.color }"
+        ></div>
+        <span>
+          {{
+            item.name === "Mapeo data"
+              ? $t("mapeoData")
+              : item.name === "Most recent alerts"
+                ? $t("mostRecentAlerts")
+                : item.name === "Previous alerts"
+                  ? $t("previousAlerts")
+                  : item.name
+          }}
+        </span>
+      </label>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .map-legend {

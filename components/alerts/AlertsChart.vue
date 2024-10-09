@@ -1,12 +1,3 @@
-<template>
-  <div class="mt-4">
-    <h3 class="text-2xl font-semibold mb-2">{{ $t("alertsLast12Months") }}</h3>
-    <div class="mb-2">
-      <LineChart :data="chartData" />
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
@@ -66,3 +57,12 @@ const chartData = computed(() => {
   };
 });
 </script>
+
+<template>
+  <div class="mt-4">
+    <h3 class="text-2xl font-semibold mb-2">{{ $t("alertsLast12Months") }}</h3>
+    <div class="mb-2">
+      <LineChart :data="chartData" />
+    </div>
+  </div>
+</template>

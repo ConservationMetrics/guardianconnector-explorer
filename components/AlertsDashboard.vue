@@ -1,47 +1,3 @@
-<template>
-  <div>
-    <div id="map"></div>
-    <button
-      v-if="!showSidebar"
-      @click="resetToInitialState"
-      class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
-    >
-      {{ $t("resetDashboard") }}
-    </button>
-    <ViewSidebar
-      :alerts-statistics="alertsStatistics"
-      :allowed-file-extensions="allowedFileExtensions"
-      :calculate-hectares="calculateHectares"
-      :date-options="dateOptions"
-      :download-alert="downloadAlert"
-      :feature-geojson="selectedFeatureGeojson"
-      :feature="selectedFeature"
-      :file-paths="imageUrl"
-      :geojson-selection="filteredData"
-      :is-alert="isAlert"
-      :logo-url="logoUrl"
-      :media-base-path="mediaBasePath"
-      :media-base-path-alerts="mediaBasePathAlerts"
-      :show-intro-panel="showIntroPanel"
-      :show-sidebar="showSidebar"
-      :show-slider="showSlider"
-      @close="handleSidebarClose"
-      @date-range-changed="handleDateRangeChanged"
-    />
-    <MapLegend
-      v-if="mapLegendContent && map"
-      :map-legend-content="mapLegendContent"
-      @toggle-layer-visibility="toggleLayerVisibility"
-    />
-    <BasemapSelector
-      v-if="showBasemapSelector"
-      :mapbox-style="mapboxStyle"
-      :planet-api-key="planetApiKey"
-      @basemapSelected="handleBasemapChange"
-    />
-  </div>
-</template>
-
 <script setup>
 import {
   ref,
@@ -999,6 +955,50 @@ onBeforeUnmount(() => {
   }
 });
 </script>
+
+<template>
+  <div>
+    <div id="map"></div>
+    <button
+      v-if="!showSidebar"
+      @click="resetToInitialState"
+      class="reset-button bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
+    >
+      {{ $t("resetDashboard") }}
+    </button>
+    <ViewSidebar
+      :alerts-statistics="alertsStatistics"
+      :allowed-file-extensions="allowedFileExtensions"
+      :calculate-hectares="calculateHectares"
+      :date-options="dateOptions"
+      :download-alert="downloadAlert"
+      :feature-geojson="selectedFeatureGeojson"
+      :feature="selectedFeature"
+      :file-paths="imageUrl"
+      :geojson-selection="filteredData"
+      :is-alert="isAlert"
+      :logo-url="logoUrl"
+      :media-base-path="mediaBasePath"
+      :media-base-path-alerts="mediaBasePathAlerts"
+      :show-intro-panel="showIntroPanel"
+      :show-sidebar="showSidebar"
+      :show-slider="showSlider"
+      @close="handleSidebarClose"
+      @date-range-changed="handleDateRangeChanged"
+    />
+    <MapLegend
+      v-if="mapLegendContent && map"
+      :map-legend-content="mapLegendContent"
+      @toggle-layer-visibility="toggleLayerVisibility"
+    />
+    <BasemapSelector
+      v-if="showBasemapSelector"
+      :mapbox-style="mapboxStyle"
+      :planet-api-key="planetApiKey"
+      @basemapSelected="handleBasemapChange"
+    />
+  </div>
+</template>
 
 <style scoped>
 body {

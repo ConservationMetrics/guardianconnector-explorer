@@ -1,3 +1,31 @@
+<script setup>
+import { defineEmits, reactive, watch } from "vue";
+import { toCamelCase } from "@/utils";
+
+// Define props
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  views: Array,
+  keys: Array,
+});
+
+// Set up composables
+const emit = defineEmits(["updateConfig"]);
+
+// Set up reactive state
+const localConfig = reactive({ ...props.config });
+
+// Watch for changes in localConfig and emit updates
+watch(
+  localConfig,
+  (newValue) => {
+    emit("updateConfig", newValue);
+  },
+  { deep: true },
+);
+</script>
+
 <template>
   <div class="config-section">
     <div class="config-header">
@@ -29,31 +57,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { defineEmits, reactive, watch } from "vue";
-import { toCamelCase } from "@/utils";
-
-// Define props
-const props = defineProps({
-  tableName: String,
-  config: Object,
-  views: Array,
-  keys: Array,
-});
-
-// Set up composables
-const emit = defineEmits(["updateConfig"]);
-
-// Set up reactive state
-const localConfig = reactive({ ...props.config });
-
-// Watch for changes in localConfig and emit updates
-watch(
-  localConfig,
-  (newValue) => {
-    emit("updateConfig", newValue);
-  },
-  { deep: true },
-);
-</script>

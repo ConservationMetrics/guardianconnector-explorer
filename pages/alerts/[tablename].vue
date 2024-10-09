@@ -1,31 +1,3 @@
-<template>
-  <div>
-    <ClientOnly>
-      <AlertsDashboard
-        v-if="dataFetched"
-        :alerts-data="alertsData"
-        :alerts-statistics="alertsStatistics"
-        :allowed-file-extensions="allowedFileExtensions"
-        :logo-url="logoUrl"
-        :map-legend-layer-ids="mapLegendLayerIds"
-        :mapbox-access-token="mapboxAccessToken"
-        :mapbox-bearing="mapboxBearing"
-        :mapbox-latitude="mapboxLatitude"
-        :mapbox-longitude="mapboxLongitude"
-        :mapbox-pitch="mapboxPitch"
-        :mapbox-projection="mapboxProjection"
-        :mapbox-style="mapboxStyle"
-        :mapbox-zoom="mapboxZoom"
-        :mapbox3d="mapbox3d"
-        :mapeo-data="mapeoData"
-        :media-base-path="mediaBasePath"
-        :media-base-path-alerts="mediaBasePathAlerts"
-        :planet-api-key="planetApiKey"
-      />
-    </ClientOnly>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { useHead, useFetch, useRuntimeConfig } from "#app";
@@ -105,3 +77,31 @@ useHead({
   title: "GuardianConnector Explorer" + t("changeDetectionAlerts"),
 });
 </script>
+
+<template>
+  <div>
+    <ClientOnly>
+      <AlertsDashboard
+        v-if="dataFetched"
+        :alerts-data="alertsData"
+        :alerts-statistics="alertsStatistics"
+        :allowed-file-extensions="allowedFileExtensions"
+        :logo-url="logoUrl"
+        :map-legend-layer-ids="mapLegendLayerIds"
+        :mapbox-access-token="mapboxAccessToken"
+        :mapbox-bearing="mapboxBearing"
+        :mapbox-latitude="mapboxLatitude"
+        :mapbox-longitude="mapboxLongitude"
+        :mapbox-pitch="mapboxPitch"
+        :mapbox-projection="mapboxProjection"
+        :mapbox-style="mapboxStyle"
+        :mapbox-zoom="mapboxZoom"
+        :mapbox3d="mapbox3d"
+        :mapeo-data="mapeoData"
+        :media-base-path="mediaBasePath"
+        :media-base-path-alerts="mediaBasePathAlerts"
+        :planet-api-key="planetApiKey"
+      />
+    </ClientOnly>
+  </div>
+</template>

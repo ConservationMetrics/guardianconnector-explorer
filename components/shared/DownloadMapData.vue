@@ -1,34 +1,3 @@
-<template>
-  <div class="button-container">
-    <button
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
-      @click="
-        typeOfData === 'alert' ? downloadAlertCSV() : downloadCSVSelection()
-      "
-    >
-      {{ $t("downloadCSV") }}
-    </button>
-    <button
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
-      @click="
-        typeOfData === 'alert'
-          ? downloadAlertGeoJSON()
-          : downloadGeoJSONSelection()
-      "
-    >
-      {{ $t("downloadGeoJSON") }}
-    </button>
-    <button
-      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
-      @click="
-        typeOfData === 'alert' ? downloadAlertKML() : downloadKMLSelection()
-      "
-    >
-      {{ $t("downloadKML") }}
-    </button>
-  </div>
-</template>
-
 <script setup>
 import tokml from "tokml";
 
@@ -328,6 +297,37 @@ const downloadKMLSelection = () => {
   URL.revokeObjectURL(link.href);
 };
 </script>
+
+<template>
+  <div class="button-container">
+    <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
+      @click="
+        typeOfData === 'alert' ? downloadAlertCSV() : downloadCSVSelection()
+      "
+    >
+      {{ $t("downloadCSV") }}
+    </button>
+    <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
+      @click="
+        typeOfData === 'alert'
+          ? downloadAlertGeoJSON()
+          : downloadGeoJSONSelection()
+      "
+    >
+      {{ $t("downloadGeoJSON") }}
+    </button>
+    <button
+      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mx-2"
+      @click="
+        typeOfData === 'alert' ? downloadAlertKML() : downloadKMLSelection()
+      "
+    >
+      {{ $t("downloadKML") }}
+    </button>
+  </div>
+</template>
 
 <style scoped>
 .button-container {

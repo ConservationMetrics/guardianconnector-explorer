@@ -1,28 +1,3 @@
-<template>
-  <div>
-    <ClientOnly>
-      <MapView
-        v-if="dataFetched"
-        :allowed-file-extensions="allowedFileExtensions"
-        :filter-column="filterColumn"
-        :map-legend-layer-ids="mapLegendLayerIds"
-        :mapbox-access-token="mapboxAccessToken"
-        :mapbox-bearing="mapboxBearing"
-        :mapbox-latitude="mapboxLatitude"
-        :mapbox-longitude="mapboxLongitude"
-        :mapbox-pitch="mapboxPitch"
-        :mapbox-projection="mapboxProjection"
-        :mapbox-style="mapboxStyle"
-        :mapbox-zoom="mapboxZoom"
-        :mapbox3d="mapbox3d"
-        :map-data="mapData"
-        :media-base-path="mediaBasePath"
-        :planet-api-key="planetApiKey"
-      />
-    </ClientOnly>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { useHead, useFetch, useRuntimeConfig } from "#app";
@@ -96,3 +71,28 @@ useHead({
   title: "GuardianConnector Explorer" + t("map"),
 });
 </script>
+
+<template>
+  <div>
+    <ClientOnly>
+      <MapView
+        v-if="dataFetched"
+        :allowed-file-extensions="allowedFileExtensions"
+        :filter-column="filterColumn"
+        :map-legend-layer-ids="mapLegendLayerIds"
+        :mapbox-access-token="mapboxAccessToken"
+        :mapbox-bearing="mapboxBearing"
+        :mapbox-latitude="mapboxLatitude"
+        :mapbox-longitude="mapboxLongitude"
+        :mapbox-pitch="mapboxPitch"
+        :mapbox-projection="mapboxProjection"
+        :mapbox-style="mapboxStyle"
+        :mapbox-zoom="mapboxZoom"
+        :mapbox3d="mapbox3d"
+        :map-data="mapData"
+        :media-base-path="mediaBasePath"
+        :planet-api-key="planetApiKey"
+      />
+    </ClientOnly>
+  </div>
+</template>

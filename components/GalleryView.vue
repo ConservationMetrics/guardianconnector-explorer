@@ -1,26 +1,3 @@
-<template>
-  <div
-    id="galleryContainer"
-    class="gallery p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-  >
-    <div class="sticky top-10 right-10 z-10" v-if="filterColumn">
-      <DataFilter
-        :data="galleryData"
-        :filter-column="filterColumn"
-        @filter="filter"
-      />
-    </div>
-    <DataFeature
-      v-for="(feature, index) in paginatedData"
-      :allowed-file-extensions="allowedFileExtensions"
-      :feature="feature"
-      :file-paths="getFilePathsWithExtension(feature, allowedFileExtensions)"
-      :key="index"
-      :media-base-path="mediaBasePath"
-    />
-  </div>
-</template>
-
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { getFilePathsWithExtension } from "@/utils";
@@ -74,3 +51,26 @@ onBeforeUnmount(() => {
   window.removeEventListener("scroll", handleScroll);
 });
 </script>
+
+<template>
+  <div
+    id="galleryContainer"
+    class="gallery p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+  >
+    <div class="sticky top-10 right-10 z-10" v-if="filterColumn">
+      <DataFilter
+        :data="galleryData"
+        :filter-column="filterColumn"
+        @filter="filter"
+      />
+    </div>
+    <DataFeature
+      v-for="(feature, index) in paginatedData"
+      :allowed-file-extensions="allowedFileExtensions"
+      :feature="feature"
+      :file-paths="getFilePathsWithExtension(feature, allowedFileExtensions)"
+      :key="index"
+      :media-base-path="mediaBasePath"
+    />
+  </div>
+</template>

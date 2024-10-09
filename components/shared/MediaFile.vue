@@ -1,3 +1,35 @@
+<script setup>
+import { computed } from "vue";
+
+// Define props
+const props = defineProps({
+  allowedFileExtensions: Object,
+  filePath: String,
+  mediaBasePath: String,
+});
+
+// Set up computed properties
+function getExtension(filePath) {
+  return filePath.split(".").pop().toLowerCase();
+}
+
+function checkExtension(extensions) {
+  if (!extensions) return false;
+  const extension = getExtension(props.filePath);
+  return extensions.includes(extension);
+}
+
+const isAudio = computed(() =>
+  checkExtension(props.allowedFileExtensions.audio),
+);
+const isImage = computed(() =>
+  checkExtension(props.allowedFileExtensions.image),
+);
+const isVideo = computed(() =>
+  checkExtension(props.allowedFileExtensions.video),
+);
+</script>
+
 <template>
   <div>
     <div v-if="isImage" class="mb-4">
@@ -43,37 +75,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { computed } from "vue";
-
-// Define props
-const props = defineProps({
-  allowedFileExtensions: Object,
-  filePath: String,
-  mediaBasePath: String,
-});
-
-// Set up computed properties
-function getExtension(filePath) {
-  return filePath.split(".").pop().toLowerCase();
-}
-
-function checkExtension(extensions) {
-  if (!extensions) return false;
-  const extension = getExtension(props.filePath);
-  return extensions.includes(extension);
-}
-
-const isAudio = computed(() =>
-  checkExtension(props.allowedFileExtensions.audio),
-);
-const isImage = computed(() =>
-  checkExtension(props.allowedFileExtensions.image),
-);
-const isVideo = computed(() =>
-  checkExtension(props.allowedFileExtensions.video),
-);
-</script>
-
-<style scoped></style>

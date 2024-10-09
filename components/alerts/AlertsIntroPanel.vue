@@ -1,3 +1,18 @@
+<script setup>
+import AlertsChart from "~/components/alerts/AlertsChart.vue";
+import AlertsSlider from "~/components/alerts/AlertsSlider.vue";
+import DownloadMapData from "~/components/shared/DownloadMapData.vue";
+
+const props = defineProps({
+  alertsStatistics: Object,
+  calculateHectares: Boolean,
+  dateOptions: Array,
+  geojsonSelection: Object,
+  logoUrl: String,
+  showSlider: Boolean,
+});
+</script>
+
 <template>
   <div>
     <!-- Header and stats -->
@@ -83,18 +98,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import AlertsChart from "~/components/alerts/AlertsChart.vue";
-import AlertsSlider from "~/components/alerts/AlertsSlider.vue";
-import DownloadMapData from "~/components/shared/DownloadMapData.vue";
-
-const props = defineProps({
-  alertsStatistics: Object,
-  calculateHectares: Boolean,
-  dateOptions: Array,
-  geojsonSelection: Object,
-  logoUrl: String,
-  showSlider: Boolean,
-});
-</script>

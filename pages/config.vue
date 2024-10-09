@@ -1,17 +1,3 @@
-<template>
-  <div>
-    <ClientOnly>
-      <ConfigDashboard
-        v-if="dataFetched"
-        :views-config="viewsConfig"
-        :table-names="tableNames"
-        @submitConfig="submitConfig"
-        @removeTableFromConfig="removeTableFromConfig"
-        @addTableToConfig="addTableToConfig"
-    /></ClientOnly>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { useHead, useFetch, useRuntimeConfig } from "#app";
@@ -88,3 +74,17 @@ useHead({
   title: "GuardianConnector Explorer: " + t("configuration"),
 });
 </script>
+
+<template>
+  <div>
+    <ClientOnly>
+      <ConfigDashboard
+        v-if="dataFetched"
+        :views-config="viewsConfig"
+        :table-names="tableNames"
+        @submitConfig="submitConfig"
+        @removeTableFromConfig="removeTableFromConfig"
+        @addTableToConfig="addTableToConfig"
+    /></ClientOnly>
+  </div>
+</template>
