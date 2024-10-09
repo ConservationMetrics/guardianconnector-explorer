@@ -117,7 +117,9 @@ const addAlertsData = () => {
   // Check if the data contains Polygon features for recent alerts
   if (
     geoJsonSource.mostRecentAlerts.features.some(
-      (feature) => feature.geometry.type === "Polygon",
+      (feature) =>
+        feature.geometry.type === "Polygon" ||
+        feature.geometry.type === "MultiPolygon",
     )
   ) {
     // Add the most recent alerts source to the map as Polygons
@@ -127,7 +129,9 @@ const addAlertsData = () => {
         data: {
           ...geoJsonSource.mostRecentAlerts,
           features: geoJsonSource.mostRecentAlerts.features.filter(
-            (feature) => feature.geometry.type === "Polygon",
+            (feature) =>
+              feature.geometry.type === "Polygon" ||
+              feature.geometry.type === "MultiPolygon",
           ),
         },
       });
@@ -217,7 +221,9 @@ const addAlertsData = () => {
   // Check if the data contains Polygon features for previous alerts
   if (
     geoJsonSource.previousAlerts.features.some(
-      (feature) => feature.geometry.type === "Polygon",
+      (feature) =>
+        feature.geometry.type === "Polygon" ||
+        feature.geometry.type === "MultiPolygon",
     )
   ) {
     // Add the previous alerts source to the map as Polygons
@@ -227,7 +233,9 @@ const addAlertsData = () => {
         data: {
           ...geoJsonSource.previousAlerts,
           features: geoJsonSource.previousAlerts.features.filter(
-            (feature) => feature.geometry.type === "Polygon",
+            (feature) =>
+              feature.geometry.type === "Polygon" ||
+              feature.geometry.type === "MultiPolygon",
           ),
         },
       });
@@ -566,7 +574,10 @@ const addPulsingCircles = () => {
   const addPulsingMarker = (feature) => {
     let lng, lat;
 
-    if (feature.geometry.type === "Polygon") {
+    if (
+      feature.geometry.type === "Polygon" ||
+      feature.geometry.type === "MultiPolygon"
+    ) {
       // Calculate the center of the bounding box
       const bounds = bbox(feature);
       lng = (bounds[0] + bounds[2]) / 2;

@@ -571,7 +571,7 @@ const isValidGeolocation = (item: Record<string, any>): boolean => {
             coord.every(Number.isFinite),
         )
       );
-    } else if (type === "Polygon" || type === "MultiPolygon") {
+    } else if (type === "Polygon") {
       return (
         Array.isArray(coordinates) &&
         coordinates.every(
@@ -582,6 +582,24 @@ const isValidGeolocation = (item: Record<string, any>): boolean => {
                 Array.isArray(coord) &&
                 coord.length === 2 &&
                 coord.every(Number.isFinite),
+            ),
+        )
+      );
+    } else if (type === "MultiPolygon") {
+      return (
+        Array.isArray(coordinates) &&
+        coordinates.every(
+          (polygon) =>
+            Array.isArray(polygon) &&
+            polygon.every(
+              (ring) =>
+                Array.isArray(ring) &&
+                ring.every(
+                  (coord) =>
+                    Array.isArray(coord) &&
+                    coord.length === 2 &&
+                    coord.every(Number.isFinite),
+                ),
             ),
         )
       );
