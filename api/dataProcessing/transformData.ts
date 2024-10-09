@@ -200,7 +200,9 @@ const prepareAlertData = (
       `${item.date_start_t1} to ${item.date_end_t1}`;
     transformedItem["monthDetected"] = `${formattedMonth}-${item.year_detec}`;
     transformedItem["YYYYMM"] = `${item.year_detec}${formattedMonth}`;
-    transformedItem["dataProvider"] = capitalizeFirstLetter(`${item.alert_source}`);
+    transformedItem["dataProvider"] = capitalizeFirstLetter(
+      `${item.alert_source}`,
+    );
     transformedItem["confidenceLevel"] = item.confidence;
     transformedItem["alertType"] = item.alert_type?.replace(/_/g, " ") ?? "";
     transformedItem["alertAreaHectares"] =
@@ -261,7 +263,6 @@ const prepareAlertData = (
       previousAlerts.push(transformedItem);
     }
   });
-
   return { mostRecentAlerts, previousAlerts };
 };
 
@@ -568,7 +569,7 @@ const isValidGeolocation = (item: Record<string, any>): boolean => {
             coord.every(Number.isFinite),
         )
       );
-    } else if (type === "Polygon" || type === "MultiPolygon") {
+    } else if (type === "Polygon") {
       return (
         Array.isArray(coordinates) &&
         coordinates.every(
@@ -579,6 +580,24 @@ const isValidGeolocation = (item: Record<string, any>): boolean => {
                 Array.isArray(coord) &&
                 coord.length === 2 &&
                 coord.every(Number.isFinite),
+            ),
+        )
+      );
+    } else if (type === "MultiPolygon") {
+      return (
+        Array.isArray(coordinates) &&
+        coordinates.every(
+          (polygon) =>
+            Array.isArray(polygon) &&
+            polygon.every(
+              (ring) =>
+                Array.isArray(ring) &&
+                ring.every(
+                  (coord) =>
+                    Array.isArray(coord) &&
+                    coord.length === 2 &&
+                    coord.every(Number.isFinite),
+                ),
             ),
         )
       );
