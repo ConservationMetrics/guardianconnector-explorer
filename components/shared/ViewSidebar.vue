@@ -4,7 +4,6 @@ import DownloadMapData from "@/components/shared/DownloadMapData.vue";
 import DataFeature from "@/components/shared/DataFeature.vue";
 import AlertsIntroPanel from "@/components/alerts/AlertsIntroPanel.vue";
 
-// Define props
 const props = defineProps({
   alertsStatistics: Object,
   allowedFileExtensions: Object,
@@ -24,17 +23,16 @@ const props = defineProps({
   showSlider: Boolean,
 });
 
-// Set up reactive state
 const scrolled = ref(false);
 
-// Define methods
+// To hide the scroll indicator when the user scrolls
 const handleScroll = (event) => {
   if (!scrolled.value && event.target.scrollTop > 0) {
     scrolled.value = true;
   }
 };
 
-// Define computed properties
+// Filter out latitude and longitude from feature object
 const filteredFeature = computed(() => {
   const { latitude, longitude, ...rest } = props.feature;
   return rest;
@@ -49,7 +47,6 @@ watch(
     }
   },
 );
-
 watch(
   () => props.showSidebar,
   (newValue) => {

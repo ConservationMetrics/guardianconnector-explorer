@@ -2,32 +2,20 @@
 import { ref, computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
-// Define props
 const props = defineProps({
   viewsConfig: Object,
   tableNames: Array,
 });
 
-// Set up composables
+const { t } = useI18n();
+
 const emit = defineEmits([
   "addTableToConfig",
   "removeTableFromConfig",
   "submitConfig",
 ]);
-const { t } = useI18n();
 
-// Set up reactive state
-const currentModalAction = ref(null);
-const modalMessage = ref("");
-const tableNameToRemove = ref("");
-const tableNameToAdd = ref(null);
-const showModal = ref(false);
-const showModalButtons = ref(false);
-const showModalDropdown = ref(false);
-const confirmButtonDisabled = ref(false);
-const minimizedCards = ref(initializeMinimizedCards());
-
-// Methods
+// Sort viewsConfig by table name
 const sortedViewsConfig = computed(() => {
   return Object.keys(props.viewsConfig)
     .sort()
@@ -37,16 +25,27 @@ const sortedViewsConfig = computed(() => {
     }, {});
 });
 
-function handleAddNewTable() {
-  modalMessage.value = t("selectTableToAdd") + ":";
-  currentModalAction.value = "addTable";
-  showModal.value = true;
-  showModalDropdown.value = true;
-  showModalButtons.value = true;
-  confirmButtonDisabled.value = true;
-}
+const modalMessage = ref("");
+const currentModalAction = ref(null);
+const showModal = ref(false);
+const showModalButtons = ref(false);
+const showModalDropdown = ref(false);
+const confirmButtonDisabled = ref(false);
+const tableNameToRemove = ref("");
+const tableNameToAdd = ref(null);
 
-function handleRemoveTableFromConfig(tableName) {
+// Handlers
+const handleAddNewTable = () => {
+  confirmButtonDisabled.value = true;
+  currentModalAction.value = "addTable";
+  modalMessage.value = t("selectTableToAdd") + ":";
+  showModal.value = true;
+  showModalButtons.value = true;
+  showModalDropdown.value = true;
+};
+
+const handleRemoveTableFromConfig = (tableName) => {
+  currentModalAction.value = "removeTable";
   modalMessage.value =
     t("removeTableAreYouSure") +
     ": <strong>" +
@@ -54,13 +53,12 @@ function handleRemoveTableFromConfig(tableName) {
     "</strong>?<br><br><em>" +
     t("tableRemovedNote") +
     ".</em>";
-  currentModalAction.value = "removeTable";
   showModal.value = true;
   showModalButtons.value = true;
   tableNameToRemove.value = tableName;
-}
+};
 
-function handleConfirmButton() {
+const handleConfirmButton = () => {
   if (currentModalAction.value === "removeTable") {
     emit("removeTableFromConfig", tableNameToRemove.value);
     modalMessage.value = t("tableRemovedFromViews") + "!";
@@ -76,30 +74,22 @@ function handleConfirmButton() {
     currentModalAction.value = null;
     location.reload();
   }, 3000);
-}
+};
 
-function handleCancelButton() {
+const handleCancelButton = () => {
+  confirmButtonDisabled.value = false;
   modalMessage.value = "";
-  tableNameToRemove.value = "";
   showModal.value = false;
   showModalDropdown.value = false;
   showModalButtons.value = false;
-  confirmButtonDisabled.value = false;
+  tableNameToRemove.value = "";
   if (currentModalAction.value === "addTable") {
     tableNameToAdd.value = null;
   }
   currentModalAction.value = null;
-}
+};
 
-function initializeMinimizedCards() {
-  const minimized = {};
-  for (const tableName in props.viewsConfig) {
-    minimized[tableName] = true;
-  }
-  return minimized;
-}
-
-async function handleSubmit({ tableName, config }) {
+const handleSubmit = async ({ tableName, config }) => {
   emit("submitConfig", { tableName, config });
   modalMessage.value = t("configUpdated") + "!";
   showModal.value = true;
@@ -107,16 +97,27 @@ async function handleSubmit({ tableName, config }) {
     showModal.value = false;
     location.reload();
   }, 3000);
-}
+};
 
-function toggleMinimize({ tableName }) {
+// Helpers for minimizing cards
+const minimizedCards = ref(initializeMinimizedCards());
+const initializeMinimizedCards = () => {
+  const minimized = {};
+  for (const tableName in props.viewsConfig) {
+    minimized[tableName] = true;
+  }
+  return minimized;
+};
+
+const toggleMinimize = ({ tableName }) => {
   const isCurrentlyMinimized = minimizedCards.value[tableName];
   for (let key in minimizedCards.value) {
     minimizedCards.value[key] = true;
   }
   minimizedCards.value[tableName] = !isCurrentlyMinimized;
-}
+};
 
+// Validation for confirm button; disable if tableNameToAdd is empty
 watch(tableNameToAdd, (newVal) => {
   confirmButtonDisabled.value = !newVal;
 });

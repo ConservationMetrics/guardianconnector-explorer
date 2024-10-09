@@ -4,7 +4,8 @@ import { toCamelCase } from "@/utils";
 
 import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
 
-// Define props
+import { updateTags } from "@/composables/useTags";
+
 const props = defineProps({
   tableName: String,
   config: Object,
@@ -12,16 +13,14 @@ const props = defineProps({
   keys: Array,
 });
 
-// Set up composables
-const emit = defineEmits(["updateConfig"]);
+const localConfig = reactive({ ...props.config });
 
-// Set up reactive state
+// Set up refs for tags field
 const tagInputs = ref({
   FILTER_OUT_VALUES_FROM_COLUMN: "",
   UNWANTED_COLUMNS: "",
   UNWANTED_SUBSTRINGS: "",
 });
-const localConfig = reactive({ ...props.config });
 const tags = ref({
   FILTER_OUT_VALUES_FROM_COLUMN: props.config.FILTER_OUT_VALUES_FROM_COLUMN
     ? props.config.FILTER_OUT_VALUES_FROM_COLUMN.split(",").map((tag) => ({
@@ -40,13 +39,8 @@ const tags = ref({
     : [],
 });
 
-// Methods
-function updateTags(key, newTags) {
-  tags.value[key] = newTags;
-  localConfig[key] = newTags.map((tag) => tag.text).join(",");
-}
-
 // Watch for changes in localConfig and emit updates
+const emit = defineEmits(["updateConfig"]);
 watch(
   localConfig,
   (newValue) => {

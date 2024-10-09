@@ -2,20 +2,16 @@
 import { ref, computed } from "vue";
 import { useHead, useFetch, useRuntimeConfig } from "#app";
 
-// Set up config
+// Refs to store the fetched data
+const viewsConfig = ref([]);
+
+// API request to fetch the data
 const {
   public: { appApiKey },
 } = useRuntimeConfig();
-
-// Set up reactive state
-const viewsConfig = ref([]);
-
-// Define headers
 const headers = {
   "x-api-key": appApiKey,
 };
-
-// Fetch config
 const { data, error } = await useFetch("/api/config", {
   headers,
 });
@@ -26,7 +22,7 @@ if (data.value && !error.value) {
   console.error("Error fetching data:", error.value);
 }
 
-// Define computed properties
+// Filter and sort the views config
 const filteredSortedViewsConfig = computed(() => {
   return Object.keys(viewsConfig.value)
     .filter((key) => Object.keys(viewsConfig.value[key]).length > 0)
@@ -37,7 +33,6 @@ const filteredSortedViewsConfig = computed(() => {
     }, {});
 });
 
-// Set up page metadata
 useHead({
   title: "GuardianConnector Explorer",
 });

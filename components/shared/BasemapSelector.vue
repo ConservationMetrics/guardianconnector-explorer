@@ -4,18 +4,22 @@ import { ref, computed, defineEmits, watch } from "vue";
 import Datepicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 
-// Define props
 const props = defineProps({
   mapboxStyle: String,
   planetApiKey: String,
 });
 
-// Set up reactive state
-const minMonth = "2020-09"; // The first month we have Planet NICFI monthly basemaps
+const emit = defineEmits(["basemapSelected"]);
+
 const showBasemapWindow = ref(false);
 const selectedBasemap = ref({ id: "custom", style: props.mapboxStyle });
 
-// Computed property for maxMonth
+const toggleBasemapWindow = () => {
+  showBasemapWindow.value = !showBasemapWindow.value;
+};
+
+// Planet NICFI monthly basemaps
+const minMonth = "2020-09"; // The first month we have Planet NICFI monthly basemaps
 const maxMonth = computed(() => {
   // If the current day is less than or equal to 15, maxMonth is two months ago.
   // Otherwise, maxMonth is the previous month.
@@ -32,25 +36,26 @@ const maxMonth = computed(() => {
   return `${year}-${month}`;
 });
 const monthYear = ref(maxMonth.value);
-
-// Emit const
-const emit = defineEmits(["basemapSelected"]);
-
-// Methods
-const toggleBasemapWindow = () => {
-  showBasemapWindow.value = !showBasemapWindow.value;
-};
-
-const emitBasemapChange = () => {
-  emit("basemapSelected", selectedBasemap.value);
-};
-
 const setPlanetDateRange = (date) => {
   // minMonth and maxMonth are in format YYYY-MM, but date is a Date object
   // so we need to convert it to a string in the same format
   date = date.toISOString().slice(0, 7);
   return date < minMonth || date > maxMonth.value;
 };
+
+// Update the monthYear when the Planet basemap is selected
+watch(selectedBasemap, (newVal, oldVal) => {
+  if (newVal.id === "planet" && newVal !== oldVal) {
+    monthYear.value = maxMonth.value;
+  }
+});
+
+// Update the Planet basemap when the monthYear changes
+watch(monthYear, (newVal, oldVal) => {
+  if (selectedBasemap.value.id === "planet") {
+    updatePlanetBasemap();
+  }
+});
 
 const updatePlanetBasemap = () => {
   if (selectedBasemap.value.id === "planet") {
@@ -59,19 +64,10 @@ const updatePlanetBasemap = () => {
   }
 };
 
-// Watchers
-watch(selectedBasemap, (newVal, oldVal) => {
-  // Update the monthYear when the planet basemap is selected
-  if (newVal.id === "planet" && newVal !== oldVal) {
-    monthYear.value = maxMonth.value;
-  }
-});
-
-watch(monthYear, (newVal, oldVal) => {
-  if (selectedBasemap.value.id === "planet") {
-    updatePlanetBasemap();
-  }
-});
+// Emit the selected basemap
+const emitBasemapChange = () => {
+  emit("basemapSelected", selectedBasemap.value);
+};
 </script>
 
 <template>

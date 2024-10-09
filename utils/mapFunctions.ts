@@ -50,11 +50,11 @@ export const mapStyles: Record<string, MapStyle> = {
   },
 };
 
-export function changeMapStyle(
+export const changeMapStyle = (
   map: mapboxgl.Map,
   basemap: Basemap,
   planetApiKey: string,
-) {
+) => {
   if (basemap.style) {
     map.setStyle(basemap.style);
   } else if (basemap.id === "planet" && mapStyles.planet.style) {
@@ -69,12 +69,12 @@ export function changeMapStyle(
   } else {
     console.warn("Basemap style not found");
   }
-}
+};
 
-function getMapboxLayersForLegend(
+const getMapboxLayersForLegend = (
   map: mapboxgl.Map,
   mapLegendLayerIds: string,
-): mapboxgl.Layer[] {
+): mapboxgl.Layer[] => {
   const layerIds = mapLegendLayerIds.split(",");
   const matchingLayers: mapboxgl.Layer[] = [];
 
@@ -91,13 +91,13 @@ function getMapboxLayersForLegend(
   });
 
   return matchingLayers;
-}
+};
 
-export function prepareMapLegendLayers(
+export const prepareMapLegendLayers = (
   map: mapboxgl.Map,
   mapLegendLayerIds: string | null,
   mapeoLegendColor: string | null,
-): unknown[] | undefined {
+): unknown[] | undefined => {
   if (!mapLegendLayerIds || !map.isStyleLoaded()) {
     return;
   }
@@ -147,12 +147,12 @@ export function prepareMapLegendLayers(
   }
 
   return mapLegendContent;
-}
+};
 
 // Function to reverse [long, lat] coordinates and remove the brackets
-export function prepareCoordinatesForSelectedFeature(
+export const prepareCoordinatesForSelectedFeature = (
   coordinates: string,
-): string {
+): string => {
   if (typeof coordinates === "object") {
     coordinates = JSON.stringify(coordinates);
   }
@@ -163,12 +163,12 @@ export function prepareCoordinatesForSelectedFeature(
     .split(",")
     .reverse()
     .join(",");
-}
+};
 
-export function toggleLayerVisibility(
+export const toggleLayerVisibility = (
   map: mapboxgl.Map,
   item: { id: string; visible: boolean },
-) {
+) => {
   const layerId = item.id;
   const visibility = item.visible ? "visible" : "none";
 
@@ -179,4 +179,4 @@ export function toggleLayerVisibility(
   if (map.getLayer(strokeLayerId)) {
     map.setLayoutProperty(strokeLayerId, "visibility", visibility);
   }
-}
+};

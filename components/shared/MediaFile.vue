@@ -1,24 +1,13 @@
 <script setup>
 import { computed } from "vue";
 
-// Define props
 const props = defineProps({
   allowedFileExtensions: Object,
   filePath: String,
   mediaBasePath: String,
 });
 
-// Set up computed properties
-function getExtension(filePath) {
-  return filePath.split(".").pop().toLowerCase();
-}
-
-function checkExtension(extensions) {
-  if (!extensions) return false;
-  const extension = getExtension(props.filePath);
-  return extensions.includes(extension);
-}
-
+// Conditional rendering based on file extension
 const isAudio = computed(() =>
   checkExtension(props.allowedFileExtensions.audio),
 );
@@ -28,6 +17,16 @@ const isImage = computed(() =>
 const isVideo = computed(() =>
   checkExtension(props.allowedFileExtensions.video),
 );
+
+const getExtension = (filePath) => {
+  return filePath.split(".").pop().toLowerCase();
+};
+
+const checkExtension = (extensions) => {
+  if (!extensions) return false;
+  const extension = getExtension(props.filePath);
+  return extensions.includes(extension);
+};
 </script>
 
 <template>

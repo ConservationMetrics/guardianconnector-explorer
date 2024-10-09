@@ -19,13 +19,14 @@ const props = defineProps({
     <div class="feature p-4 rounded-lg shadow-lg">
       <div>
         <img
-          v-if="logoUrl"
-          :src="logoUrl"
+          v-if="props.logoUrl"
+          :src="props.logoUrl"
           class="w-auto mx-auto mb-4 max-h-25"
           alt="Logo"
         />
         <h2 class="text-2xl font-semibold mb-2">
-          {{ $t("changeDetectionAlerts") }}: {{ alertsStatistics.territory }}
+          {{ $t("changeDetectionAlerts") }}:
+          {{ props.alertsStatistics.territory }}
         </h2>
         <p class="text-l mb-2">
           {{ $t("mostRecentAlertsShownIn") }}
@@ -36,64 +37,64 @@ const props = defineProps({
         <div
           class="mb-2"
           v-if="
-            alertsStatistics.typeOfAlerts &&
-            alertsStatistics.typeOfAlerts.length
+            props.alertsStatistics.typeOfAlerts &&
+            props.alertsStatistics.typeOfAlerts.length
           "
         >
           <span class="font-bold">{{ $t("typeOfAlerts") }}:</span>
-          {{ alertsStatistics.typeOfAlerts.join(", ") }}
+          {{ props.alertsStatistics.typeOfAlerts.join(", ") }}
         </div>
         <div
           class="mb-2"
           v-if="
-            alertsStatistics.dataProviders &&
-            alertsStatistics.dataProviders.length
+            props.alertsStatistics.dataProviders &&
+            props.alertsStatistics.dataProviders.length
           "
         >
           <span class="font-bold">{{ $t("dataProviders") }}:</span>
-          {{ alertsStatistics.dataProviders.join(", ") }}
+          {{ props.alertsStatistics.dataProviders.join(", ") }}
         </div>
         <div class="mb-2">
           <span class="font-bold">{{ $t("alertDetectionRange") }}:</span>
-          {{ alertsStatistics.alertDetectionRange }}
+          {{ props.alertsStatistics.alertDetectionRange }}
         </div>
         <div class="mb-2">
           <span class="font-bold">{{ $t("recentAlertsDate") }}:</span>
-          {{ alertsStatistics.recentAlertsDate }}
+          {{ props.alertsStatistics.recentAlertsDate }}
         </div>
         <div class="mb-2">
           <span class="font-bold">{{ $t("recentAlertsNumber") }}:</span>
-          {{ alertsStatistics.recentAlertsNumber }}
+          {{ props.alertsStatistics.recentAlertsNumber }}
         </div>
         <div class="mb-2">
           <span class="font-bold">{{ $t("alertsTotal") }}:</span>
-          {{ alertsStatistics.alertsTotal }}
+          {{ props.alertsStatistics.alertsTotal }}
         </div>
-        <div v-if="calculateHectares" class="mb-2">
+        <div v-if="props.calculateHectares" class="mb-2">
           <span class="font-bold">{{ $t("hectaresTotal") }}:</span>
-          {{ alertsStatistics.hectaresTotal }}
+          {{ props.alertsStatistics.hectaresTotal }}
         </div>
       </div>
     </div>
     <!-- Slider -->
-    <div v-if="showSlider" class="feature p-4 rounded-lg shadow-lg">
+    <div v-if="props.showSlider" class="feature p-4 rounded-lg shadow-lg">
       <AlertsSlider
-        :date-options="dateOptions"
+        :date-options="props.dateOptions"
         @date-range-changed="$emit('date-range-changed', $event)"
       />
-      <div v-if="geojsonSelection">
+      <div v-if="props.geojsonSelection">
         <!-- Download -->
         <DownloadMapData
-          :geojson="geojsonSelection"
+          :geojson="props.geojsonSelection"
           :type-of-data="'multiple-alerts'"
         />
       </div>
     </div>
     <!-- Chart -->
-    <div v-if="alertsStatistics" class="feature p-4 rounded-lg shadow-lg">
+    <div v-if="props.alertsStatistics" class="feature p-4 rounded-lg shadow-lg">
       <AlertsChart
-        :alerts-statistics="alertsStatistics"
-        :calculate-hectares="calculateHectares"
+        :alerts-statistics="props.alertsStatistics"
+        :calculate-hectares="props.calculateHectares"
       />
     </div>
   </div>

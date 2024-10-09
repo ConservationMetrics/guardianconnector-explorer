@@ -17,7 +17,6 @@ import ViewSidebar from "@/components/shared/ViewSidebar.vue";
 import MapLegend from "@/components/shared/MapLegend.vue";
 import BasemapSelector from "@/components/shared/BasemapSelector.vue";
 
-// Define props
 const props = defineProps({
   allowedFileExtensions: Object,
   filterColumn: String,
@@ -36,17 +35,58 @@ const props = defineProps({
   planetApiKey: String,
 });
 
-// Set up reactive state
-const currentBasemap = ref(props.mapboxStyle);
 const filteredData = ref([...props.mapData]);
-const processedData = ref([...props.mapData]);
 const map = ref(null);
-const mapLegendContent = ref(null);
 const selectedFeature = ref(null);
 const showSidebar = ref(false);
 const showBasemapSelector = ref(false);
 
-// Define methods
+onMounted(() => {
+  mapboxgl.accessToken = props.mapboxAccessToken;
+
+  map.value = new mapboxgl.Map({
+    container: "map",
+    style: props.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
+    projection: props.mapboxProjection || "mercator",
+    center: [props.mapboxLongitude || 0, props.mapboxLatitude || -15],
+    zoom: props.mapboxZoom || 2.5,
+    pitch: props.mapboxPitch || 0,
+    bearing: props.mapboxBearing || 0,
+  });
+
+  map.value.on("load", () => {
+    if (props.mapbox3d) {
+      map.value.addSource("mapbox-dem", {
+        type: "raster-dem",
+        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+        tileSize: 512,
+        maxzoom: 14,
+      });
+      map.value.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
+    }
+
+    prepareMapCanvasContent();
+
+    // Navigation Control (zoom buttons and compass)
+    const nav = new mapboxgl.NavigationControl();
+    map.value.addControl(nav, "top-right");
+
+    // Scale Control
+    const scale = new mapboxgl.ScaleControl({
+      maxWidth: 80,
+      unit: "metric",
+    });
+    map.value.addControl(scale, "bottom-left");
+
+    // Fullscreen Control
+    const fullscreenControl = new mapboxgl.FullscreenControl();
+    map.value.addControl(fullscreenControl, "top-right");
+
+    showBasemapSelector.value = true;
+  });
+});
+
+// Add data to the map and set up event listeners
 const addDataToMap = () => {
   // Remove existing data layers from the map
   if (map.value) {
@@ -170,7 +210,13 @@ const addDataToMap = () => {
     },
   );
 };
+const prepareMapCanvasContent = () => {
+  addDataToMap();
+  prepareMapLegendContent();
+};
 
+// Filter data based on selected values from DataFilter component
+const processedData = ref([...props.mapData]);
 const filterValues = (values) => {
   if (values.includes("null")) {
     filteredData.value = [...processedData.value];
@@ -182,6 +228,8 @@ const filterValues = (values) => {
   addDataToMap(); // Call this method to update the map data
 };
 
+// Basemap selector methods
+const currentBasemap = ref(props.mapboxStyle);
 const handleBasemapChange = (newBasemap) => {
   changeMapStyle(map.value, newBasemap, props.planetApiKey);
   currentBasemap.value = newBasemap;
@@ -190,11 +238,8 @@ const handleBasemapChange = (newBasemap) => {
   });
 };
 
-const prepareMapCanvasContent = () => {
-  addDataToMap();
-  prepareMapLegendContent();
-};
-
+// Map legend methods
+const mapLegendContent = ref(null);
 const prepareMapLegendContent = () => {
   if (!props.mapLegendLayerIds) {
     return;
@@ -206,56 +251,9 @@ const prepareMapLegendContent = () => {
     );
   });
 };
-
 const toggleLayerVisibility = (item) => {
   utilsToggleLayerVisibility(map.value, item);
 };
-
-// Lifecycle hooks
-onMounted(() => {
-  mapboxgl.accessToken = props.mapboxAccessToken;
-
-  map.value = new mapboxgl.Map({
-    container: "map",
-    style: props.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
-    projection: props.mapboxProjection || "mercator",
-    center: [props.mapboxLongitude || 0, props.mapboxLatitude || -15],
-    zoom: props.mapboxZoom || 2.5,
-    pitch: props.mapboxPitch || 0,
-    bearing: props.mapboxBearing || 0,
-  });
-
-  map.value.on("load", () => {
-    if (props.mapbox3d) {
-      map.value.addSource("mapbox-dem", {
-        type: "raster-dem",
-        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
-        tileSize: 512,
-        maxzoom: 14,
-      });
-      map.value.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
-    }
-
-    prepareMapCanvasContent();
-
-    // Navigation Control (zoom buttons and compass)
-    const nav = new mapboxgl.NavigationControl();
-    map.value.addControl(nav, "top-right");
-
-    // Scale Control
-    const scale = new mapboxgl.ScaleControl({
-      maxWidth: 80,
-      unit: "metric",
-    });
-    map.value.addControl(scale, "bottom-left");
-
-    // Fullscreen Control
-    const fullscreenControl = new mapboxgl.FullscreenControl();
-    map.value.addControl(fullscreenControl, "top-right");
-
-    showBasemapSelector.value = true;
-  });
-});
 
 onBeforeUnmount(() => {
   if (map.value) {

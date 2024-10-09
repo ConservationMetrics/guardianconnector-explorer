@@ -3,7 +3,6 @@ import { computed } from "vue";
 
 import MediaFile from "@/components/shared/MediaFile.vue";
 
-// Define props
 const props = defineProps({
   allowedFileExtensions: Object,
   feature: Object,
@@ -13,7 +12,7 @@ const props = defineProps({
   mediaBasePathAlerts: String,
 });
 
-// Set up computed properties
+// Sort feature object by key
 const sortedFeature = computed(() => {
   return Object.keys(props.feature)
     .sort()
@@ -23,8 +22,8 @@ const sortedFeature = computed(() => {
     }, {});
 });
 
-// Define methods
-function setMediaBasePath() {
+// Set media base path based on whether it's an alert or not
+const setMediaBasePath = () => {
   if (props.isAlert && props.mediaBasePathAlerts) {
     return props.mediaBasePathAlerts;
   } else if (!props.isAlert && props.mediaBasePath) {
@@ -32,7 +31,7 @@ function setMediaBasePath() {
   } else {
     return false;
   }
-}
+};
 </script>
 
 <template>

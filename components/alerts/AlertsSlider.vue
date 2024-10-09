@@ -1,21 +1,12 @@
 <script setup>
+import { ref, watch, onMounted, defineEmits } from "vue";
 import VueSlider from "vue-3-slider-component";
 
-import { ref, watch, onMounted, defineEmits } from "vue";
-
-// Define emits
-const emit = defineEmits(["date-range-changed"]);
-
-// Define props
 const props = defineProps({
   dateOptions: Array,
 });
 
-// Set up reactive state
-const selectedRange = ref([]);
-const userInteracted = ref(false);
-
-// Lifecycle hooks
+// Set selected range to the first and last date options
 onMounted(() => {
   if (props.dateOptions && props.dateOptions.length > 0) {
     selectedRange.value = [
@@ -25,7 +16,11 @@ onMounted(() => {
   }
 });
 
-// Watchers
+// Emit date range changes if user has interacted with the slider
+const selectedRange = ref([]);
+const userInteracted = ref(false);
+const emit = defineEmits(["date-range-changed"]);
+
 watch(selectedRange, (newRange) => {
   if (userInteracted.value) {
     emit("date-range-changed", newRange);

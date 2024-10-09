@@ -8,6 +8,7 @@ import {
   defineEmits,
 } from "vue";
 import { useI18n } from "vue-i18n";
+const { t } = useI18n();
 
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -28,7 +29,6 @@ import BasemapSelector from "@/components/shared/BasemapSelector.vue";
 import ViewSidebar from "@/components/shared/ViewSidebar.vue";
 import MapLegend from "@/components/shared/MapLegend.vue";
 
-// Define props
 const props = defineProps({
   alertsData: Object,
   alertsStatistics: Object,
@@ -49,37 +49,75 @@ const props = defineProps({
   planetApiKey: String,
 });
 
-// Set up reactive state
 const calculateHectares = ref(false);
-const currentBasemap = ref(props.mapboxStyle);
 const dateOptions = ref([]);
-const downloadAlert = ref(false);
-const featuresUnderCursor = ref(0);
-const hasLineStrings = ref(false);
-const imageCaption = ref(null);
-const imageUrl = ref([]);
-const isAlert = ref(false);
 const map = ref(null);
-const mapeoDataColor = ref(null);
-const mapLegendContent = ref(null);
-const pulsingCirclesAdded = ref(null);
-const selectedDateRange = ref(null);
-const selectedFeature = ref(null);
-const selectedFeatureGeojson = ref(null);
-const selectedFeatureId = ref(null);
-const selectedFeatureSource = ref(null);
 const showBasemapSelector = ref(false);
 const showIntroPanel = ref(true);
 const showSidebar = ref(true);
 const showSlider = ref(false);
 
+onMounted(() => {
+  mapboxgl.accessToken = props.mapboxAccessToken;
+
+  map.value = new mapboxgl.Map({
+    container: "map",
+    style: props.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
+    projection: props.mapboxProjection || "mercator",
+    center: [props.mapboxLongitude || 0, props.mapboxLatitude || -15],
+    zoom: props.mapboxZoom || 2.5,
+    pitch: props.mapboxPitch || 0,
+    bearing: props.mapboxBearing || 0,
+  });
+
+  map.value.on("load", () => {
+    // Add 3D Terrain if set in env var
+    if (props.mapbox3d) {
+      map.value.addSource("mapbox-dem", {
+        type: "raster-dem",
+        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
+        tileSize: 512,
+        maxzoom: 14,
+      });
+      map.value.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
+    }
+
+    prepareMapCanvasContent();
+
+    // Navigation Control (zoom buttons and compass)
+    const nav = new mapboxgl.NavigationControl();
+    map.value.addControl(nav, "top-right");
+
+    // Scale Control
+    const scale = new mapboxgl.ScaleControl({
+      maxWidth: 80,
+      unit: "metric",
+    });
+    map.value.addControl(scale, "bottom-left");
+
+    // Fullscreen Control
+    const fullscreenControl = new mapboxgl.FullscreenControl();
+    map.value.addControl(fullscreenControl, "top-right");
+
+    showBasemapSelector.value = true;
+
+    dateOptions.value = getDateOptions();
+
+    if (isOnlyLineStringData() !== true) {
+      calculateHectares.value = true;
+    }
+    showSlider.value = true;
+  });
+});
+
 // Define emits
 const emit = defineEmits(["reset-legend-visibility"]);
 
-// Set up composables
-const { t } = useI18n();
-
-// Define methods
+// Map content
+// Add data to the map and set up event listeners
+const featuresUnderCursor = ref(0);
+const hasLineStrings = ref(false);
+const mapeoDataColor = ref(null);
 const addAlertsData = () => {
   const geoJsonSource = props.alertsData;
 
@@ -333,7 +371,6 @@ const addAlertsData = () => {
       (feature) => feature.geometry.type === "LineString",
     );
 };
-
 const addMapeoData = () => {
   // Create a GeoJSON source with all the features
   const geoJsonSource = {
@@ -416,7 +453,68 @@ const addMapeoData = () => {
     );
   });
 };
+const prepareMapCanvasContent = () => {
+  if (props.alertsData) {
+    addAlertsData();
+  }
+  if (props.mapeoData) {
+    addMapeoData();
+  }
+  addPulsingCircles();
+  prepareMapLegendContent();
 
+  // Add buffer for LineStrings to make them easier to select
+  if (hasLineStrings.value) {
+    map.value.on("mousemove", handleBufferMouseEvent);
+    map.value.on("click", handleBufferClick);
+  }
+};
+
+// Handlers for buffer around LineStrings
+const isOnlyLineStringData = () => {
+  const allFeatures = [
+    ...props.alertsData.mostRecentAlerts.features,
+    ...props.alertsData.previousAlerts.features,
+  ];
+  return allFeatures.every((feature) => feature.geometry.type === "LineString");
+};
+const handleBufferClick = (e) => {
+  const pixelBuffer = 10;
+  const bbox = [
+    [e.point.x - pixelBuffer, e.point.y - pixelBuffer],
+    [e.point.x + pixelBuffer, e.point.y + pixelBuffer],
+  ];
+
+  const features = map.value.queryRenderedFeatures(bbox, {
+    layers: ["most-recent-alerts-linestring", "previous-alerts-linestring"],
+  });
+
+  if (features.length > 0) {
+    const firstFeature = features[0];
+    const layerId = firstFeature.layer.id;
+    selectFeature(firstFeature, layerId);
+  }
+};
+const handleBufferMouseEvent = (e) => {
+  const pixelBuffer = 10;
+  const bbox = [
+    [e.point.x - pixelBuffer, e.point.y - pixelBuffer],
+    [e.point.x + pixelBuffer, e.point.y + pixelBuffer],
+  ];
+
+  const features = map.value.queryRenderedFeatures(bbox, {
+    layers: ["most-recent-alerts-linestring", "previous-alerts-linestring"],
+  });
+
+  if (features.length) {
+    map.value.getCanvas().style.cursor = "pointer";
+  } else if (featuresUnderCursor.value === 0) {
+    map.value.getCanvas().style.cursor = "";
+  }
+};
+
+// Add pulsing circles around the most recent alerts
+const pulsingCirclesAdded = ref(null);
 const addPulsingCircles = () => {
   if (pulsingCirclesAdded.value) {
     return;
@@ -510,7 +608,74 @@ const addPulsingCircles = () => {
   // Add pulsing markers for most recent alerts
   props.alertsData.mostRecentAlerts.features.forEach(addPulsingMarker);
 };
+// Method to remove pulsing circles
+const removePulsingCircles = () => {
+  document.querySelectorAll(".pulsing-dot").forEach((el) => el.remove());
+  pulsingCirclesAdded.value = false;
+};
 
+// Basemap selector methods
+const currentBasemap = ref(props.mapboxStyle);
+const handleBasemapChange = (newBasemap) => {
+  removePulsingCircles();
+  changeMapStyle(map.value, newBasemap, props.planetApiKey);
+
+  currentBasemap.value = newBasemap;
+
+  // Once map is idle, re-add sources, layers, and event listeners
+  map.value.once("idle", () => {
+    prepareMapCanvasContent();
+  });
+};
+
+// Map legend methods
+const mapLegendContent = ref(null);
+const prepareMapLegendContent = () => {
+  map.value.once("idle", () => {
+    let mapLegendLayerIds = "";
+
+    // Add most-recent-alerts & previous-alerts layers to mapLegendContent
+    mapLegendLayerIds = mapLegendLayerIds.value;
+    if (hasLineStrings.value) {
+      mapLegendLayerIds =
+        "most-recent-alerts-linestring," +
+        (props.alertsData.previousAlerts.features.length
+          ? "previous-alerts-linestring,"
+          : "") +
+        mapLegendLayerIds;
+    } else {
+      mapLegendLayerIds =
+        "most-recent-alerts-polygon," +
+        (props.alertsData.previousAlerts.features.length
+          ? "previous-alerts-polygon,"
+          : "") +
+        mapLegendLayerIds;
+    }
+
+    // Add mapeo-data layer to mapLegendContent
+    if (props.mapeoData) {
+      mapLegendLayerIds = "mapeo-data," + mapLegendLayerIds;
+    }
+
+    // if there are no layers to show in the legend, return
+    if (!mapLegendLayerIds) {
+      return;
+    }
+
+    mapLegendContent.value = prepareMapLegendLayers(
+      map.value,
+      mapLegendLayerIds,
+      mapeoDataColor.value,
+    );
+  });
+};
+const toggleLayerVisibility = (item) => {
+  utilsToggleLayerVisibility(map.value, item);
+};
+
+// Sidebar content
+// Methods for date range selection and filtering
+const selectedDateRange = ref(null);
 const convertDates = (start, end) => {
   // Convert "MM-YYYY" to "YYYYMM" for comparison
   const convertToDate = (dateStr) => {
@@ -532,7 +697,6 @@ const convertDates = (start, end) => {
 
   return [startDate, endDate];
 };
-
 const getDateOptions = () => {
   let dates = props.alertsStatistics.allDates;
 
@@ -546,55 +710,6 @@ const getDateOptions = () => {
 
   return dates;
 };
-
-const handleBasemapChange = (newBasemap) => {
-  removePulsingCircles();
-  changeMapStyle(map.value, newBasemap, props.planetApiKey);
-
-  currentBasemap.value = newBasemap;
-
-  // Once map is idle, re-add sources, layers, and event listeners
-  map.value.once("idle", () => {
-    prepareMapCanvasContent();
-  });
-};
-
-const handleBufferClick = (e) => {
-  const pixelBuffer = 10;
-  const bbox = [
-    [e.point.x - pixelBuffer, e.point.y - pixelBuffer],
-    [e.point.x + pixelBuffer, e.point.y + pixelBuffer],
-  ];
-
-  const features = map.value.queryRenderedFeatures(bbox, {
-    layers: ["most-recent-alerts-linestring", "previous-alerts-linestring"],
-  });
-
-  if (features.length > 0) {
-    const firstFeature = features[0];
-    const layerId = firstFeature.layer.id;
-    selectFeature(firstFeature, layerId);
-  }
-};
-
-const handleBufferMouseEvent = (e) => {
-  const pixelBuffer = 10;
-  const bbox = [
-    [e.point.x - pixelBuffer, e.point.y - pixelBuffer],
-    [e.point.x + pixelBuffer, e.point.y + pixelBuffer],
-  ];
-
-  const features = map.value.queryRenderedFeatures(bbox, {
-    layers: ["most-recent-alerts-linestring", "previous-alerts-linestring"],
-  });
-
-  if (features.length) {
-    map.value.getCanvas().style.cursor = "pointer";
-  } else if (featuresUnderCursor.value === 0) {
-    map.value.getCanvas().style.cursor = "";
-  }
-};
-
 const handleDateRangeChanged = (newRange) => {
   // Extract start and end dates from newRange
   let [start, end] = newRange;
@@ -652,141 +767,52 @@ const handleDateRangeChanged = (newRange) => {
     selectedDateRange.value = newRange;
   });
 };
-
 const handleSidebarClose = () => {
   showSidebar.value = false;
   resetSelectedFeature();
 };
+const filteredData = computed(() => {
+  // Function to filter features by date range.
+  // This is being passed to the Download component in
+  // AlertsIntroPanel.
 
-const isOnlyLineStringData = () => {
-  const allFeatures = [
-    ...props.alertsData.mostRecentAlerts.features,
-    ...props.alertsData.previousAlerts.features,
-  ];
-  return allFeatures.every((feature) => feature.geometry.type === "LineString");
-};
-
-const prepareMapCanvasContent = () => {
-  if (props.alertsData) {
-    addAlertsData();
+  // If no date range is selected, return the full data
+  if (!selectedDateRange.value) {
+    return props.alertsData;
   }
-  if (props.mapeoData) {
-    addMapeoData();
-  }
-  addPulsingCircles();
-  prepareMapLegendContent();
 
-  // Add buffer for LineStrings to make them easier to select
-  if (hasLineStrings.value) {
-    map.value.on("mousemove", handleBufferMouseEvent);
-    map.value.on("click", handleBufferClick);
-  }
-};
+  const [start, end] = selectedDateRange.value;
 
-const prepareMapLegendContent = () => {
-  map.value.once("idle", () => {
-    let mapLegendLayerIds = "";
+  const [startDate, endDate] = convertDates(start, end);
 
-    // Add most-recent-alerts & previous-alerts layers to mapLegendContent
-    mapLegendLayerIds = mapLegendLayerIds.value;
-    if (hasLineStrings.value) {
-      mapLegendLayerIds =
-        "most-recent-alerts-linestring," +
-        (props.alertsData.previousAlerts.features.length
-          ? "previous-alerts-linestring,"
-          : "") +
-        mapLegendLayerIds;
-    } else {
-      mapLegendLayerIds =
-        "most-recent-alerts-polygon," +
-        (props.alertsData.previousAlerts.features.length
-          ? "previous-alerts-polygon,"
-          : "") +
-        mapLegendLayerIds;
-    }
+  const filterFeatures = (features) => {
+    return features.filter((feature) => {
+      const monthDetected = feature.properties["YYYYMM"];
+      return monthDetected >= startDate && monthDetected <= endDate;
+    });
+  };
 
-    // Add mapeo-data layer to mapLegendContent
-    if (props.mapeoData) {
-      mapLegendLayerIds = "mapeo-data," + mapLegendLayerIds;
-    }
+  return {
+    mostRecentAlerts: {
+      ...props.alertsData.mostRecentAlerts,
+      features: filterFeatures(props.alertsData.mostRecentAlerts.features),
+    },
+    previousAlerts: {
+      ...props.alertsData.previousAlerts,
+      features: filterFeatures(props.alertsData.previousAlerts.features),
+    },
+  };
+});
 
-    // if there are no layers to show in the legend, return
-    if (!mapLegendLayerIds) {
-      return;
-    }
-
-    mapLegendContent.value = prepareMapLegendLayers(
-      map.value,
-      mapLegendLayerIds,
-      mapeoDataColor.value,
-    );
-  });
-};
-
-const removePulsingCircles = () => {
-  document.querySelectorAll(".pulsing-dot").forEach((el) => el.remove());
-  pulsingCirclesAdded.value = false;
-};
-
-const resetSelectedFeature = () => {
-  if (selectedFeatureId.value === null || !selectedFeatureSource.value) {
-    return;
-  }
-  map.value.setFeatureState(
-    { source: selectedFeatureSource.value, id: selectedFeatureId.value },
-    { selected: false },
-  );
-  selectedFeature.value = null;
-  selectedFeatureGeojson.value = null;
-  selectedFeatureId.value = null;
-  selectedFeatureSource.value = null;
-};
-
-const resetToInitialState = () => {
-  resetSelectedFeature();
-  showSidebar.value = true;
-  showIntroPanel.value = true;
-  downloadAlert.value = false;
-  imageUrl.value = [];
-  imageCaption.value = null;
-  selectedDateRange.value = null;
-
-  // Reset the filters for layers that start with 'most-recent-alerts' and 'alerts'
-  map.value.getStyle().layers.forEach((layer) => {
-    if (
-      layer.id.startsWith("most-recent-alerts") ||
-      layer.id.startsWith("alerts")
-    ) {
-      map.value.setFilter(layer.id, null);
-    }
-  });
-
-  mapLegendContent.value = mapLegendContent.value.map((item) => ({
-    ...item,
-    visible: true,
-  }));
-  mapLegendContent.value.forEach((item) => {
-    map.value.setLayoutProperty(item.id, "visibility", "visible");
-  });
-  emit("reset-legend-visibility");
-
-  // Fly to the initial position
-  map.value.flyTo({
-    center: [props.mapboxLongitude || 0, props.mapboxLatitude || -15],
-    zoom: props.mapboxZoom || 2.5,
-    pitch: props.mapboxPitch || 0,
-    bearing: props.mapboxBearing || 0,
-  });
-
-  // Add pulsing circles after the map has finished flying
-  // to the initial position. This is for reasons of user experience,
-  // as well as the fact that queryRenderedFeatures() will only return
-  // features that are visible in the browser viewport.)
-  map.value.once("idle", () => {
-    addPulsingCircles();
-  });
-};
-
+// Methods for selecting and resetting
+const downloadAlert = ref(false);
+const imageCaption = ref(null);
+const imageUrl = ref([]);
+const isAlert = ref(false);
+const selectedFeature = ref(null);
+const selectedFeatureGeojson = ref(null);
+const selectedFeatureId = ref(null);
+const selectedFeatureSource = ref(null);
 const selectFeature = (feature, layerId) => {
   let featureObject = feature.properties;
 
@@ -857,97 +883,63 @@ const selectFeature = (feature, layerId) => {
 
   removePulsingCircles();
 };
-
-const toggleLayerVisibility = (item) => {
-  utilsToggleLayerVisibility(map.value, item);
-};
-
-const filteredData = computed(() => {
-  // Function to filter features by date range.
-  // This is being passed to the Download component in
-  // AlertsIntroPanel.
-
-  // If no date range is selected, return the full data
-  if (!selectedDateRange.value) {
-    return props.alertsData;
+const resetSelectedFeature = () => {
+  if (selectedFeatureId.value === null || !selectedFeatureSource.value) {
+    return;
   }
+  map.value.setFeatureState(
+    { source: selectedFeatureSource.value, id: selectedFeatureId.value },
+    { selected: false },
+  );
+  selectedFeature.value = null;
+  selectedFeatureGeojson.value = null;
+  selectedFeatureId.value = null;
+  selectedFeatureSource.value = null;
+};
+const resetToInitialState = () => {
+  resetSelectedFeature();
+  showSidebar.value = true;
+  showIntroPanel.value = true;
+  downloadAlert.value = false;
+  imageUrl.value = [];
+  imageCaption.value = null;
+  selectedDateRange.value = null;
 
-  const [start, end] = selectedDateRange.value;
+  // Reset the filters for layers that start with 'most-recent-alerts' and 'alerts'
+  map.value.getStyle().layers.forEach((layer) => {
+    if (
+      layer.id.startsWith("most-recent-alerts") ||
+      layer.id.startsWith("alerts")
+    ) {
+      map.value.setFilter(layer.id, null);
+    }
+  });
 
-  const [startDate, endDate] = convertDates(start, end);
+  mapLegendContent.value = mapLegendContent.value.map((item) => ({
+    ...item,
+    visible: true,
+  }));
+  mapLegendContent.value.forEach((item) => {
+    map.value.setLayoutProperty(item.id, "visibility", "visible");
+  });
+  emit("reset-legend-visibility");
 
-  const filterFeatures = (features) => {
-    return features.filter((feature) => {
-      const monthDetected = feature.properties["YYYYMM"];
-      return monthDetected >= startDate && monthDetected <= endDate;
-    });
-  };
-
-  return {
-    mostRecentAlerts: {
-      ...props.alertsData.mostRecentAlerts,
-      features: filterFeatures(props.alertsData.mostRecentAlerts.features),
-    },
-    previousAlerts: {
-      ...props.alertsData.previousAlerts,
-      features: filterFeatures(props.alertsData.previousAlerts.features),
-    },
-  };
-});
-
-// Lifecycle hooks
-onMounted(() => {
-  mapboxgl.accessToken = props.mapboxAccessToken;
-
-  map.value = new mapboxgl.Map({
-    container: "map",
-    style: props.mapboxStyle || "mapbox://styles/mapbox/streets-v12",
-    projection: props.mapboxProjection || "mercator",
+  // Fly to the initial position
+  map.value.flyTo({
     center: [props.mapboxLongitude || 0, props.mapboxLatitude || -15],
     zoom: props.mapboxZoom || 2.5,
     pitch: props.mapboxPitch || 0,
     bearing: props.mapboxBearing || 0,
   });
 
-  map.value.on("load", () => {
-    // Add 3D Terrain if set in env var
-    if (props.mapbox3d) {
-      map.value.addSource("mapbox-dem", {
-        type: "raster-dem",
-        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
-        tileSize: 512,
-        maxzoom: 14,
-      });
-      map.value.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
-    }
-
-    prepareMapCanvasContent();
-
-    // Navigation Control (zoom buttons and compass)
-    const nav = new mapboxgl.NavigationControl();
-    map.value.addControl(nav, "top-right");
-
-    // Scale Control
-    const scale = new mapboxgl.ScaleControl({
-      maxWidth: 80,
-      unit: "metric",
-    });
-    map.value.addControl(scale, "bottom-left");
-
-    // Fullscreen Control
-    const fullscreenControl = new mapboxgl.FullscreenControl();
-    map.value.addControl(fullscreenControl, "top-right");
-
-    showBasemapSelector.value = true;
-
-    dateOptions.value = getDateOptions();
-
-    if (isOnlyLineStringData() !== true) {
-      calculateHectares.value = true;
-    }
-    showSlider.value = true;
+  // Add pulsing circles after the map has finished flying
+  // to the initial position. This is for reasons of user experience,
+  // as well as the fact that queryRenderedFeatures() will only return
+  // features that are visible in the browser viewport.)
+  map.value.once("idle", () => {
+    addPulsingCircles();
   });
-});
+};
 
 onBeforeUnmount(() => {
   if (map.value) {

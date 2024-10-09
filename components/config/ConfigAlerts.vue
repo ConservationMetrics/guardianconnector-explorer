@@ -1,10 +1,11 @@
 <script setup>
 import { ref, defineEmits, reactive, watch } from "vue";
-import { toCamelCase } from "@/utils";
 
 import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
 
-// Define props
+import { toCamelCase } from "@/utils";
+import { updateTags } from "@/composables/useTags";
+
 const props = defineProps({
   tableName: String,
   config: Object,
@@ -12,15 +13,12 @@ const props = defineProps({
   keys: Array,
 });
 
-// Set up composables
-const emit = defineEmits(["updateConfig"]);
-
-// Set up reactive state
 const localConfig = reactive({ ...props.config });
+
+// Set up refs for tags field
 const tagInputs = ref({
   MAPEO_CATEGORY_IDS: "",
 });
-
 const tags = ref({
   MAPEO_CATEGORY_IDS: props.config.MAPEO_CATEGORY_IDS
     ? props.config.MAPEO_CATEGORY_IDS.split(",").map((tag) => ({
@@ -29,13 +27,8 @@ const tags = ref({
     : [],
 });
 
-// Methods
-function updateTags(key, newTags) {
-  tags.value[key] = newTags;
-  localConfig[key] = newTags.map((tag) => tag.text).join(",");
-}
-
 // Watch for changes in localConfig and emit updates
+const emit = defineEmits(["updateConfig"]);
 watch(
   localConfig,
   (newValue) => {

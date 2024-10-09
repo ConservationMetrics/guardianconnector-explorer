@@ -3,25 +3,18 @@ import { ref } from "vue";
 import { useHead, useFetch, useRuntimeConfig } from "#app";
 import { useI18n } from "vue-i18n";
 
-// Set up config
-const {
-  public: { appApiKey },
-} = useRuntimeConfig();
-
-// Set up composables
-const { t } = useI18n();
-
-// Set up reactive state
+// Refs to store the fetched data
 const viewsConfig = ref([]);
 const tableNames = ref([]);
 const dataFetched = ref(false);
 
-// Define headers
+// API request to fetch the data
+const {
+  public: { appApiKey },
+} = useRuntimeConfig();
 const headers = {
   "x-api-key": appApiKey,
 };
-
-// Fetch config
 const { data, error } = await useFetch("/api/config", {
   headers,
 });
@@ -34,7 +27,7 @@ if (data.value && !error.value) {
   console.error("Error fetching data:", error.value);
 }
 
-// Methods
+// POST request to submit the updated config
 const submitConfig = async ({ config, tableName }) => {
   try {
     await $fetch(`/api/config/update_config/${tableName}`, {
@@ -47,6 +40,7 @@ const submitConfig = async ({ config, tableName }) => {
   }
 };
 
+// POST request to remove a table from the config
 const removeTableFromConfig = async (tableName) => {
   try {
     await $fetch(`/api/config/delete_table/${tableName}`, {
@@ -58,6 +52,7 @@ const removeTableFromConfig = async (tableName) => {
   }
 };
 
+// POST request to add a table to the config
 const addTableToConfig = async (tableName) => {
   try {
     await $fetch(`/api/config/new_table/${tableName}`, {
@@ -69,7 +64,7 @@ const addTableToConfig = async (tableName) => {
   }
 };
 
-// Set up page metadata
+const { t } = useI18n();
 useHead({
   title: "GuardianConnector Explorer: " + t("configuration"),
 });

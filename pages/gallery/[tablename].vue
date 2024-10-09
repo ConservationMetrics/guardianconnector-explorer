@@ -4,32 +4,25 @@ import { useHead, useFetch, useRuntimeConfig } from "#app";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 
-// Set up config
-const {
-  public: { appApiKey },
-} = useRuntimeConfig();
+// Extract the tablename from the route parameters
+const route = useRoute();
+const table = route.params.tablename;
 
-// Set up composables
-const { t } = useI18n();
-
-// Set up reactive state
+// Refs to store the fetched data
 const allowedFileExtensions = ref({});
 const dataFetched = ref(false);
 const filterColumn = ref("");
 const galleryData = ref([]);
 const mediaBasePath = ref("");
 
-// Define headers
+// API request to fetch the data
+const {
+  public: { appApiKey },
+} = useRuntimeConfig();
+
 const headers = {
   "x-api-key": appApiKey,
 };
-
-// Get the current route
-const route = useRoute();
-
-// Extract the tablename from the route parameters
-const table = route.params.tablename;
-
 const { data, error } = await useFetch(`/api/${table}/gallery`, {
   headers,
 });
@@ -44,7 +37,7 @@ if (data.value && !error.value) {
   console.error("Error fetching data:", error.value);
 }
 
-// Set up page metadata
+const { t } = useI18n();
 useHead({
   title: "GuardianConnector Explorer" + t("gallery"),
 });

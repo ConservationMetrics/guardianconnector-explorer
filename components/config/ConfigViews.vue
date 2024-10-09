@@ -1,7 +1,6 @@
 <script setup>
 import { ref, watch, defineEmits } from "vue";
 
-// Define props
 const props = defineProps({
   tableName: String,
   config: Object,
@@ -9,13 +8,13 @@ const props = defineProps({
   keys: Array,
 });
 
-// Set up composables
-const emit = defineEmits(["update:views"]);
-
-// Set up local state
 const localViews = ref([...props.views]);
 
-// Watch for changes to views
+// Set up composables
+
+// Watch for changes to views and emit updates
+const emit = defineEmits(["update:views"]);
+
 watch(
   () => props.views,
   (newViews) => {
@@ -24,7 +23,6 @@ watch(
   { deep: true },
 );
 
-// Methods
 function updateViews() {
   emit("update:views", localViews.value);
 }

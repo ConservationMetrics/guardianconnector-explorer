@@ -2,21 +2,18 @@
 import { ref, computed } from "vue";
 import VueSelect from "vue3-select-component";
 
-// Define props
 const props = defineProps({
   data: Array,
   filterColumn: String,
   showColoredDot: Boolean,
 });
 
-// Define emits
 const emit = defineEmits(["filter"]);
 
-// Set up reactive state
 const defaultColor = "#ffffff";
 const selectedValue = ref([]);
 
-// Set up computed properties
+// Compute unique values
 const uniqueValues = computed(() => {
   const values = props.data
     .map((item) => ({
@@ -40,7 +37,7 @@ const uniqueValues = computed(() => {
   return Array.from(uniqueMap.values());
 });
 
-// Define methods
+// Emit filter selection
 function emitFilter() {
   if (selectedValue.value.length > 0) {
     const labels = selectedValue.value;

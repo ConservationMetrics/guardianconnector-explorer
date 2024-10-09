@@ -1,36 +1,20 @@
 <script setup>
 import { defineEmits, ref, computed, onMounted } from "vue";
 
-// Define props
 const props = defineProps({
   tableName: String,
   config: Object,
   isMinimized: Boolean,
 });
 
-// Set up composables
 const emit = defineEmits([
   "submitConfig",
   "removeTableFromConfig",
   "toggleMinimize",
 ]);
 
-// Set up reactive state
-const localConfig = ref({});
-const originalConfig = ref(null);
+// Set keys for the different sections of the config
 const views = ref([]);
-
-onMounted(() => {
-  if (props.config) {
-    localConfig.value = JSON.parse(JSON.stringify(props.config));
-  }
-  originalConfig.value = JSON.parse(JSON.stringify(localConfig.value));
-  views.value = localConfig.value?.VIEWS
-    ? localConfig.value.VIEWS.split(",")
-    : [];
-});
-
-// Methods
 const viewsKeys = computed(() => ["VIEWS"]);
 const mapConfigKeys = computed(() => [
   "MAPBOX_STYLE",
@@ -55,6 +39,20 @@ const filterKeys = computed(() => [
 ]);
 const otherKeys = computed(() => ["LOGO_URL"]);
 
+// On mounted, set localConfig to props.config
+const originalConfig = ref(null);
+const localConfig = ref({});
+onMounted(() => {
+  if (props.config) {
+    localConfig.value = JSON.parse(JSON.stringify(props.config));
+  }
+  originalConfig.value = JSON.parse(JSON.stringify(localConfig.value));
+  views.value = localConfig.value?.VIEWS
+    ? localConfig.value.VIEWS.split(",")
+    : [];
+});
+
+// Form validations and helpers
 const isChanged = computed(() => {
   const localConfigFiltered = Object.fromEntries(
     Object.entries(localConfig.value).filter(([value]) => value !== ""),
@@ -87,25 +85,26 @@ const shouldShowConfigOther = computed(() =>
   hasView(["map", "gallery", "alerts"]),
 );
 
-function hasView(viewsArray) {
+const hasView = (viewsArray) => {
   return viewsArray.some((view) => views.value.includes(view));
-}
+};
 
-function handleConfigUpdate(newConfig) {
+// Handlers for updating config and form submission
+const handleViewUpdate = (newViews) => {
+  views.value = newViews;
+  localConfig.value.VIEWS = newViews.join(",");
+};
+
+const handleConfigUpdate = (newConfig) => {
   localConfig.value = newConfig;
-}
+};
 
-function handleSubmit() {
+const handleSubmit = () => {
   emit("submitConfig", {
     tableName: props.tableName,
     config: localConfig.value,
   });
-}
-
-function updateViews(newViews) {
-  views.value = newViews;
-  localConfig.value.VIEWS = newViews.join(",");
-}
+};
 </script>
 
 <template>
@@ -123,7 +122,7 @@ function updateViews(newViews) {
           :config="localConfig"
           :views="views"
           :keys="viewsKeys"
-          @update:views="updateViews"
+          @update:views="handleViewUpdate"
         />
         <ConfigMap
           v-if="shouldShowConfigMap"

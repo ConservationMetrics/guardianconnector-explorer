@@ -1,10 +1,8 @@
 <script setup>
 import tokml from "tokml";
 
-// Define props
 const props = defineProps(["geojson", "typeOfData"]);
 
-// Methods
 const downloadAlertCSV = () => {
   // Convert featureObject to CSV and download
   if (!props.geojson) {

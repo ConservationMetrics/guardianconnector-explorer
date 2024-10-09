@@ -24,16 +24,14 @@ Chart.register(
   LinearScale,
 );
 
-// Define props
+const { t } = useI18n();
+
 const props = defineProps({
   alertsStatistics: Object,
   calculateHectares: Boolean,
 });
 
-// Set up composables
-const { t } = useI18n();
-
-// Define computed
+// Populate chart data
 const chartData = computed(() => {
   const dataKey = props.calculateHectares
     ? "hectaresPerMonth"

@@ -1,23 +1,24 @@
 <script setup>
 import { ref, watch, onMounted } from "vue";
 
-// Define props
 const props = defineProps({
   mapLegendContent: Array,
   resetLegend: Boolean,
 });
 
-// Define emits
 const emit = defineEmits(["toggle-layer-visibility"]);
 
-// Set up reactive state
 const localMapLegendContent = ref([]);
 
-// Define methods
-const getTypeClass = (item) => {
-  return `${item.type}-box`;
-};
+onMounted(() => {
+  // Ensure all items are visible initially
+  localMapLegendContent.value = props.mapLegendContent.map((item) => ({
+    ...item,
+    visible: true,
+  }));
+});
 
+// Layer visibility toggles
 const toggleLayerVisibility = (item) => {
   emit("toggle-layer-visibility", item);
 };
@@ -29,6 +30,11 @@ const resetLegendVisibility = () => {
   }));
 };
 
+// Get the class for the geometry type
+const getTypeClass = (item) => {
+  return `${item.type}-box`;
+};
+
 // Watch for changes in the resetLegend prop
 watch(
   () => props.resetLegend,
@@ -38,15 +44,6 @@ watch(
     }
   },
 );
-
-// Lifecycle hooks
-onMounted(() => {
-  // Ensure all items are visible initially
-  localMapLegendContent.value = props.mapLegendContent.map((item) => ({
-    ...item,
-    visible: true,
-  }));
-});
 </script>
 
 <template>

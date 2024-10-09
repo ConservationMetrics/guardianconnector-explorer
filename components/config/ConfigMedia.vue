@@ -1,8 +1,8 @@
 <script setup>
 import { defineEmits, reactive, watch } from "vue";
+
 import { toCamelCase } from "@/utils";
 
-// Define props
 const props = defineProps({
   tableName: String,
   config: Object,
@@ -10,13 +10,10 @@ const props = defineProps({
   keys: Array,
 });
 
-// Set up composables
-const emit = defineEmits(["updateConfig"]);
-
-// Set up reactive state
 const localConfig = reactive({ ...props.config });
 
 // Watch for changes in localConfig and emit updates
+const emit = defineEmits(["updateConfig"]);
 watch(
   localConfig,
   (newValue) => {
