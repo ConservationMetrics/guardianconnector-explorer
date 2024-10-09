@@ -15,7 +15,10 @@ export default [
     files: ["**/*.{js,ts,vue}"],
     languageOptions: { parserOptions: { parser: tseslint.parser } },
     rules: {
-      "no-unused-vars": ["warn", { ignoreRestSiblings: true }],
+      "no-unused-vars": [
+        "warn",
+        { ignoreRestSiblings: true, argsIgnorePattern: "^_" },
+      ],
       "no-undef": "warn",
       "@typescript-eslint/no-unused-vars": [
         "warn",
