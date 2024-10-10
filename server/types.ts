@@ -1,6 +1,64 @@
-export type Column = {
+import pg from "pg";
+import sqlite3 from "sqlite3";
+
+export type DatabaseConnection = pg.Client | sqlite3.Database | null;
+
+export interface Database {
+  // SQLite methods
+  all: <T = unknown>(
+    _sql: string,
+    _callback: (_err: Error, _rows: T[]) => void,
+  ) => void;
+  run: (
+    _sql: string,
+    _values?: unknown[],
+    _callback?: (_err: Error) => void,
+  ) => void;
+  // Method for other databases to execute a query
+  query: <T = unknown>(
+    _sql: string,
+    _values?: unknown[],
+    _callback?: (_err: Error, _result: { rows: T[] }) => void,
+  ) => void;
+
+  host?: string;
+  user?: string;
+  password?: string;
+  port?: number;
+  ssl?: boolean;
+
+  close?: () => Promise<void>;
+}
+
+export type ConfigRow = {
+  table_name: string;
+  views_config: string;
+};
+
+export type ColumnEntry = {
   original_column: string;
   sql_column: string;
+};
+
+export type DataEntry = Record<string, string>;
+
+export type GeoDataEntry = Record<string, string | number | null>;
+
+export type Coordinate = [number, number];
+export type LineString = Coordinate[];
+export type Polygon = LineString[];
+export type MultiPolygon = Polygon[];
+
+export type GeoJSONFeature = {
+  type: "Feature";
+  id?: string;
+  properties: { [key: string]: unknown };
+  geometry?: { [key: string]: unknown };
+};
+
+export type GeoJSON = {
+  type: "FeatureCollection";
+  features: GeoJSONFeature[];
 };
 
 export type AlertRecord = {
@@ -11,17 +69,33 @@ export type AlertRecord = {
   area_alert_ha: string;
 };
 
-export type Metadata = {
+export type AlertsMetadata = {
   alert_source: string;
   type_alert: string;
   month: number;
   year: number;
   total_alerts: string;
   description_alerts: string;
+  territory: string;
 };
 
 export type AlertsPerMonth = Record<string, number>;
 
+export type AlertsStatistics = {
+  territory: string;
+  typeOfAlerts: string[];
+  dataProviders: string[];
+  alertDetectionRange: string;
+  allDates: string[];
+  earliestAlertsDate: string;
+  recentAlertsDate: string;
+  recentAlertsNumber: number;
+  alertsTotal: number;
+  alertsPerMonth: AlertsPerMonth;
+  hectaresTotal: string;
+  hectaresPerMonth: AlertsPerMonth;
+  twelveMonthsBefore: string;
+};
 export interface ViewConfig {
   VIEWS: string;
   FILTER_BY_COLUMN: string;

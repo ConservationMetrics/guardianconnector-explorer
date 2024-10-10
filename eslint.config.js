@@ -22,7 +22,7 @@ export default [
       "no-undef": "warn",
       "@typescript-eslint/no-unused-vars": [
         "warn",
-        { ignoreRestSiblings: true },
+        { ignoreRestSiblings: true, argsIgnorePattern: "^_" },
       ],
       "@typescript-eslint/no-explicit-any": "warn",
     },
@@ -32,5 +32,8 @@ export default [
     rules: {
       "vue/multi-word-component-names": "off",
     },
+  },
+  {
+    ignores: ["public/"],
   },
 ];

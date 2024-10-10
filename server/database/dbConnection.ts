@@ -1,7 +1,6 @@
 import pg from "pg";
 import sqlite3 from "sqlite3";
-
-type DatabaseConnection = pg.Client | sqlite3.Database | null;
+import { type DatabaseConnection } from "../types";
 
 export const setupDatabaseConnection = async (
   isConfigDb: boolean,

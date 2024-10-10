@@ -1,7 +1,8 @@
 import { fetchTableNames } from "../../database/dbOperations";
+import { type DatabaseConnection } from "../../types";
 
 export const getFilteredTableNames = async (
-  database: any,
+  database: DatabaseConnection,
   isSqlite: boolean,
 ) => {
   let tableNames = await fetchTableNames(database, isSqlite);

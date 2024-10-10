@@ -7,7 +7,9 @@ export default defineNuxtConfig({
     head: {
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1",
-      script: [{ src: "/lightbox/lightbox-plus-jquery.js", defer: true }],
+      script: [
+        { src: "/vendor/lightbox/lightbox-plus-jquery.js", defer: true },
+      ],
       meta: [
         { charset: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -28,7 +30,7 @@ export default defineNuxtConfig({
     "nuxt-windicss",
   ],
 
-  css: ["public/lightbox/lightbox.min.css"],
+  css: ["public/vendor/lightbox/lightbox.min.css"],
 
   i18n: {
     locales: [

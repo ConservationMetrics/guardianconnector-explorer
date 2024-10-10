@@ -51,7 +51,7 @@ watch(selectedBasemap, (newVal, oldVal) => {
 });
 
 // Update the Planet basemap when the monthYear changes
-watch(monthYear, (newVal, oldVal) => {
+watch(monthYear, (_newVal, _oldVal) => {
   if (selectedBasemap.value.id === "planet") {
     updatePlanetBasemap();
   }

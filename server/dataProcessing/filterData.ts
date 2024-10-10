@@ -1,14 +1,19 @@
-import { type Column, type AllowedFileExtensions } from "../types";
+import {
+  type ColumnEntry,
+  type DataEntry,
+  type GeoDataEntry,
+  type AllowedFileExtensions,
+} from "../types";
 import { hasValidCoordinates } from "./helpers";
 
 // Filter out unwanted columns and substrings
 // Use SQL column mapping if available
 export const filterUnwantedKeys = (
-  data: any[],
-  columns: Column[] | null,
+  data: DataEntry[],
+  columns: ColumnEntry[] | null,
   unwantedColumnsList: string | undefined,
   unwantedSubstringsList: string | undefined,
-): any[] => {
+): DataEntry[] => {
   const filterColumns = (
     originalColumns: Set<string>,
     unwantedColumns: string[],
@@ -77,7 +82,7 @@ export const filterUnwantedKeys = (
   const filteredData = data.map((item) =>
     Object.keys(item)
       .filter((key) => filteredSqlColumns.has(key))
-      .reduce((obj: any, key) => {
+      .reduce((obj: DataEntry, key) => {
         obj[key] = item[key];
         return obj;
       }, {}),
@@ -88,10 +93,10 @@ export const filterUnwantedKeys = (
 
 // Filter out data that matches a comma-separated list of values for a given column
 export const filterOutUnwantedValues = (
-  data: any[],
+  data: DataEntry[],
   filterByColumn: string | undefined,
   filterOutValues: string | undefined,
-): any[] => {
+): DataEntry[] => {
   if (!filterByColumn || !filterOutValues) {
     return data;
   }
@@ -107,18 +112,24 @@ export const filterOutUnwantedValues = (
 
 // Filter out data without columns storing have valid coordinates
 export const filterGeoData = (
-  data: Array<Record<string, any>>,
-): Array<Record<string, any>> => {
-  const geoData = data.filter((feature) => hasValidCoordinates(feature));
+  data: GeoDataEntry | null | undefined,
+): GeoDataEntry[] => {
+  if (!Array.isArray(data)) {
+    console.warn("Data is null, undefined, or not an array");
+    return [];
+  }
+  const geoData = data.filter((feature: GeoDataEntry) =>
+    hasValidCoordinates(feature),
+  );
 
   return geoData;
 };
 
 // Filter out data without any columns storing file extensions
 export const filterDataByExtension = (
-  data: Array<Record<string, any>>,
+  data: DataEntry[],
   extensions: AllowedFileExtensions,
-): Array<Record<string, any>> => {
+): DataEntry[] => {
   return data.filter((entry) => {
     return Object.values(entry).some((value) => {
       return (

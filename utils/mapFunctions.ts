@@ -114,14 +114,23 @@ export const prepareMapLegendLayers = (
       const layerType = layer.type;
       let layerColor = map.getPaintProperty(
         layerId,
-        `${layerType}-color` as any,
+        `${layerType}-color` as
+          | "fill-color"
+          | "line-color"
+          | "circle-color"
+          | "heatmap-color"
+          | "fill-extrusion-color"
+          | "raster-opacity"
+          | "hillshade-shadow-color"
+          | "background-color"
+          | "sky-opacity",
       );
 
       if (!layerColor) {
         return;
       }
 
-      const layerColorColumn = layerColor[3];
+      const layerColorColumn = (layerColor as string[])[3];
       if (Array.isArray(layerColorColumn) && mapeoLegendColor) {
         layerColor = mapeoLegendColor;
       }

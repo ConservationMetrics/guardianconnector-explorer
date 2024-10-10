@@ -1,4 +1,16 @@
-import { type AlertRecord, type Metadata, type AlertsPerMonth } from "../types";
+import {
+  type AlertRecord,
+  type AlertsMetadata,
+  type AlertsPerMonth,
+  type AlertsStatistics,
+  type DataEntry,
+  type Coordinate,
+  type LineString,
+  type Polygon,
+  type MultiPolygon,
+  type GeoJSON,
+  type GeoJSONFeature,
+} from "../types";
 import {
   capitalizeFirstLetter,
   getRandomColor,
@@ -6,9 +18,7 @@ import {
 } from "./helpers";
 
 // Transform survey data keys and values
-const transformSurveyData = (
-  filteredData: Array<Record<string, any>>,
-): Array<Record<string, any>> => {
+const transformSurveyData = (filteredData: DataEntry[]): DataEntry[] => {
   const transformSurveyDataKey = (key: string): string => {
     let transformedKey = key
       .replace(/^g__/, "geo")
@@ -24,7 +34,10 @@ const transformSurveyData = (
     return transformedKey.trimStart();
   };
 
-  const transformSurveyDataValue = (key: string, value: any) => {
+  const transformSurveyDataValue = (
+    key: string,
+    value: string | number | null,
+  ) => {
     if (value === null) return null;
     if (key === "g__coordinates") return value;
 
@@ -66,11 +79,11 @@ const transformSurveyData = (
     return transformedValue;
   };
   const transformedData = filteredData.map((entry) => {
-    const transformedEntry: Record<string, any> = {};
+    const transformedEntry: DataEntry = {};
     Object.entries(entry).forEach(([key, value]) => {
       const transformedKey = transformSurveyDataKey(key);
       const transformedValue = transformSurveyDataValue(key, value);
-      transformedEntry[transformedKey] = transformedValue;
+      transformedEntry[transformedKey] = String(transformedValue);
     });
     return transformedEntry;
   });
@@ -80,16 +93,16 @@ const transformSurveyData = (
 
 // Prepare data for the map view
 const prepareMapData = (
-  transformedData: Array<Record<string, any>>,
+  transformedData: DataEntry[],
   filterColumn: string | undefined,
-): Array<Record<string, any>> => {
+): DataEntry[] => {
   const colorMap = new Map<string, string>();
 
   // Process different geometry types and extract coordinates
-  const processGeolocation = (obj: any) => {
+  const processGeolocation = (obj: { [key: string]: string }) => {
     try {
       const geometryType = obj.geotype;
-      let coordinates;
+      let coordinates: Coordinate | LineString | Polygon = [];
 
       // Convert string to array
       if (!Array.isArray(obj.geocoordinates)) {
@@ -102,11 +115,11 @@ const prepareMapData = (
         Array.isArray(coordinates) &&
         coordinates.length === 2
       ) {
-        obj.geocoordinates = coordinates;
+        obj.geocoordinates = JSON.stringify(coordinates);
       } else if (geometryType === "LineString") {
-        obj.geocoordinates = coordinates;
+        obj.geocoordinates = JSON.stringify(coordinates);
       } else if (geometryType === "Polygon") {
-        obj.geocoordinates = [coordinates];
+        obj.geocoordinates = JSON.stringify([coordinates]);
       }
     } catch (error) {
       console.error("Error parsing coordinates:", error);
@@ -136,20 +149,12 @@ const prepareMapData = (
     }
 
     // Add random color to each item per the filter column
-    if (filterColumn !== undefined) {
-      const filterColumnValue = item[filterColumn];
-      if (filterColumnValue) {
-        if (!colorMap.has(filterColumnValue)) {
-          colorMap.set(filterColumnValue, getRandomColor());
-        }
-        item["filter-color"] = colorMap.get(filterColumnValue);
-      } else {
-        item["filter-color"] = "#3333FF"; // Fallback color of blue
-      }
-    } else {
-      // Handle the case when filterColumn is undefined
-      item["filter-color"] = "#3333FF"; // Fallback color of blue
+    const filterColumnValue =
+      filterColumn !== undefined ? (item[filterColumn] ?? "") : "";
+    if (filterColumnValue && !colorMap.has(filterColumnValue)) {
+      colorMap.set(filterColumnValue, getRandomColor());
     }
+    item["filter-color"] = colorMap.get(filterColumnValue) ?? "#3333FF";
 
     return processGeolocation(item);
   });
@@ -159,16 +164,16 @@ const prepareMapData = (
 
 // Prepare data for the alerts view
 const prepareAlertData = (
-  data: Array<Record<string, any>>,
+  data: DataEntry[],
 ): {
-  mostRecentAlerts: Array<Record<string, any>>;
-  previousAlerts: Array<Record<string, any>>;
+  mostRecentAlerts: DataEntry[];
+  previousAlerts: DataEntry[];
 } => {
   const transformChangeDetectionItem = (
-    item: Record<string, any>,
+    item: DataEntry,
     formattedMonth: string,
-  ): Record<string, any> => {
-    const transformedItem: Record<string, any> = {};
+  ): DataEntry => {
+    const transformedItem: DataEntry = {};
 
     // Keep columns starting with 'g__'
     Object.keys(item).forEach((key) => {
@@ -207,7 +212,7 @@ const prepareAlertData = (
     transformedItem["alertType"] = item.alert_type?.replace(/_/g, " ") ?? "";
     transformedItem["alertAreaHectares"] =
       typeof item.area_alert_ha === "number"
-        ? item.area_alert_ha.toFixed(2)
+        ? (item.area_alert_ha as number).toFixed(2)
         : item.area_alert_ha;
     transformedItem["geographicCentroid"] = calculateCentroid(
       item.g__coordinates,
@@ -235,7 +240,10 @@ const prepareAlertData = (
     const formattedMonth =
       item.month_detec.length === 1 ? `0${item.month_detec}` : item.month_detec;
     const monthYearStr = `${formattedMonth}-${item.year_detec}`;
-    const date = new Date(item.year_detec, formattedMonth - 1);
+    const date = new Date(
+      parseInt(item.year_detec),
+      parseInt(formattedMonth) - 1,
+    );
 
     if (date > latestDate) {
       latestDate = date;
@@ -243,8 +251,8 @@ const prepareAlertData = (
     }
   });
 
-  const mostRecentAlerts: Array<Record<string, any>> = [];
-  const previousAlerts: Array<Record<string, any>> = [];
+  const mostRecentAlerts: DataEntry[] = [];
+  const previousAlerts: DataEntry[] = [];
 
   // Second pass to segregate the data
   validGeoData.forEach((item) => {
@@ -270,21 +278,19 @@ const prepareAlertData = (
 // Prepare statistics for the alerts view intro panel
 const prepareAlertsStatistics = (
   data: AlertRecord[],
-  metadata: Metadata[] | null,
-): Record<string, any> => {
+  metadata: AlertsMetadata[] | null,
+): AlertsStatistics => {
   let dataProviders: string[] = [];
 
-  const territory =
+  const territory: string =
     data[0].territory_name.charAt(0).toUpperCase() +
     data[0].territory_name.slice(1);
 
   const typeOfAlerts = Array.from(
     new Set(
       data
-        .map((item) =>
-          item.alert_type ? item.alert_type.replace(/_/g, " ") : null,
-        )
-        .filter(Boolean),
+        .map((item) => item.alert_type)
+        .filter((alertType): alertType is string => alertType !== null),
     ),
   );
 
@@ -491,23 +497,13 @@ const prepareAlertsStatistics = (
 };
 
 // Transform data to GeoJSON format
-const transformToGeojson = (
-  inputArray: Array<{ [key: string]: any }>,
-): {
-  type: string;
-  features: Array<{
-    type: string;
-    id?: string | undefined;
-    properties: { [key: string]: any };
-    geometry?: { [key: string]: any };
-  }>;
-} => {
+const transformToGeojson = (inputArray: DataEntry[]): GeoJSON => {
   const features = inputArray.map((input) => {
-    const feature = {
+    const feature: GeoJSONFeature = {
       type: "Feature",
       id: undefined,
-      properties: {} as { [key: string]: any },
-      geometry: {} as { [key: string]: any },
+      properties: {},
+      geometry: {},
     };
 
     Object.entries(input).forEach(([key, value]) => {
@@ -516,10 +512,12 @@ const transformToGeojson = (
         feature.properties[key] = value;
       } else if (key.startsWith("g__")) {
         const geometryKey = key.substring(3); // Removes 'g__' prefix
-        if (geometryKey === "coordinates") {
-          feature.geometry[geometryKey] = JSON.parse(value);
-        } else {
-          feature.geometry[geometryKey] = value;
+        if (feature.geometry) {
+          if (geometryKey === "coordinates") {
+            feature.geometry[geometryKey] = JSON.parse(value);
+          } else {
+            feature.geometry[geometryKey] = value;
+          }
         }
       } else {
         feature.properties[key] = value;
@@ -536,7 +534,7 @@ const transformToGeojson = (
 };
 
 // Validate geolocation data
-const isValidGeolocation = (item: Record<string, any>): boolean => {
+const isValidGeolocation = (item: DataEntry): boolean => {
   const validGeoTypes = [
     "LineString",
     "MultiLineString",
@@ -545,7 +543,10 @@ const isValidGeolocation = (item: Record<string, any>): boolean => {
     "MultiPolygon",
   ];
 
-  const isValidCoordinates = (type: string, coordinates: any): boolean => {
+  const isValidCoordinates = (
+    type: string,
+    coordinates: MultiPolygon | Polygon | LineString | Coordinate | string,
+  ): boolean => {
     if (typeof coordinates === "string") {
       try {
         coordinates = JSON.parse(coordinates);

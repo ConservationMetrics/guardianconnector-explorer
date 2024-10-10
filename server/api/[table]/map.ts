@@ -10,7 +10,11 @@ import {
   filterOutUnwantedValues,
   filterGeoData,
 } from "../../dataProcessing/filterData";
-import { type AllowedFileExtensions } from "../../types";
+import {
+  type AllowedFileExtensions,
+  type ColumnEntry,
+  type DataEntry,
+} from "../../types";
 
 export default defineEventHandler(async (event: H3Event) => {
   const { table } = event.context.params as { table: string };
@@ -26,6 +30,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbSsl,
     isSqlite,
     sqliteDbPath,
+    // eslint-disable-next-line no-undef
   } = useRuntimeConfig() as unknown as {
     public: { allowedFileExtensions: AllowedFileExtensions };
     configDatabase: string;
@@ -75,8 +80,8 @@ export default defineEventHandler(async (event: H3Event) => {
 
     // Filter data to remove unwanted columns and substrings
     const filteredData = filterUnwantedKeys(
-      mainData,
-      columnsData,
+      mainData as DataEntry[],
+      columnsData as ColumnEntry[],
       viewsConfig[table].UNWANTED_COLUMNS,
       viewsConfig[table].UNWANTED_SUBSTRINGS,
     );

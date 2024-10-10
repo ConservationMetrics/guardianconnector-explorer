@@ -6,7 +6,7 @@ interface Tag {
 
 export function updateTags(initialTags: Record<string, Tag[]>): {
   tags: Ref<Record<string, Tag[]>>;
-  updateTags: (key: string, newTags: Tag[]) => string;
+  updateTags: (_key: string, _newTags: Tag[]) => string;
 } {
   const tags = ref(initialTags);
 

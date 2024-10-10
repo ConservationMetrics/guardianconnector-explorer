@@ -1,38 +1,53 @@
-import { type Views } from "../types";
+import { Client } from "pg";
+import { Database as SqliteDatabase } from "sqlite3";
+import {
+  type Views,
+  type DatabaseConnection,
+  type ConfigRow,
+  type DataEntry,
+  type ColumnEntry,
+} from "../types";
 
 const checkTableExists = (
-  db: any,
+  db: DatabaseConnection,
   table: string | undefined,
   isSqlite: boolean | undefined,
 ): Promise<boolean> => {
   return new Promise((resolve, reject) => {
     let query: string;
     if (isSqlite) {
+      const sqliteDb = db as SqliteDatabase;
       query = `SELECT name FROM sqlite_master WHERE type='table' AND name='${table}'`;
-      db.all(query, (err: Error, rows: any[]) => {
+      sqliteDb.all(query, (err: Error, rows: unknown[]) => {
         if (err) reject(err);
         resolve(rows.length > 0);
       });
     } else {
+      const pgClient = db as Client;
       query = `SELECT to_regclass('${table}')`;
-      db.query(query, (err: Error, result: { rows: any[] }) => {
-        if (err) reject(err);
-        resolve(result.rows[0].to_regclass !== null);
-      });
+      pgClient.query<{ to_regclass: string | null }>(
+        query,
+        [],
+        (err: Error, result) => {
+          if (err) reject(err);
+          resolve(result.rows[0].to_regclass !== null);
+        },
+      );
     }
   });
 };
 
 const fetchDataFromTable = async (
-  db: any,
+  db: DatabaseConnection,
   table: string | undefined,
   isSqlite: boolean | undefined,
-): Promise<any[]> => {
+): Promise<unknown[]> => {
   let query: string;
   if (isSqlite) {
+    const sqliteDb = db as SqliteDatabase;
     query = `SELECT * FROM ${table}`;
     return new Promise((resolve, reject) => {
-      db.all(query, (err: Error, rows: any[]) => {
+      sqliteDb.all(query, (err: Error, rows: Record<string, unknown>[]) => {
         if (err) reject(err);
         if (
           rows.length > 0 &&
@@ -44,9 +59,10 @@ const fetchDataFromTable = async (
       });
     });
   } else {
+    const pgClient = db as Client;
     query = `SELECT * FROM ${table}`;
     return new Promise((resolve, reject) => {
-      db.query(query, (err: Error, result: { rows: any[] }) => {
+      pgClient.query(query, [], (err: Error, result: { rows: unknown[] }) => {
         if (err) reject(err);
         resolve(result.rows);
       });
@@ -55,20 +71,20 @@ const fetchDataFromTable = async (
 };
 
 export const fetchData = async (
-  db: any,
+  db: DatabaseConnection,
   table: string | undefined,
   isSqlite: boolean | undefined,
 ): Promise<{
-  mainData: any[];
-  columnsData: any[] | null;
-  metadata: any[] | null;
+  mainData: DataEntry[];
+  columnsData: ColumnEntry[] | null;
+  metadata: unknown[] | null;
 }> => {
   console.log("Fetching data from", table, "...");
   // Fetch data
   const mainDataExists = await checkTableExists(db, table, isSqlite);
-  let mainData = null;
+  let mainData: DataEntry[] = [];
   if (mainDataExists) {
-    mainData = await fetchDataFromTable(db, table, isSqlite);
+    mainData = (await fetchDataFromTable(db, table, isSqlite)) as DataEntry[];
   } else {
     throw new Error("Main table does not exist");
   }
@@ -78,7 +94,11 @@ export const fetchData = async (
   const columnsTableExists = await checkTableExists(db, columnsTable, isSqlite);
   let columnsData = null;
   if (columnsTableExists) {
-    columnsData = await fetchDataFromTable(db, columnsTable, isSqlite);
+    columnsData = (await fetchDataFromTable(
+      db,
+      columnsTable,
+      isSqlite,
+    )) as ColumnEntry[];
   }
 
   // Fetch metadata
@@ -99,7 +119,7 @@ export const fetchData = async (
 };
 
 export const fetchTableNames = async (
-  db: any,
+  db: DatabaseConnection,
   isSqlite: boolean | undefined,
 ): Promise<string[]> => {
   const query = isSqlite
@@ -108,21 +128,30 @@ export const fetchTableNames = async (
 
   return new Promise((resolve, reject) => {
     if (isSqlite) {
-      db.all(query, (err: Error, rows: any[]) => {
-        if (err) reject(err);
-        resolve(rows.map((row) => row.name));
-      });
+      const sqliteDb = db as SqliteDatabase;
+      sqliteDb.all<{ name: string }>(
+        query,
+        (err: Error, rows: { name: string }[]) => {
+          if (err) reject(err);
+          resolve(rows.map((row) => row.name));
+        },
+      );
     } else {
-      db.query(query, (err: Error, result: { rows: any[] }) => {
-        if (err) reject(err);
-        resolve(result.rows.map((row) => row.table_name));
-      });
+      const pgClient = db as Client;
+      pgClient.query<{ table_name: string }>(
+        query,
+        [],
+        (err: Error, result) => {
+          if (err) reject(err);
+          resolve(result.rows.map((row) => row.table_name));
+        },
+      );
     }
   });
 };
 
 export const fetchConfig = async (
-  db: any,
+  db: DatabaseConnection,
   isSQLite: boolean | undefined,
 ): Promise<Views> => {
   // Create the config table if it does not exist
@@ -133,12 +162,14 @@ export const fetchConfig = async (
 
   await new Promise<void>((resolve, reject) => {
     if (isSQLite) {
-      db.run(createConfigTable, (err: Error) => {
+      const sqliteDb = db as SqliteDatabase;
+      sqliteDb.run(createConfigTable, [], (err: Error) => {
         if (err) reject(err);
         else resolve();
       });
     } else {
-      db.query(createConfigTable, (err: Error) => {
+      const pgClient = db as Client;
+      pgClient.query(createConfigTable, [], (err: Error) => {
         if (err) reject(err);
         else resolve();
       });
@@ -148,22 +179,24 @@ export const fetchConfig = async (
   // Fetch the config data
   const query = `SELECT * FROM config`;
 
-  const result = await new Promise<any[]>((resolve, reject) => {
+  const result = await new Promise<ConfigRow[]>((resolve, reject) => {
     if (isSQLite) {
-      db.all(query, (err: Error, rows: any[]) => {
+      const sqliteDb = db as SqliteDatabase;
+      sqliteDb.all(query, (err: Error, rows: unknown[]) => {
         if (err) reject(err);
-        resolve(rows);
+        resolve(rows as ConfigRow[]);
       });
     } else {
-      db.query(query, (err: Error, result: { rows: any[] }) => {
+      const pgClient = db as Client;
+      pgClient.query(query, [], (err: Error, result: { rows: unknown[] }) => {
         if (err) reject(err);
-        resolve(result.rows);
+        resolve(result.rows as ConfigRow[]);
       });
     }
   });
 
   const viewsConfig: Views = {};
-  result.forEach((row: any) => {
+  result.forEach((row: ConfigRow) => {
     viewsConfig[row.table_name] = JSON.parse(row.views_config);
   });
 
@@ -171,9 +204,9 @@ export const fetchConfig = async (
 };
 
 export const updateConfig = async (
-  db: any,
+  db: DatabaseConnection,
   tableName: string,
-  config: any,
+  config: unknown,
   isSQLite: boolean | undefined,
 ): Promise<void> => {
   const configString = JSON.stringify(config);
@@ -184,7 +217,8 @@ export const updateConfig = async (
 
   return new Promise((resolve, reject) => {
     if (isSQLite) {
-      db.run(query, [configString, tableName], (err: Error) => {
+      const sqliteDb = db as SqliteDatabase;
+      sqliteDb.run(query, [configString, tableName], (err: Error) => {
         if (err) {
           console.error("SQLite Error:", err);
           reject(err);
@@ -193,7 +227,8 @@ export const updateConfig = async (
         }
       });
     } else {
-      db.query(query, [configString, tableName], (err: Error) => {
+      const pgClient = db as Client;
+      pgClient.query(query, [configString, tableName], (err: Error) => {
         if (err) {
           console.error("PostgreSQL Error:", err);
           reject(err);
@@ -206,7 +241,7 @@ export const updateConfig = async (
 };
 
 export const addNewTableToConfig = async (
-  db: any,
+  db: DatabaseConnection,
   tableName: string,
   isSQLite: boolean | undefined,
 ): Promise<void> => {
@@ -216,7 +251,8 @@ export const addNewTableToConfig = async (
 
   return new Promise((resolve, reject) => {
     if (isSQLite) {
-      db.run(query, [tableName, "{}"], (err: Error) => {
+      const sqliteDb = db as SqliteDatabase;
+      sqliteDb.run(query, [tableName, "{}"], (err: Error) => {
         if (err) {
           console.error("SQLite Error:", err);
           reject(err);
@@ -225,7 +261,8 @@ export const addNewTableToConfig = async (
         }
       });
     } else {
-      db.query(query, [tableName, "{}"], (err: Error) => {
+      const pgClient = db as Client;
+      pgClient.query(query, [tableName, "{}"], (err: Error) => {
         if (err) {
           console.error("PostgreSQL Error:", err);
           reject(err);
@@ -238,7 +275,7 @@ export const addNewTableToConfig = async (
 };
 
 export const removeTableFromConfig = async (
-  db: any,
+  db: DatabaseConnection,
   tableName: string,
   isSQLite: boolean | undefined,
 ): Promise<void> => {
@@ -248,7 +285,8 @@ export const removeTableFromConfig = async (
 
   return new Promise((resolve, reject) => {
     if (isSQLite) {
-      db.run(query, [tableName], (err: Error) => {
+      const sqliteDb = db as SqliteDatabase;
+      sqliteDb.run(query, [tableName], (err: Error) => {
         if (err) {
           console.error("SQLite Error:", err);
           reject(err);
@@ -257,7 +295,8 @@ export const removeTableFromConfig = async (
         }
       });
     } else {
-      db.query(query, [tableName], (err: Error) => {
+      const pgClient = db as Client;
+      pgClient.query(query, [tableName], (err: Error) => {
         if (err) {
           console.error("PostgreSQL Error:", err);
           reject(err);

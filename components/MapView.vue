@@ -157,6 +157,7 @@ const addDataToMap = () => {
 
   // Add a layer for Polygon features
   if (!map.value.getLayer("data-layer-polygon")) {
+    console.log("hmmm");
     map.value.addLayer({
       id: "data-layer-polygon",
       type: "fill",

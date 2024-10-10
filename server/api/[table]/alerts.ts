@@ -28,6 +28,7 @@ export default defineEventHandler(async (event: H3Event) => {
     dbSsl,
     isSqlite,
     sqliteDbPath,
+    // eslint-disable-next-line no-undef
   } = useRuntimeConfig() as unknown as {
     public: { allowedFileExtensions: AllowedFileExtensions };
     configDatabase: string;
