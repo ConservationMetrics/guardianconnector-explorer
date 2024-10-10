@@ -1,5 +1,4 @@
 import {
-  type AlertRecord,
   type AlertsMetadata,
   type AlertsPerMonth,
   type AlertsStatistics,
@@ -277,7 +276,7 @@ const prepareAlertData = (
 
 // Prepare statistics for the alerts view intro panel
 const prepareAlertsStatistics = (
-  data: AlertRecord[],
+  data: DataEntry[],
   metadata: AlertsMetadata[] | null,
 ): AlertsStatistics => {
   let dataProviders: string[] = [];
@@ -418,7 +417,7 @@ const prepareAlertsStatistics = (
   // Helper function to update months cumulatively
   // Whether it be alerts or hectares
   const updateCumulativeData = (
-    dataCollection: AlertRecord[],
+    dataCollection: DataEntry[],
     accumulatorMap: Record<string, number>,
     property: "alerts" | "hectares",
   ) => {

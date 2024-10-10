@@ -12,7 +12,11 @@ import {
   filterUnwantedKeys,
   filterGeoData,
 } from "../../dataProcessing/filterData";
-import { type AllowedFileExtensions } from "../../types";
+import {
+  type AllowedFileExtensions,
+  type DataEntry,
+  type AlertsMetadata,
+} from "../../types";
 
 export default defineEventHandler(async (event: H3Event) => {
   const { table } = event.context.params as { table: string };
@@ -74,11 +78,21 @@ export default defineEventHandler(async (event: H3Event) => {
 
   try {
     const viewsConfig = await fetchConfig(configDb, isSqlite);
-    const { mainData, metadata } = await fetchData(db, table, isSqlite);
+    const { mainData, metadata } = (await fetchData(db, table, isSqlite)) as {
+      mainData: DataEntry[];
+      metadata: AlertsMetadata[];
+    };
 
     // Prepare alerts data for the alerts view
     const changeDetectionData = prepareAlertData(mainData);
+    const alertsGeojsonData = {
+      mostRecentAlerts: transformToGeojson(
+        changeDetectionData.mostRecentAlerts,
+      ),
+      previousAlerts: transformToGeojson(changeDetectionData.previousAlerts),
+    };
 
+    // Prepare Mapeo data for the alerts view
     const mapeoTable = viewsConfig[table].MAPEO_TABLE;
     const mapeoCategoryIds = viewsConfig[table].MAPEO_CATEGORY_IDS;
 
@@ -98,7 +112,7 @@ export default defineEventHandler(async (event: H3Event) => {
 
       // Filter Mapeo data to only show data where category matches any values in mapeoCategoryIds (a comma-separated string of values)
       const filteredMapeoDataByCategory = filteredMapeoData.filter(
-        (row: any) => {
+        (row: DataEntry) => {
           return Object.keys(row).some(
             (key) =>
               key.includes("category") &&
@@ -123,16 +137,8 @@ export default defineEventHandler(async (event: H3Event) => {
     // Prepare statistics data for the alerts view
     const alertsStatistics = prepareAlertsStatistics(mainData, metadata);
 
-    // Convert alert data to GeoJSON format
-    const geojsonData = {
-      mostRecentAlerts: transformToGeojson(
-        changeDetectionData.mostRecentAlerts,
-      ),
-      previousAlerts: transformToGeojson(changeDetectionData.previousAlerts),
-    };
-
     const response = {
-      alertsData: geojsonData,
+      alertsData: alertsGeojsonData,
       alertsStatistics: alertsStatistics,
       allowedFileExtensions: allowedFileExtensions,
       logoUrl: viewsConfig[table].LOGO_URL,

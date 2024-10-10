@@ -42,8 +42,6 @@ export type ColumnEntry = {
 
 export type DataEntry = Record<string, string>;
 
-export type GeoDataEntry = Record<string, string | number | null>;
-
 export type Coordinate = [number, number];
 export type LineString = Coordinate[];
 export type Polygon = LineString[];
@@ -59,14 +57,6 @@ export type GeoJSONFeature = {
 export type GeoJSON = {
   type: "FeatureCollection";
   features: GeoJSONFeature[];
-};
-
-export type AlertRecord = {
-  territory_name: string;
-  alert_type: string;
-  month_detec: string;
-  year_detec: string;
-  area_alert_ha: string;
 };
 
 export type AlertsMetadata = {

@@ -37,6 +37,7 @@ const props = defineProps({
   mapboxStyle: String,
   mapboxZoom: Number,
   mapbox3d: Boolean,
+  mapeoData: Object,
   mediaBasePath: String,
   mediaBasePathAlerts: String,
   planetApiKey: String,
@@ -297,7 +298,7 @@ const addAlertsData = () => {
       });
     }
 
-    // Add a layer for previous alerts linestrings
+    // Add a layer for previous alerts LineStrings
     if (!map.value.getLayer("previous-alerts-linestring")) {
       map.value.addLayer({
         id: "previous-alerts-linestring",
@@ -381,7 +382,7 @@ const addMapeoData = () => {
       type: "Feature",
       geometry: {
         type: feature.geotype,
-        coordinates: feature.geocoordinates,
+        coordinates: JSON.parse(feature.geocoordinates),
       },
       properties: {
         ...feature,

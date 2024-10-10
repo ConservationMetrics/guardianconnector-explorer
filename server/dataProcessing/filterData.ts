@@ -1,7 +1,6 @@
 import {
   type ColumnEntry,
   type DataEntry,
-  type GeoDataEntry,
   type AllowedFileExtensions,
 } from "../types";
 import { hasValidCoordinates } from "./helpers";
@@ -112,13 +111,13 @@ export const filterOutUnwantedValues = (
 
 // Filter out data without columns storing have valid coordinates
 export const filterGeoData = (
-  data: GeoDataEntry | null | undefined,
-): GeoDataEntry[] => {
+  data: DataEntry[] | null | undefined,
+): DataEntry[] => {
   if (!Array.isArray(data)) {
     console.warn("Data is null, undefined, or not an array");
     return [];
   }
-  const geoData = data.filter((feature: GeoDataEntry) =>
+  const geoData = data.filter((feature: DataEntry) =>
     hasValidCoordinates(feature),
   );
 

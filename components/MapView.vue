@@ -109,13 +109,15 @@ const addDataToMap = () => {
       type: "Feature",
       geometry: {
         type: feature.geotype,
-        coordinates: feature.geocoordinates,
+        coordinates: JSON.parse(feature.geocoordinates),
       },
       properties: {
         feature,
       },
     })),
   };
+
+  console.log(geoJsonSource);
 
   // Add the source to the map
   if (!map.value.getSource("data-source")) {
@@ -125,8 +127,19 @@ const addDataToMap = () => {
     });
   }
 
-  // Add a layer for Point features
-  if (!map.value.getLayer("data-layer-point")) {
+  // Check for feature types in the GeoJSON data
+  const hasPointFeatures = geoJsonSource.features.some(
+    (feature) => feature.geometry.type === "Point",
+  );
+  const hasLineStringFeatures = geoJsonSource.features.some(
+    (feature) => feature.geometry.type === "LineString",
+  );
+  const hasPolygonFeatures = geoJsonSource.features.some(
+    (feature) => feature.geometry.type === "Polygon",
+  );
+
+  // Add a layer for Point features if present
+  if (hasPointFeatures && !map.value.getLayer("data-layer-point")) {
     map.value.addLayer({
       id: "data-layer-point",
       type: "circle",
@@ -141,8 +154,8 @@ const addDataToMap = () => {
     });
   }
 
-  // Add a layer for LineString features
-  if (!map.value.getLayer("data-layer-linestring")) {
+  // Add a layer for LineString features if present
+  if (hasLineStringFeatures && !map.value.getLayer("data-layer-linestring")) {
     map.value.addLayer({
       id: "data-layer-linestring",
       type: "line",
@@ -155,9 +168,8 @@ const addDataToMap = () => {
     });
   }
 
-  // Add a layer for Polygon features
-  if (!map.value.getLayer("data-layer-polygon")) {
-    console.log("hmmm");
+  // Add a layer for Polygon features if present
+  if (hasPolygonFeatures && !map.value.getLayer("data-layer-polygon")) {
     map.value.addLayer({
       id: "data-layer-polygon",
       type: "fill",
@@ -171,45 +183,48 @@ const addDataToMap = () => {
   }
 
   // Add event listeners
-  ["data-layer-point", "data-layer-linestring", "data-layer-polygon"].forEach(
-    (layerId) => {
-      map.value.on(
-        "mouseenter",
-        layerId,
-        () => {
-          map.value.getCanvas().style.cursor = "pointer";
-        },
-        { passive: true },
-      );
-      map.value.on(
-        "mouseleave",
-        layerId,
-        () => {
-          map.value.getCanvas().style.cursor = "";
-        },
-        { passive: true },
-      );
-      map.value.on(
-        "click",
-        layerId,
-        (e) => {
-          let featureObject = JSON.parse(e.features[0].properties.feature);
-          delete featureObject["filter-color"];
+  const layersToAddListeners = [];
+  if (hasPointFeatures) layersToAddListeners.push("data-layer-point");
+  if (hasLineStringFeatures) layersToAddListeners.push("data-layer-linestring");
+  if (hasPolygonFeatures) layersToAddListeners.push("data-layer-polygon");
 
-          // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
-          if (featureObject.geocoordinates) {
-            featureObject.geocoordinates = prepareCoordinatesForSelectedFeature(
-              featureObject.geocoordinates,
-            );
-          }
+  layersToAddListeners.forEach((layerId) => {
+    map.value.on(
+      "mouseenter",
+      layerId,
+      () => {
+        map.value.getCanvas().style.cursor = "pointer";
+      },
+      { passive: true },
+    );
+    map.value.on(
+      "mouseleave",
+      layerId,
+      () => {
+        map.value.getCanvas().style.cursor = "";
+      },
+      { passive: true },
+    );
+    map.value.on(
+      "click",
+      layerId,
+      (e) => {
+        let featureObject = JSON.parse(e.features[0].properties.feature);
+        delete featureObject["filter-color"];
 
-          selectedFeature.value = featureObject;
-          showSidebar.value = true;
-        },
-        { passive: true },
-      );
-    },
-  );
+        // Rewrite coordinates string from [long, lat] to lat, long, removing brackets
+        if (featureObject.geocoordinates) {
+          featureObject.geocoordinates = prepareCoordinatesForSelectedFeature(
+            featureObject.geocoordinates,
+          );
+        }
+
+        selectedFeature.value = featureObject;
+        showSidebar.value = true;
+      },
+      { passive: true },
+    );
+  });
 };
 const prepareMapCanvasContent = () => {
   addDataToMap();
