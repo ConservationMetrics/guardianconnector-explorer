@@ -273,7 +273,6 @@ const prepareAlertData = (
       previousAlerts.push(transformedItem);
     }
   });
-
   return { mostRecentAlerts, previousAlerts };
 };
 
