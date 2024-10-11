@@ -17,7 +17,7 @@ import {
 } from "./helpers";
 
 // Transform survey data keys and values
-const transformSurveyData = (filteredData: DataEntry[]): DataEntry[] => {
+const transformSurveyData = (data: DataEntry[]): DataEntry[] => {
   const transformSurveyDataKey = (key: string): string => {
     let transformedKey = key
       .replace(/^g__/, "geo")
@@ -77,7 +77,7 @@ const transformSurveyData = (filteredData: DataEntry[]): DataEntry[] => {
     }
     return transformedValue;
   };
-  const transformedData = filteredData.map((entry) => {
+  const transformedData = data.map((entry) => {
     const transformedEntry: DataEntry = {};
     Object.entries(entry).forEach(([key, value]) => {
       const transformedKey = transformSurveyDataKey(key);
@@ -92,13 +92,16 @@ const transformSurveyData = (filteredData: DataEntry[]): DataEntry[] => {
 
 // Prepare data for the map view
 const prepareMapData = (
-  transformedData: DataEntry[],
+  data: DataEntry[],
   filterColumn: string | undefined,
 ): DataEntry[] => {
   const colorMap = new Map<string, string>();
 
   // Process different geometry types and extract coordinates
   const processGeolocation = (obj: { [key: string]: string }) => {
+    if (!obj.geocoordinates || obj.geocoordinates.trim() === "") {
+      return obj;
+    }
     try {
       const geometryType = obj.geotype;
       let coordinates: Coordinate | LineString | Polygon = [];
@@ -127,7 +130,7 @@ const prepareMapData = (
   };
 
   // Add geometry type and process coordinates for each item
-  const processedGeoData = transformedData.map((item) => {
+  const processedGeoData = data.map((item) => {
     if (!item.geotype) {
       const coordinateKey = Object.keys(item).find((key) =>
         key.toLowerCase().includes("coordinates"),
@@ -496,8 +499,8 @@ const prepareAlertsStatistics = (
 };
 
 // Transform data to GeoJSON format
-const transformToGeojson = (inputArray: DataEntry[]): GeoJSON => {
-  const features = inputArray.map((input) => {
+const transformToGeojson = (data: DataEntry[]): GeoJSON => {
+  const features = data.map((input) => {
     const feature: GeoJSONFeature = {
       type: "Feature",
       id: undefined,
