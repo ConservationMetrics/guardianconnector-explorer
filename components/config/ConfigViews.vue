@@ -1,3 +1,33 @@
+<script setup>
+import { ref, watch } from "vue";
+
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  views: Array,
+  keys: Array,
+});
+
+const localViews = ref([...props.views]);
+
+// Set up composables
+
+// Watch for changes to views and emit updates
+const emit = defineEmits(["update:views"]);
+
+watch(
+  () => props.views,
+  (newViews) => {
+    localViews.value = [...newViews];
+  },
+  { deep: true },
+);
+
+function updateViews() {
+  emit("update:views", localViews.value);
+}
+</script>
+
 <template>
   <div class="config-section">
     <div v-for="key in keys" :key="key" class="config-field">
@@ -38,32 +68,3 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  props: {
-    tableName: String,
-    config: Object,
-    views: Array,
-    keys: Array,
-  },
-  data() {
-    return {
-      localViews: [...this.views],
-    };
-  },
-  watch: {
-    views: {
-      handler(newViews) {
-        this.localViews = [...newViews];
-      },
-      deep: true,
-    },
-  },
-  methods: {
-    updateViews() {
-      this.$emit("update:views", this.localViews);
-    },
-  },
-};
-</script>

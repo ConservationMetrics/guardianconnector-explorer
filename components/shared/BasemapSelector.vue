@@ -1,14 +1,86 @@
+<script setup>
+import { ref, computed, watch } from "vue";
+
+import Datepicker from "vue-datepicker-next";
+import "vue-datepicker-next/index.css";
+
+const props = defineProps({
+  mapboxStyle: String,
+  planetApiKey: String,
+});
+
+const emit = defineEmits(["basemapSelected"]);
+
+const showBasemapWindow = ref(false);
+const selectedBasemap = ref({ id: "custom", style: props.mapboxStyle });
+
+const toggleBasemapWindow = () => {
+  showBasemapWindow.value = !showBasemapWindow.value;
+};
+
+// Planet NICFI monthly basemaps
+const minMonth = "2020-09"; // The first month we have Planet NICFI monthly basemaps
+const maxMonth = computed(() => {
+  // If the current day is less than or equal to 15, maxMonth is two months ago.
+  // Otherwise, maxMonth is the previous month.
+  // This is because Planet NICFI monthly basemaps for the previous month are published on the 15th of each month.
+  const date = new Date();
+  if (date.getDate() <= 15) {
+    date.setMonth(date.getMonth() - 2);
+  } else {
+    date.setMonth(date.getMonth() - 1);
+  }
+  const year = date.getFullYear();
+  let month = date.getMonth() + 1;
+  month = month < 10 ? `0${month}` : month;
+  return `${year}-${month}`;
+});
+const monthYear = ref(maxMonth.value);
+const setPlanetDateRange = (date) => {
+  // minMonth and maxMonth are in format YYYY-MM, but date is a Date object
+  // so we need to convert it to a string in the same format
+  date = date.toISOString().slice(0, 7);
+  return date < minMonth || date > maxMonth.value;
+};
+
+// Update the monthYear when the Planet basemap is selected
+watch(selectedBasemap, (newVal, oldVal) => {
+  if (newVal.id === "planet" && newVal !== oldVal) {
+    monthYear.value = maxMonth.value;
+  }
+});
+
+// Update the Planet basemap when the monthYear changes
+watch(monthYear, (_newVal, _oldVal) => {
+  if (selectedBasemap.value.id === "planet") {
+    updatePlanetBasemap();
+  }
+});
+
+const updatePlanetBasemap = () => {
+  if (selectedBasemap.value.id === "planet") {
+    selectedBasemap.value.monthYear = monthYear.value;
+    emitBasemapChange();
+  }
+};
+
+// Emit the selected basemap
+const emitBasemapChange = () => {
+  emit("basemapSelected", selectedBasemap.value);
+};
+</script>
+
 <template>
   <div>
     <div
       class="basemap-toggle rounded shadow"
-      :class="{ active: showModal }"
-      @click="toggleModal"
+      :class="{ active: showBasemapWindow }"
+      @click="toggleBasemapWindow"
     >
       <img src="/map.svg" alt="Map Icon" />
     </div>
-    <div v-if="showModal" class="modal rounded shadow">
-      <div class="modal-content">
+    <div v-if="showBasemapWindow" class="basemap-window rounded shadow">
+      <div class="basemap-window-content">
         <h3 class="font-semibold mb-2">{{ $t("selectBasemap") }}</h3>
         <label>
           <input
@@ -16,7 +88,7 @@
             :value="{ id: 'custom', style: mapboxStyle }"
             name="basemap"
             v-model="selectedBasemap"
-            @change="emitBasemap"
+            @change="emitBasemapChange"
           />
           {{ $t("yourMapboxStyleDefault") }}
         </label>
@@ -29,7 +101,7 @@
             }"
             name="basemap"
             v-model="selectedBasemap"
-            @change="emitBasemap"
+            @change="emitBasemapChange"
           />
           {{ $t("mapboxSatelliteUpTo2019") }}
         </label>
@@ -42,7 +114,7 @@
             }"
             name="basemap"
             v-model="selectedBasemap"
-            @change="emitBasemap"
+            @change="emitBasemapChange"
           />
           {{ $t("mapboxStreets") }}
         </label>
@@ -52,13 +124,13 @@
             :value="{ id: 'planet', monthYear: monthYear }"
             name="basemap"
             v-model="selectedBasemap"
-            @change="emitBasemap"
+            @change="emitBasemapChange"
           />
           {{ $t("planetMonthlyVisualBasemap") }}
         </label>
         <label v-if="selectedBasemap.id === 'planet'">
           <Datepicker
-            v-model="monthYear"
+            v-model:value="monthYear"
             format="YYYY-MM"
             value-type="YYYY-MM"
             type="month"
@@ -72,78 +144,6 @@
     </div>
   </div>
 </template>
-
-<script>
-// @ts-ignore
-import Datepicker from "vue2-datepicker";
-import "vue2-datepicker/index.css";
-
-export default {
-  name: "BasemapSelector",
-  components: {
-    Datepicker,
-  },
-  props: ["mapboxStyle", "planetApiKey"],
-  data() {
-    return {
-      monthYear: this.maxMonth,
-      minMonth: "2020-09", // The first month we have Planet NICFI monthly basemaps
-      showModal: false,
-      selectedBasemap: { id: "custom", style: this.mapboxStyle },
-    };
-  },
-  computed: {
-    maxMonth() {
-      // If the current day is less than or equal to 15, maxMonth is two months ago.
-      // Otherwise, maxMonth is the previous  month.
-      // This is because Planet NICFI monthly basemaps for the previous month are published on the 15th of each month.
-      const date = new Date();
-      if (date.getDate() <= 15) {
-        date.setMonth(date.getMonth() - 2);
-      } else {
-        date.setMonth(date.getMonth() - 1);
-      }
-      const year = date.getFullYear();
-      let month = date.getMonth() + 1;
-      month = month < 10 ? `0${month}` : month;
-      return `${year}-${month}`;
-    },
-  },
-  methods: {
-    toggleModal() {
-      this.showModal = !this.showModal;
-    },
-    emitBasemap() {
-      this.$emit("basemapSelected", this.selectedBasemap);
-    },
-    setPlanetDateRange(date) {
-      // minMonth and maxMonth are in format YYYY-MM, but date is a Date object
-      // so we need to convert it to a string in the same format
-      date = date.toISOString().slice(0, 7);
-      return date < this.minMonth || date > this.maxMonth;
-    },
-    updatePlanetBasemap() {
-      if (this.selectedBasemap.id === "planet") {
-        this.selectedBasemap.monthYear = this.monthYear;
-        this.emitBasemap();
-      }
-    },
-  },
-  watch: {
-    selectedBasemap(newVal, oldVal) {
-      // Update the monthYear when the planet basemap is selected
-      if (newVal.id === "planet" && newVal !== oldVal) {
-        this.monthYear = this.maxMonth;
-      }
-    },
-    monthYear(newVal, oldVal) {
-      if (this.selectedBasemap.id === "planet") {
-        this.updatePlanetBasemap();
-      }
-    },
-  },
-};
-</script>
 
 <style scoped>
 .basemap-toggle {
@@ -169,7 +169,7 @@ export default {
   background-color: #fff44f;
 }
 
-.modal {
+.basemap-window {
   position: absolute;
   right: 50px;
   top: 147px;
@@ -180,12 +180,12 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.modal-content {
+.basemap-window-content {
   display: flex;
   flex-direction: column;
 }
 
-.modal h3 {
+.basemap-window h3 {
   margin-top: 0;
 }
 

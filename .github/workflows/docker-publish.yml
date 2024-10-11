@@ -30,12 +30,14 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: communityfirst/guardianconnector-views
+      - name: Run tests
+        run: npm install && npm run test
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: linux/amd64
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}
@@ -52,22 +54,18 @@ jobs:
     #   - name: Test run of Docker image
     #     run: |
     #       docker run --rm \
-    #         -e DATABASE="your_db_location" \
-    #         -e DATABASE="your_db_location"
-    #         -e DB_HOST="localhost"
-    #         -e DB_USER="your_db_user"
-    #         -e DB_PASSWORD="your_db_password"
-    #         -e DB_PORT="5432"
-    #         -e DB_SSL="true"
-    #         -e SQLITE_DB_PATH="./sql.db"
-    #         -e PORT="8080"
+    #         -e NUXT_DATABASE="your_db_location"
+    #         -e NUXT_DB_HOST="localhost"
+    #         -e NUXT_DB_USER="your_db_user"
+    #         -e NUXT_DB_PASSWORD="your_db_password"
+    #         -e NUXT_DB_PORT="5432"
+    #         -e NUXT_DB_SSL="true"
+    #         -e NUXT_SQLITE_DB_PATH="./sql.db"
+    #         -e NUXT_PORT="8080"
     #         -e NUXT_ENV_AUTH_STRATEGY="none" 
-    #         -e PASSWORD="guardian-connector"
-    #         -e SECRET_JWT_KEY="secret-jwt-key"
-    #         -e NUXT_ENV_AUTH0_DOMAIN="domain.us.auth0.com"
-    #         -e NUXT_ENV_AUTH0_CLIENT_ID=""
-    #         -e NUXT_ENV_AUTH0_CLIENT_SECRET=""
-    #         -e NUXT_ENV_AUTH0_AUDIENCE="https://audience.auth0.com/api/v2/"
-    #         -e NUXT_ENV_AUTH0_BASE_URL='http://localhost:3000'
-    #         -e VUE_APP_API_KEY=""
+    #         -e NUXT_OAUTH_AUTH0_DOMAIN="domain.us.auth0.com"
+    #         -e NUXT_OAUTH_AUTH0_CLIENT_ID=""
+    #         -e NUXT_OAUTH_AUTH0_CLIENT_SECRET=""
+    #         -e NUXT_PUBLIC_BASE_URL='http://localhost:3000'
+    #         -e NUXT_PUBLIC_APP_API_KEY=""
     #           ${{ steps.meta.outputs.tags }}

@@ -1,8 +1,117 @@
+<script setup>
+import { ref, computed, onMounted } from "vue";
+
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  isMinimized: Boolean,
+});
+
+const emit = defineEmits([
+  "submitConfig",
+  "removeTableFromConfig",
+  "toggleMinimize",
+]);
+
+// Set keys for the different sections of the config
+const views = ref([]);
+const viewsKeys = computed(() => ["VIEWS"]);
+const mapConfigKeys = computed(() => [
+  "MAPBOX_STYLE",
+  "MAPBOX_ACCESS_TOKEN",
+  "MAPBOX_ZOOM",
+  "MAPBOX_CENTER_LATITUDE",
+  "MAPBOX_CENTER_LONGITUDE",
+  "MAPBOX_PROJECTION",
+  "MAPBOX_BEARING",
+  "MAPBOX_PITCH",
+  "MAPBOX_3D",
+  "MAP_LEGEND_LAYER_IDS",
+  "PLANET_API_KEY",
+]);
+const mediaKeys = computed(() => ["MEDIA_BASE_PATH", "MEDIA_BASE_PATH_ALERTS"]);
+const alertKeys = computed(() => ["MAPEO_CATEGORY_IDS", "MAPEO_TABLE"]);
+const filterKeys = computed(() => [
+  "FILTER_OUT_VALUES_FROM_COLUMN",
+  "FRONT_END_FILTER_COLUMN",
+  "UNWANTED_COLUMNS",
+  "UNWANTED_SUBSTRINGS",
+]);
+const otherKeys = computed(() => ["LOGO_URL"]);
+
+// On mounted, set localConfig to props.config
+const originalConfig = ref(null);
+const localConfig = ref({});
+onMounted(() => {
+  if (props.config) {
+    localConfig.value = JSON.parse(JSON.stringify(props.config));
+  }
+  originalConfig.value = JSON.parse(JSON.stringify(localConfig.value));
+  views.value = localConfig.value?.VIEWS
+    ? localConfig.value.VIEWS.split(",")
+    : [];
+});
+
+// Form validations and helpers
+const isChanged = computed(() => {
+  const localConfigFiltered = Object.fromEntries(
+    Object.entries(localConfig.value).filter(([value]) => value !== ""),
+  );
+  const originalConfigFiltered = Object.fromEntries(
+    Object.entries(originalConfig.value).filter(([value]) => value !== ""),
+  );
+  return (
+    JSON.stringify(localConfigFiltered) !==
+    JSON.stringify(originalConfigFiltered)
+  );
+});
+
+const isFormValid = computed(() => {
+  const isMapConfigValid = shouldShowConfigMap.value
+    ? localConfig.value.MAPBOX_ACCESS_TOKEN?.trim() !== "" &&
+      localConfig.value.MAPBOX_ACCESS_TOKEN != null
+    : true;
+
+  return isMapConfigValid;
+});
+
+const shouldShowConfigMap = computed(() => hasView(["alerts", "map"]));
+const shouldShowConfigMedia = computed(() =>
+  hasView(["map", "gallery", "alerts"]),
+);
+const shouldShowConfigAlerts = computed(() => hasView(["alerts"]));
+const shouldShowConfigFilters = computed(() => hasView(["map", "gallery"]));
+const shouldShowConfigOther = computed(() =>
+  hasView(["map", "gallery", "alerts"]),
+);
+
+const hasView = (viewsArray) => {
+  return viewsArray.some((view) => views.value.includes(view));
+};
+
+// Handlers for updating config and form submission
+const handleViewUpdate = (newViews) => {
+  views.value = newViews;
+  localConfig.value.VIEWS = newViews.join(",");
+};
+
+const handleConfigUpdate = (newConfig) => {
+  localConfig.value = newConfig;
+};
+
+const handleSubmit = () => {
+  emit("submitConfig", {
+    tableName: props.tableName,
+    config: localConfig.value,
+  });
+};
+</script>
+
 <template>
   <div class="table-item card">
     <h2 class="card-header">
       <p class="table-name">{{ tableName }}</p>
-      <button class="hamburger" @click="$emit('toggle-minimize', tableName)">
+      <button class="hamburger" @click="$emit('toggleMinimize', { tableName })">
         ☰
       </button>
     </h2>
@@ -13,7 +122,7 @@
           :config="localConfig"
           :views="views"
           :keys="viewsKeys"
-          @update:views="updateViews"
+          @update:views="handleViewUpdate"
         />
         <ConfigMap
           v-if="shouldShowConfigMap"
@@ -21,6 +130,7 @@
           :views="views"
           :config="localConfig"
           :keys="mapConfigKeys"
+          @updateConfig="handleConfigUpdate"
         />
         <ConfigMedia
           v-if="shouldShowConfigMedia"
@@ -28,6 +138,7 @@
           :views="views"
           :config="localConfig"
           :keys="mediaKeys"
+          @updateConfig="handleConfigUpdate"
         />
         <ConfigAlerts
           v-if="shouldShowConfigAlerts"
@@ -35,6 +146,7 @@
           :views="views"
           :config="localConfig"
           :keys="alertKeys"
+          @updateConfig="handleConfigUpdate"
         />
         <ConfigFilters
           v-if="shouldShowConfigFilters"
@@ -42,6 +154,7 @@
           :views="views"
           :config="localConfig"
           :keys="filterKeys"
+          @updateConfig="handleConfigUpdate"
         />
         <ConfigOther
           v-if="shouldShowConfigOther"
@@ -49,6 +162,7 @@
           :views="views"
           :config="localConfig"
           :keys="otherKeys"
+          @updateConfig="handleConfigUpdate"
         />
         <button
           type="submit"
@@ -60,14 +174,14 @@
               'bg-blue-500 hover:bg-blue-700': isChanged && isFormValid,
             },
           ]"
-          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mb-2 md:mb-0"
+          class="text-white font-bold py-2 px-4 rounded transition-colors duration-200 mr-2 mb-2 md:mb-0"
         >
           {{ $t("submit") }}
         </button>
         <button
           type="button"
-          class="remove-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200 md:ml-2 ml-0"
-          @click="$emit('remove-table-from-config', tableName)"
+          class="remove-button text-white font-bold bg-red-500 hover:bg-red-700 py-2 px-4 rounded transition-colors duration-200"
+          @click="$emit('removeTableFromConfig', tableName)"
         >
           {{ $t("removeTable") }}
         </button>
@@ -75,135 +189,6 @@
     </div>
   </div>
 </template>
-
-<script>
-import ConfigViews from "./ConfigViews.vue";
-import ConfigMap from "./ConfigMap.vue";
-import ConfigMedia from "./ConfigMedia.vue";
-import ConfigAlerts from "./ConfigAlerts.vue";
-import ConfigFilters from "./ConfigFilters.vue";
-import ConfigOther from "./ConfigOther.vue";
-
-export default {
-  props: {
-    tableName: String,
-    config: Object,
-    isMinimized: Boolean,
-  },
-  components: {
-    ConfigViews,
-    ConfigMap,
-    ConfigMedia,
-    ConfigAlerts,
-    ConfigFilters,
-    ConfigOther,
-  },
-  data() {
-    return {
-      localConfig: {},
-      originalConfig: null,
-      views: [],
-    };
-  },
-  mounted() {
-    if (this.config) {
-      this.localConfig = JSON.parse(JSON.stringify(this.config));
-    }
-    this.originalConfig = JSON.parse(JSON.stringify(this.localConfig));
-    this.views = this.localConfig?.VIEWS
-      ? this.localConfig.VIEWS.split(",")
-      : [];
-  },
-  computed: {
-    viewsKeys() {
-      return ["VIEWS"];
-    },
-    mapConfigKeys() {
-      return [
-        "MAPBOX_STYLE",
-        "MAPBOX_ACCESS_TOKEN",
-        "MAPBOX_ZOOM",
-        "MAPBOX_CENTER_LATITUDE",
-        "MAPBOX_CENTER_LONGITUDE",
-        "MAPBOX_PROJECTION",
-        "MAPBOX_BEARING",
-        "MAPBOX_PITCH",
-        "MAPBOX_3D",
-        "MAP_LEGEND_LAYER_IDS",
-        "PLANET_API_KEY",
-      ];
-    },
-    mediaKeys() {
-      return ["MEDIA_BASE_PATH", "MEDIA_BASE_PATH_ALERTS"];
-    },
-    alertKeys() {
-      return ["MAPEO_CATEGORY_IDS", "MAPEO_TABLE"];
-    },
-    filterKeys() {
-      return [
-        "FILTER_OUT_VALUES_FROM_COLUMN",
-        "FRONT_END_FILTER_COLUMN",
-        "UNWANTED_COLUMNS",
-        "UNWANTED_SUBSTRINGS",
-      ];
-    },
-    otherKeys() {
-      return ["LOGO_URL"];
-    },
-    isChanged() {
-      const localConfigFiltered = Object.fromEntries(
-        Object.entries(this.localConfig).filter(([key, value]) => value !== ""),
-      );
-      const originalConfigFiltered = Object.fromEntries(
-        Object.entries(this.originalConfig).filter(
-          ([key, value]) => value !== "",
-        ),
-      );
-      return (
-        JSON.stringify(localConfigFiltered) !==
-        JSON.stringify(originalConfigFiltered)
-      );
-    },
-    isFormValid() {
-      // Validations for required fields
-      const isMapConfigValid = this.shouldShowConfigMap
-        ? this.localConfig.MAPBOX_ACCESS_TOKEN?.trim() !== "" &&
-          this.localConfig.MAPBOX_ACCESS_TOKEN != null
-        : true;
-
-      return isMapConfigValid;
-    },
-    shouldShowConfigMap() {
-      return this.hasView(["alerts", "map"]);
-    },
-    shouldShowConfigMedia() {
-      return this.hasView(["map", "gallery", "alerts"]);
-    },
-    shouldShowConfigAlerts() {
-      return this.hasView(["alerts"]);
-    },
-    shouldShowConfigFilters() {
-      return this.hasView(["map", "gallery"]);
-    },
-    shouldShowConfigOther() {
-      return this.hasView(["map", "gallery", "alerts"]);
-    },
-  },
-  methods: {
-    hasView(views) {
-      return views.some((view) => this.views.includes(view));
-    },
-    handleSubmit() {
-      // this.originalConfig = JSON.parse(JSON.stringify(this.localConfig));
-      this.$emit("submit-config", this.tableName, this.localConfig);
-    },
-    updateViews(newViews) {
-      this.views = newViews;
-      this.localConfig.VIEWS = newViews.join(",");
-    },
-  },
-};
-</script>
 
 <style>
 .table-item.card {

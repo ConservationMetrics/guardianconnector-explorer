@@ -1,10 +1,40 @@
+<script setup>
+import { ref, watch, onMounted } from "vue";
+import VueSlider from "vue-3-slider-component";
+
+const props = defineProps({
+  dateOptions: Array,
+});
+
+// Set selected range to the first and last date options
+onMounted(() => {
+  if (props.dateOptions && props.dateOptions.length > 0) {
+    selectedRange.value = [
+      props.dateOptions[0],
+      props.dateOptions[props.dateOptions.length - 1],
+    ];
+  }
+});
+
+// Emit date range changes if user has interacted with the slider
+const selectedRange = ref([]);
+const userInteracted = ref(false);
+const emit = defineEmits(["date-range-changed"]);
+
+watch(selectedRange, (newRange) => {
+  if (userInteracted.value) {
+    emit("date-range-changed", newRange);
+  }
+});
+</script>
+
 <template>
   <div class="mt-4 mb-10">
     <h3 class="text-2xl font-semibold mb-2">
       {{ $t("selectAlertDateRange") }}
     </h3>
     <div class="mb-6">
-      <vue-slider
+      <VueSlider
         class="date-slider"
         v-model="selectedRange"
         :contained="true"
@@ -19,40 +49,3 @@
     </div>
   </div>
 </template>
-
-<script>
-// This specific pattern of importing vue-slider-component follows the official
-// documentation for server-side rendering: https://nightcatsama.github.io/vue-slider-component/#/
-import VueSlider from "vue-slider-component/dist-css/vue-slider-component.umd.min.js";
-import "vue-slider-component/dist-css/vue-slider-component.css";
-import "vue-slider-component/theme/default.css";
-
-export default {
-  name: "AlertSlider",
-  props: ["dateOptions"],
-  components: { VueSlider },
-  data() {
-    return {
-      selectedRange: [],
-      userInteracted: false,
-    };
-  },
-  created() {
-    if (this.dateOptions && this.dateOptions.length > 0) {
-      this.selectedRange = [
-        this.dateOptions[0],
-        this.dateOptions[this.dateOptions.length - 1],
-      ];
-    }
-  },
-  watch: {
-    selectedRange(newRange) {
-      if (this.userInteracted) {
-        this.$emit("date-range-changed", newRange);
-      }
-    },
-  },
-};
-</script>
-
-<style scoped></style>

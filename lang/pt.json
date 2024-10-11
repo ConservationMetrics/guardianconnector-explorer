@@ -35,7 +35,7 @@
   "filterOutValuesFromColumn": "Quais valores filtrar da coluna",
   "frontEndFilterColumn": "Coluna para filtrar valores",
   "gallery": "Galeria",
-  "galleryNotAvailable": "A galeria de visualizações do GuardianConnector não está disponível. Por favor, ative a incorporação de mídia",
+  "galleryNotAvailable": "A galeria do GuardianConnector Explorer não está disponível. Por favor, ative a incorporação de mídia",
   "geocoordinates": "Coordenadas",
   "geographicCentroid": "Centróide geográfico",
   "geotype": "Tipo de geometria",

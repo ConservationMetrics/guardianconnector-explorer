@@ -1,13 +1,7 @@
-<template>
-  <div class="mt-4">
-    <h3 class="text-2xl font-semibold mb-2">{{ $t("alertsLast12Months") }}</h3>
-    <div class="mb-2">
-      <LineChart :data="chartData" />
-    </div>
-  </div>
-</template>
+<script setup>
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-<script>
 import { Line as LineChart } from "vue-chartjs";
 import {
   Chart,
@@ -30,34 +24,43 @@ Chart.register(
   LinearScale,
 );
 
-export default {
-  name: "AlertsChart",
-  props: ["statistics", "calculateHectares"],
-  components: { LineChart },
-  computed: {
-    chartData() {
-      // Determine which dataset to use based on the calculateHectares prop
-      const dataKey = this.calculateHectares
-        ? "hectaresPerMonth"
-        : "alertsPerMonth";
-      const label = this.calculateHectares
-        ? this.$t("hectaresPerMonth")
-        : this.$t("numberOfAlerts");
+const { t } = useI18n();
 
-      return {
-        labels: Object.keys(this.statistics[dataKey]),
-        datasets: [
-          {
-            backgroundColor: "rgba(0, 0, 0, 0)",
-            borderColor: "#f87979",
-            data: Object.values(this.statistics[dataKey]),
-            fill: false,
-            label: label,
-            pointBackgroundColor: "#f87979",
-          },
-        ],
-      };
-    },
-  },
-};
+const props = defineProps({
+  alertsStatistics: Object,
+  calculateHectares: Boolean,
+});
+
+// Populate chart data
+const chartData = computed(() => {
+  const dataKey = props.calculateHectares
+    ? "hectaresPerMonth"
+    : "alertsPerMonth";
+  const label = props.calculateHectares
+    ? t("hectaresPerMonth")
+    : t("numberOfAlerts");
+
+  return {
+    labels: Object.keys(props.alertsStatistics[dataKey]),
+    datasets: [
+      {
+        backgroundColor: "rgba(0, 0, 0, 0)",
+        borderColor: "#f87979",
+        data: Object.values(props.alertsStatistics[dataKey]),
+        fill: false,
+        label: label,
+        pointBackgroundColor: "#f87979",
+      },
+    ],
+  };
+});
 </script>
+
+<template>
+  <div class="mt-4">
+    <h3 class="text-2xl font-semibold mb-2">{{ $t("alertsLast12Months") }}</h3>
+    <div class="mb-2">
+      <LineChart :data="chartData" />
+    </div>
+  </div>
+</template>

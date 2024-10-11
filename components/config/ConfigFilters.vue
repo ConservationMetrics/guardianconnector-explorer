@@ -1,3 +1,55 @@
+<script setup>
+import { ref, reactive, watch } from "vue";
+import { toCamelCase } from "@/utils";
+
+import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
+
+import { updateTags } from "@/composables/useTags";
+
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  views: Array,
+  keys: Array,
+});
+
+const localConfig = reactive({ ...props.config });
+
+// Set up refs for tags field
+const tagInputs = ref({
+  FILTER_OUT_VALUES_FROM_COLUMN: "",
+  UNWANTED_COLUMNS: "",
+  UNWANTED_SUBSTRINGS: "",
+});
+const tags = ref({
+  FILTER_OUT_VALUES_FROM_COLUMN: props.config.FILTER_OUT_VALUES_FROM_COLUMN
+    ? props.config.FILTER_OUT_VALUES_FROM_COLUMN.split(",").map((tag) => ({
+        text: tag,
+      }))
+    : [],
+  UNWANTED_COLUMNS: props.config.UNWANTED_COLUMNS
+    ? props.config.UNWANTED_COLUMNS.split(",").map((tag) => ({
+        text: tag,
+      }))
+    : [],
+  UNWANTED_SUBSTRINGS: props.config.UNWANTED_SUBSTRINGS
+    ? props.config.UNWANTED_SUBSTRINGS.split(",").map((tag) => ({
+        text: tag,
+      }))
+    : [],
+});
+
+// Watch for changes in localConfig and emit updates
+const emit = defineEmits(["updateConfig"]);
+watch(
+  localConfig,
+  (newValue) => {
+    emit("updateConfig", newValue);
+  },
+  { deep: true },
+);
+</script>
+
 <template>
   <div class="config-section">
     <div class="config-header">
@@ -8,7 +60,7 @@
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <input
           :id="`${tableName}-${key}`"
-          v-model="config[key]"
+          v-model="localConfig[key]"
           class="input-field"
         />
       </template>
@@ -21,10 +73,7 @@
       >
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
 
-        <component
-          class="tag-field"
-          :is="isClient ? 'vue-tags-input' : 'div'"
-          v-if="isClient"
+        <VueTagsInput
           v-model="tagInputs[key]"
           :tags="tags[key]"
           @tags-changed="updateTags(key, $event)"
@@ -33,55 +82,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import { toCamelCase } from "@/src/utils.ts";
-export default {
-  props: {
-    tableName: String,
-    config: Object,
-    views: Array,
-    keys: Array,
-  },
-  components: {
-    VueTagsInput: () => import("@johmun/vue-tags-input"),
-  },
-  data() {
-    return {
-      tagInputs: {
-        FILTER_OUT_VALUES_FROM_COLUMN: "",
-        UNWANTED_COLUMNS: "",
-        UNWANTED_SUBSTRINGS: "",
-      },
-      tags: {
-        FILTER_OUT_VALUES_FROM_COLUMN: this.config.FILTER_OUT_VALUES_FROM_COLUMN
-          ? this.config.FILTER_OUT_VALUES_FROM_COLUMN.split(",").map((tag) => ({
-              text: tag,
-            }))
-          : [],
-        UNWANTED_COLUMNS: this.config.UNWANTED_COLUMNS
-          ? this.config.UNWANTED_COLUMNS.split(",").map((tag) => ({
-              text: tag,
-            }))
-          : [],
-        UNWANTED_SUBSTRINGS: this.config.UNWANTED_SUBSTRINGS
-          ? this.config.UNWANTED_SUBSTRINGS.split(",").map((tag) => ({
-              text: tag,
-            }))
-          : [],
-      },
-      isClient: false,
-    };
-  },
-  methods: {
-    toCamelCase: toCamelCase,
-    updateTags(key, newTags) {
-      this.tags[key] = newTags;
-      this.config[key] = newTags.map((tag) => tag.text).join(",");
-    },
-  },
-  mounted() {
-    this.isClient = true;
-  },
-};
-</script>

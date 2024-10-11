@@ -1,3 +1,43 @@
+<script setup>
+import { ref, reactive, watch } from "vue";
+
+import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
+
+import { toCamelCase } from "@/utils";
+import { updateTags } from "@/composables/useTags";
+
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  views: Array,
+  keys: Array,
+});
+
+const localConfig = reactive({ ...props.config });
+
+// Set up refs for tags field
+const tagInputs = ref({
+  MAPEO_CATEGORY_IDS: "",
+});
+const tags = ref({
+  MAPEO_CATEGORY_IDS: props.config.MAPEO_CATEGORY_IDS
+    ? props.config.MAPEO_CATEGORY_IDS.split(",").map((tag) => ({
+        text: tag,
+      }))
+    : [],
+});
+
+// Watch for changes in localConfig and emit updates
+const emit = defineEmits(["updateConfig"]);
+watch(
+  localConfig,
+  (newValue) => {
+    emit("updateConfig", newValue);
+  },
+  { deep: true },
+);
+</script>
+
 <template>
   <div class="config-section">
     <div class="config-header">
@@ -8,15 +48,13 @@
       <template v-if="key === 'MAPEO_TABLE'">
         <input
           :id="`${tableName}-${key}`"
-          v-model="config[key]"
+          v-model="localConfig[key]"
           class="input-field"
         />
       </template>
       <template v-else-if="key === 'MAPEO_CATEGORY_IDS'">
-        <component
-          v-if="isClient"
+        <VueTagsInput
           class="tag-field"
-          :is="isClient ? 'vue-tags-input' : 'div'"
           v-model="tagInputs[key]"
           :tags="tags[key]"
           @tags-changed="updateTags(key, $event)"
@@ -25,43 +63,3 @@
     </div>
   </div>
 </template>
-
-<script>
-import { toCamelCase } from "@/src/utils.ts";
-export default {
-  props: {
-    tableName: String,
-    config: Object,
-    views: Array,
-    keys: Array,
-  },
-  components: {
-    VueTagsInput: () => import("@johmun/vue-tags-input"),
-  },
-  data() {
-    return {
-      tagInputs: {
-        MAPEO_CATEGORY_IDS: "",
-      },
-      tags: {
-        MAPEO_CATEGORY_IDS: this.config.MAPEO_CATEGORY_IDS
-          ? this.config.MAPEO_CATEGORY_IDS.split(",").map((tag) => ({
-              text: tag,
-            }))
-          : [],
-      },
-      isClient: false,
-    };
-  },
-  methods: {
-    toCamelCase: toCamelCase,
-    updateTags(key, newTags) {
-      this.tags[key] = newTags;
-      this.config[key] = newTags.map((tag) => tag.text).join(",");
-    },
-  },
-  mounted() {
-    this.isClient = true;
-  },
-};
-</script>

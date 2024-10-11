@@ -1,155 +1,88 @@
+<script setup>
+import { ref } from "vue";
+import { useHead, useFetch, useRuntimeConfig } from "#app";
+import { useI18n } from "vue-i18n";
+
+// Refs to store the fetched data
+const viewsConfig = ref([]);
+const tableNames = ref([]);
+const dataFetched = ref(false);
+
+// API request to fetch the data
+const {
+  public: { appApiKey },
+} = useRuntimeConfig();
+const headers = {
+  "x-api-key": appApiKey,
+};
+const { data, error } = await useFetch("/api/config", {
+  headers,
+});
+
+if (data.value && !error.value) {
+  viewsConfig.value = data.value[0];
+  tableNames.value = data.value[1];
+  dataFetched.value = true;
+} else {
+  console.error("Error fetching data:", error.value);
+}
+
+// POST request to submit the updated config
+const submitConfig = async ({ config, tableName }) => {
+  try {
+    // eslint-disable-next-line no-undef
+    await $fetch(`/api/config/update_config/${tableName}`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(config),
+    });
+  } catch (error) {
+    console.error("Error submitting request data:", error);
+  }
+};
+
+// POST request to remove a table from the config
+const removeTableFromConfig = async (tableName) => {
+  try {
+    // eslint-disable-next-line no-undef
+    await $fetch(`/api/config/delete_table/${tableName}`, {
+      method: "POST",
+      headers,
+    });
+  } catch (error) {
+    console.error("Error removing table from config:", error);
+  }
+};
+
+// POST request to add a table to the config
+const addTableToConfig = async (tableName) => {
+  try {
+    // eslint-disable-next-line no-undef
+    await $fetch(`/api/config/new_table/${tableName}`, {
+      method: "POST",
+      headers,
+    });
+  } catch (error) {
+    console.error("Error adding table to config:", error);
+  }
+};
+
+const { t } = useI18n();
+useHead({
+  title: "GuardianConnector Explorer: " + t("configuration"),
+});
+</script>
+
 <template>
   <div>
-    <Config
-      v-if="dataFetched"
-      :views-config="viewsConfig"
-      :table-names="tableNames"
-      @submit-config="submitConfig"
-      @remove-table-from-config="removeTableFromConfig"
-      @add-table-to-config="addTableToConfig"
-    />
+    <ClientOnly>
+      <ConfigDashboard
+        v-if="dataFetched"
+        :views-config="viewsConfig"
+        :table-names="tableNames"
+        @submitConfig="submitConfig"
+        @removeTableFromConfig="removeTableFromConfig"
+        @addTableToConfig="addTableToConfig"
+    /></ClientOnly>
   </div>
 </template>
-
-<script>
-import axios from "axios";
-import Config from "~/components/Config.vue";
-
-export default {
-  head() {
-    return {
-      title: "GuardianConnector Views: " + this.$t("configuration"),
-    };
-  },
-  components: { Config },
-  async asyncData({ $axios, app }) {
-    // Set up the headers for the request
-    let headers = {
-      "x-api-key": app.$config.apiKey.replace(/['"]+/g, ""),
-      "x-auth-strategy": app.$auth.strategy.name,
-    };
-
-    // If the authentication strategy is 'local', include the token in the headers
-    if (app.$auth.strategy.name === "local") {
-      const token = app.$auth.strategy.token.get();
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-    try {
-      const response = await $axios.get("/api/config", { headers });
-
-      // Check if the response is OK
-      if (response.status !== 200) {
-        throw new Error("Network response was not ok");
-      }
-
-      // Set the viewsConfig data
-      return {
-        viewsConfig: response.data[0],
-        tableNames: response.data[1],
-        dataFetched: true,
-      };
-    } catch (error) {
-      console.error("Error fetching views config from API:", error);
-      return {
-        dataFetched: false,
-      };
-    }
-  },
-  data() {
-    return {
-      viewsConfig: {},
-      tableNames: [],
-      dataFetched: false,
-    };
-  },
-  methods: {
-    async submitConfig(tableName, config) {
-      try {
-        // Set up the headers for the request
-        let headers = {
-          "x-api-key": this.$config.apiKey.replace(/['"]+/g, ""),
-          "x-auth-strategy": this.$auth.strategy.name,
-        };
-
-        // If the authentication strategy is 'local', include the token in the headers
-        if (this.$auth.strategy.name === "local") {
-          const token = this.$auth.strategy.token.get();
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        // Make the API call using Axios
-        const response = await axios.post(`/api/config/${tableName}`, config, {
-          headers,
-        });
-
-        // Check if the response is OK
-        if (response.status !== 200) {
-          throw new Error("Network response was not ok");
-        }
-      } catch (error) {
-        console.error("Error updating config:", error);
-      }
-    },
-    async addTableToConfig(tableName) {
-      try {
-        // Set up the headers for the request
-        let headers = {
-          "x-api-key": this.$config.apiKey.replace(/['"]+/g, ""),
-          "x-auth-strategy": this.$auth.strategy.name,
-        };
-
-        // If the authentication strategy is 'local', include the token in the headers
-        if (this.$auth.strategy.name === "local") {
-          const token = this.$auth.strategy.token.get();
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        // Make the API call using Axios
-        const response = await axios.post(
-          `/api/config/new-table/${tableName}`,
-          {
-            tableName,
-          },
-          {
-            headers,
-          },
-        );
-
-        // Check if the response is OK
-        if (response.status !== 200) {
-          throw new Error("Network response was not ok");
-        }
-      } catch (error) {
-        console.error("Error adding table to config:", error);
-      }
-    },
-    async removeTableFromConfig(tableName) {
-      try {
-        // Set up the headers for the request
-        let headers = {
-          "x-api-key": this.$config.apiKey.replace(/['"]+/g, ""),
-          "x-auth-strategy": this.$auth.strategy.name,
-        };
-
-        // If the authentication strategy is 'local', include the token in the headers
-        if (this.$auth.strategy.name === "local") {
-          const token = this.$auth.strategy.token.get();
-          headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        // Make the API call using Axios
-        const response = await axios.delete(`/api/config/${tableName}`, {
-          headers,
-        });
-
-        // Check if the response is OK
-        if (response.status !== 200) {
-          throw new Error("Network response was not ok");
-        }
-      } catch (error) {
-        console.error("Error removing table from config:", error);
-      }
-    },
-  },
-};
-</script>

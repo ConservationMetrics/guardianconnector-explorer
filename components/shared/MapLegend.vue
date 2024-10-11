@@ -1,3 +1,51 @@
+<script setup>
+import { ref, watch, onMounted } from "vue";
+
+const props = defineProps({
+  mapLegendContent: Array,
+  resetLegend: Boolean,
+});
+
+const emit = defineEmits(["toggle-layer-visibility"]);
+
+const localMapLegendContent = ref([]);
+
+onMounted(() => {
+  // Ensure all items are visible initially
+  localMapLegendContent.value = props.mapLegendContent.map((item) => ({
+    ...item,
+    visible: true,
+  }));
+});
+
+// Layer visibility toggles
+const toggleLayerVisibility = (item) => {
+  emit("toggle-layer-visibility", item);
+};
+
+const resetLegendVisibility = () => {
+  localMapLegendContent.value = localMapLegendContent.value.map((item) => ({
+    ...item,
+    visible: true,
+  }));
+};
+
+// Get the class for the geometry type
+const getTypeClass = (item) => {
+  return `${item.type}-box`;
+};
+
+// Watch for changes in the resetLegend prop
+watch(
+  () => props.resetLegend,
+  (newVal) => {
+    if (newVal) {
+      resetLegendVisibility();
+    }
+  },
+);
+</script>
+
 <template>
   <div class="map-legend feature p-4 rounded-lg shadow-lg">
     <h2 class="text-2xl font-semibold mb-2">{{ $t("mapLegend") }}</h2>
@@ -34,42 +82,6 @@
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  props: ["mapLegendContent"],
-  data() {
-    return {
-      localMapLegendContent: [],
-    };
-  },
-  created() {
-    // Ensure all items are visible initially
-    this.localMapLegendContent = this.mapLegendContent.map((item) => ({
-      ...item,
-      visible: true,
-    }));
-    this.$root.$on("reset-legend-visibility", this.resetLegendVisibility);
-  },
-  methods: {
-    getTypeClass(item) {
-      return `${item.type}-box`;
-    },
-    toggleLayerVisibility(item) {
-      this.$emit("toggle-layer-visibility", item);
-    },
-    resetLegendVisibility() {
-      this.localMapLegendContent = this.localMapLegendContent.map((item) => ({
-        ...item,
-        visible: true,
-      }));
-    },
-  },
-  beforeDestroy() {
-    this.$root.$off("reset-legend-visibility", this.resetLegendVisibility);
-  },
-};
-</script>
 
 <style scoped>
 .map-legend {

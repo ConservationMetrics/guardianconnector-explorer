@@ -20,12 +20,16 @@ Prefer short-lived feature branches.
   the long-running feature branch (instead of review when merging the long-running branch to
   `main`)
 
-## Committing code
+## GitHub Issues & Labels
+
+Create new Github Issues using the templates wherever possible.
+
+## PR Review & Committing code
 
 Multiple commits or PRs can be created for an Issue. e.g. each implementation step might get its own PR.
 
-Code review is not required, but is encouraged as a powerful tool for learning.  Benefits include:
-- Spread knowledge of the code base throughout the team.
+Code review is encouraged as a powerful tool for learning.  Benefits include
+- Spread knowledge of the code base throughout the team: reviewing code is a remarkably effective way to learn the codebase.
 - Expose everyone to different approaches.
 - Ensure code is readable (and therefore maintainable).
 - Yield better software (but ultimately the responsibility
@@ -35,7 +39,50 @@ Code review is not limited to approval/rejection of PRs. Also consider involving
 earlier in the process, before the code is finished.  Ask them for a narrower review—e.g., a
 design review or to focus on a specific part of the code change.
 
+As a reviewer:
+- be kind & helpful, but do not be "nice" for the sake of avoiding conflict.
+- "I find this very hard to follow" is valid feedback, even if the code's behavior is technically correct.
+- Ability for code review to find defects diminishes with longer PRs: Feel free to reject any
+  review that adds more than 400 lines of new code. (no upper limit on deletions!)
+
 Merging branches and PRs to `main`:
-- Code should be merged by the branch author, unless a merge is urgently needed.
-- Merge PRs via 'Squash and Merge' option in GitHub.
+- The branch author should be the one to merge.
+- Merge PRs via 'Merge Commit' option in GitHub.
 - Delete a branch when you are done with it.
+
+# Tests
+
+## Testing Strategy
+
+Keep the test suite
+* **complete**: every feature needs a test.
+* **focused**: test behavior, not implementation.
+* **stable**: tests should be deterministic and fully repeatable.
+* **fast**: no sleeps, no time-based tests.
+
+## Test Frameworks
+
+For testing Nuxt.js and Vue, use `@nuxt/test-utils` + `@vue/test-utils` with `vitest`.
+See the [Nuxt documentation on testing](https://nuxt.com/docs/getting-started/testing).
+
+# Coding & Documentation Style
+
+## Prettier & ESLint for JavaScript, JSON, & SCSS
+
+All developers are expected to use [prettier](https://prettier.io/) to format their JavaScript, TypeScript, Vue, JSON and SCSS
+code. [Configuration](https://prettier.io/docs/en/configuration.html) lives in [`.prettierrc`](admin_ui/.prettierrc)
+
+> To apply Prettier autoformatting you can configure your text editor to format on save [according
+> to these docs](https://prettier.io/docs/en/editors.html)
+> - For VS Code, set `editor.formatOnSave` to true in your editor config.
+> or in a pre-commit hook [according to these docs](https://prettier.io/docs/en/precommit.html).
+
+ESLint helps identify problematic patterns found in JavaScript code. The
+[configuration](https://eslint.org/docs/user-guide/configuring) lives in [`eslint.config.js`](admin_ui/eslint.config.js)
+
+> Follow [ESLint Getting Started](https://eslint.org/docs/user-guide/getting-started).
+> To configure ESLint in VS Code, create a `.vscode/settings.json` in the project's root and add
+> ```
+>    "eslint.nodePath": "/home/\${user}/dev/nosh-by-gosh/client/node_modules",
+>    "eslint.workingDirectories": ["client"]
+> ```

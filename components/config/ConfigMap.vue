@@ -1,3 +1,43 @@
+<script setup>
+import { ref, reactive, watch } from "vue";
+
+import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
+
+import { toCamelCase } from "@/utils";
+import { updateTags } from "@/composables/useTags";
+
+const props = defineProps({
+  tableName: String,
+  config: Object,
+  views: Array,
+  keys: Array,
+});
+
+const localConfig = reactive({ ...props.config });
+
+// Set up refs for tags field
+const tagInputs = ref({
+  MAP_LEGEND_LAYER_IDS: "",
+});
+const tags = ref({
+  MAP_LEGEND_LAYER_IDS: props.config.MAP_LEGEND_LAYER_IDS
+    ? props.config.MAP_LEGEND_LAYER_IDS.split(",").map((tag) => ({
+        text: tag,
+      }))
+    : [],
+});
+
+// Watch for changes in localConfig and emit updates
+const emit = defineEmits(["updateConfig"]);
+watch(
+  localConfig,
+  (newValue) => {
+    emit("updateConfig", newValue);
+  },
+  { deep: true },
+);
+</script>
+
 <template>
   <div class="config-section">
     <div class="config-header">
@@ -8,7 +48,7 @@
         <label :for="`${tableName}-${key}`">{{ $t("mapboxStyle") }}</label>
         <input
           :id="`${tableName}-${key}`"
-          v-model="config[key]"
+          v-model="localConfig[key]"
           class="input-field"
           pattern="^mapbox:\/\/styles\/[^\/]+\/[^\/]+$"
           placeholder="mapbox://styles/user/styleId"
@@ -23,7 +63,7 @@
         >
         <input
           :id="`${tableName}-${key}`"
-          v-model="config[key]"
+          v-model="localConfig[key]"
           class="input-field"
           pattern="^pk\.ey.*"
           placeholder="pk.ey…"
@@ -42,7 +82,7 @@
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <input
           :id="`${tableName}-${key}`"
-          v-model="config[key]"
+          v-model="localConfig[key]"
           class="input-field"
           type="number"
           step="any"
@@ -78,7 +118,7 @@
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <select
           :id="`${tableName}-${key}`"
-          v-model="config[key]"
+          v-model="localConfig[key]"
           class="input-field"
         >
           <option value="mercator">Mercator</option>
@@ -97,17 +137,15 @@
           <input
             type="checkbox"
             :id="`${tableName}-${key}`"
-            v-model="config[key]"
+            v-model="localConfig[key]"
           />
           {{ $t("enable") }}
         </label>
       </template>
       <template v-else-if="key === 'MAP_LEGEND_LAYER_IDS'">
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
-        <component
+        <VueTagsInput
           class="tag-field"
-          :is="isClient ? 'vue-tags-input' : 'div'"
-          v-if="isClient"
           v-model="tagInputs[key]"
           :tags="tags[key]"
           @tags-changed="updateTags(key, $event)"
@@ -117,51 +155,10 @@
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <input
           :id="`${tableName}-${key}`"
-          v-model="config[key]"
+          v-model="localConfig[key]"
           class="input-field"
         />
       </template>
     </div>
   </div>
 </template>
-
-<script>
-import { toCamelCase } from "@/src/utils.ts";
-
-export default {
-  props: {
-    tableName: String,
-    config: Object,
-    views: Array,
-    keys: Array,
-  },
-  components: {
-    VueTagsInput: () => import("@johmun/vue-tags-input"),
-  },
-  data() {
-    return {
-      tagInputs: {
-        MAP_LEGEND_LAYER_IDS: "",
-      },
-      tags: {
-        MAP_LEGEND_LAYER_IDS: this.config.MAP_LEGEND_LAYER_IDS
-          ? this.config.MAP_LEGEND_LAYER_IDS.split(",").map((tag) => ({
-              text: tag,
-            }))
-          : [],
-      },
-      isClient: false,
-    };
-  },
-  methods: {
-    toCamelCase: toCamelCase,
-    updateTags(key, newTags) {
-      this.tags[key] = newTags;
-      this.config[key] = newTags.map((tag) => tag.text).join(",");
-    },
-  },
-  mounted() {
-    this.isClient = true;
-  },
-};
-</script>
