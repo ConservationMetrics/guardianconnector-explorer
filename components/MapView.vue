@@ -117,8 +117,6 @@ const addDataToMap = () => {
     })),
   };
 
-  console.log(geoJsonSource);
-
   // Add the source to the map
   if (!map.value.getSource("data-source")) {
     map.value.addSource("data-source", {
