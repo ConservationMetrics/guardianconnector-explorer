@@ -14,7 +14,7 @@ onMounted(() => {
 
 const { t } = useI18n();
 useHead({
-  title: "Frizzle: " + t("login"),
+  title: "GuardianConnector Explorer: " + t("login"),
 });
 </script>
 
