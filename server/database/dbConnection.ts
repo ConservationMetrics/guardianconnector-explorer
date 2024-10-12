@@ -16,25 +16,6 @@ export const setupDatabaseConnection = async (
 ): Promise<DatabaseConnection> => {
   console.log(`Setting up database connection to ${database}...`);
 
-  if (isConfigDb && !isSqlite) {
-    // Ensure the database is created before connecting
-    const created = await createDatabaseIfNotExists(
-      database as string,
-      defaultDb as string,
-      host,
-      user,
-      password,
-      port,
-      ssl as string,
-    );
-    if (!created) {
-      console.error(
-        `Failed to create or verify the existence of database ${database}`,
-      );
-      return null;
-    }
-  }
-
   if (isSqlite) {
     if (sqliteDbPath === undefined) {
       throw new Error("sqliteDbPath is undefined");
@@ -61,7 +42,7 @@ export const setupDatabaseConnection = async (
       port: parseInt(port, 10),
       ssl: ssl === true ? { rejectUnauthorized: false } : false,
     };
-    const client = new pg.Client(dbConnection);
+    let client = new pg.Client(dbConnection);
 
     try {
       await client.connect();
@@ -76,7 +57,37 @@ export const setupDatabaseConnection = async (
           "Error connecting to the PostgreSQL database: Self-signed certificate issue.",
         );
       } else {
-        console.error("Error connecting to the PostgreSQL database:", error);
+        // Attempt to create the database if connection fails
+        if (isConfigDb) {
+          console.log("Config database does not exist. Attemping to create...");
+          const created = await createDatabaseIfNotExists(
+            database as string,
+            defaultDb as string,
+            host,
+            user,
+            password,
+            port,
+            ssl as string,
+          );
+          if (created) {
+            // Retry connection after creating the database
+            client = new pg.Client(dbConnection);
+            try {
+              await client.connect();
+              console.log(
+                `Connected to the PostgreSQL database: "${database}"`,
+              );
+              return client;
+            } catch (retryError) {
+              console.error("Retry failed:", retryError);
+            }
+          }
+        } else {
+          console.error(
+            `Error connecting to the PostgreSQL database ${database}:`,
+            error,
+          );
+        }
       }
       return null;
     }
