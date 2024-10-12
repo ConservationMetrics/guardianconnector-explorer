@@ -29,7 +29,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: communityfirst/guardianconnector-views
+          images: communityfirst/guardianconnector-explorer
       - name: Run tests
         run: npm install && npm run test
       - name: Build and push Docker image
@@ -41,7 +41,7 @@ jobs:
           push: true
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ${{ github.ref == 'refs/heads/main' && 'communityfirst/guardianconnector-views:latest' || '' }}
+            ${{ github.ref == 'refs/heads/main' && 'communityfirst/guardianconnector-explorer:latest' || '' }}
           labels: ${{ steps.meta.outputs.labels }}
       - name: Docker Hub Description
         if: github.event_name == 'release'
@@ -49,8 +49,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: communityfirst/guardianconnector-views
-          short-description: 'A Nuxt app to visualize GuardianConnector data in different views.'
+          repository: communityfirst/guardianconnector-explorer
+          short-description: 'A Nuxt app to explore GuardianConnector data in different views'
     #   - name: Test run of Docker image
     #     run: |
     #       docker run --rm \
