@@ -640,7 +640,7 @@ const prepareMapLegendContent = () => {
     let mapLegendLayerIds = "";
 
     // Add most-recent-alerts & previous-alerts layers to mapLegendContent
-    mapLegendLayerIds = mapLegendLayerIds.value;
+    mapLegendLayerIds = props.mapLegendLayerIds;
     if (hasLineStrings.value) {
       mapLegendLayerIds =
         "most-recent-alerts-linestring," +

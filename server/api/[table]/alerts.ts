@@ -83,8 +83,6 @@ export default defineEventHandler(async (event: H3Event) => {
       metadata: AlertsMetadata[];
     };
 
-    console.log(metadata);
-
     // Prepare alerts data for the alerts view
     const changeDetectionData = prepareAlertData(mainData);
     const alertsGeojsonData = {

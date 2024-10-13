@@ -61,7 +61,7 @@
   "mapboxStreets": "Mapbox Streets",
   "mapboxStyle": "Mapbox Style",
   "mapeoCategoryIds": "Mapeo Category IDs to show on the alerts map",
-  "mapeoData": "Mapeo Data",
+  "mapeoData": "Mapeo data",
   "mapeoTable": "Name of Mapeo data table",
   "media": "Media",
   "mediaBasePath": "Base path for media",
