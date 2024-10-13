@@ -56,6 +56,13 @@ export const setupDatabaseConnection = async (
         console.error(
           "Error connecting to the PostgreSQL database: Self-signed certificate issue.",
         );
+      } else if (
+        error instanceof Error &&
+        error.message.includes("azure replication users")
+      ) {
+        console.error(
+          "Error connecting to the PostgreSQL database: remaining connection slots are reserved for azure replication users.",
+        );
       } else {
         // Attempt to create the database if connection fails
         if (isConfigDb) {
@@ -80,6 +87,8 @@ export const setupDatabaseConnection = async (
               return client;
             } catch (retryError) {
               console.error("Retry failed:", retryError);
+            } finally {
+              await client.end();
             }
           }
         } else {
@@ -94,39 +103,6 @@ export const setupDatabaseConnection = async (
   }
 };
 
-const checkDatabaseExists = async (
-  database: string,
-  defaultDb: string | undefined,
-  host: string | undefined,
-  user: string | undefined,
-  password: string | undefined,
-  port: string,
-  ssl: boolean | string | undefined,
-): Promise<boolean> => {
-  const client = new pg.Client({
-    user: user,
-    host: host,
-    password: password,
-    port: parseInt(port, 10),
-    ssl: ssl === true ? { rejectUnauthorized: false } : false,
-    database: defaultDb,
-  });
-
-  try {
-    await client.connect();
-    const res = await client.query(
-      `SELECT 1 FROM pg_database WHERE datname = $1`,
-      [database],
-    );
-    return (res.rowCount ?? 0) > 0;
-  } catch (error) {
-    console.error(`Error checking if database ${database} exists:`, error);
-    return false;
-  } finally {
-    await client.end();
-  }
-};
-
 const createDatabaseIfNotExists = async (
   database: string,
   defaultDb: string | undefined,
@@ -136,18 +112,6 @@ const createDatabaseIfNotExists = async (
   port: string,
   ssl: boolean | string | undefined,
 ): Promise<boolean> => {
-  const exists = await checkDatabaseExists(
-    database,
-    defaultDb,
-    host,
-    user,
-    password,
-    port,
-    ssl,
-  );
-  if (exists) {
-    return true;
-  }
   console.log(`Creating database ${database}...`);
 
   const client = new pg.Client({
