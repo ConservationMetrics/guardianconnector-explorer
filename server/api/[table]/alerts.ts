@@ -1,5 +1,5 @@
 import { defineEventHandler, sendError, H3Event } from "h3";
-import { setupDatabaseConnection } from "../../database/dbConnection";
+import { configDb, db } from "@/server/index";
 import { fetchConfig, fetchData } from "../../database/dbOperations";
 import {
   prepareAlertData,
@@ -23,58 +23,12 @@ export default defineEventHandler(async (event: H3Event) => {
 
   const {
     public: { allowedFileExtensions },
-    configDatabase,
-    database,
-    dbHost,
-    dbUser,
-    dbPassword,
-    dbPort,
-    dbSsl,
     isSqlite,
-    sqliteDbPath,
     // eslint-disable-next-line no-undef
   } = useRuntimeConfig() as unknown as {
     public: { allowedFileExtensions: AllowedFileExtensions };
-    configDatabase: string;
     isSqlite: boolean;
-    sqliteDbPath: string;
-    database: string;
-    dbHost: string;
-    dbUser: string;
-    dbPassword: string;
-    dbPort: string;
-    dbSsl: boolean;
   };
-
-  const configDb = await setupDatabaseConnection(
-    /* isConfigDb */ true,
-    isSqlite,
-    sqliteDbPath,
-    configDatabase,
-    database,
-    dbHost,
-    dbUser,
-    dbPassword,
-    dbPort,
-    dbSsl,
-  );
-
-  if (!configDb) {
-    throw new Error("Failed to connect to configDb");
-  }
-
-  const db = await setupDatabaseConnection(
-    /* isConfigDb */ false,
-    isSqlite,
-    sqliteDbPath,
-    database,
-    database,
-    dbHost,
-    dbUser,
-    dbPassword,
-    dbPort,
-    dbSsl,
-  );
 
   try {
     const viewsConfig = await fetchConfig(configDb, isSqlite);

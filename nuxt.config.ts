@@ -22,6 +22,10 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  nitro: {
+    plugins: ["@/server/index.ts"],
+  },
+
   modules: [
     "gc-shared-resources",
     "nuxt-auth-utils",
