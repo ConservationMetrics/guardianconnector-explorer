@@ -3,7 +3,6 @@ import { ref, watch, onMounted } from "vue";
 
 const props = defineProps({
   mapLegendContent: Array,
-  resetLegend: Boolean,
 });
 
 const emit = defineEmits(["toggle-layer-visibility"]);
@@ -23,25 +22,19 @@ const toggleLayerVisibility = (item) => {
   emit("toggle-layer-visibility", item);
 };
 
-const resetLegendVisibility = () => {
-  localMapLegendContent.value = localMapLegendContent.value.map((item) => ({
-    ...item,
-    visible: true,
-  }));
-};
-
 // Get the class for the geometry type
 const getTypeClass = (item) => {
   return `${item.type}-box`;
 };
 
-// Watch for changes in the resetLegend prop
+// Watch for changes in mapLegendContent prop
 watch(
-  () => props.resetLegend,
-  (newVal) => {
-    if (newVal) {
-      resetLegendVisibility();
-    }
+  () => props.mapLegendContent,
+  (newContent) => {
+    localMapLegendContent.value = newContent.map((item) => ({
+      ...item,
+      visible: true,
+    }));
   },
 );
 </script>

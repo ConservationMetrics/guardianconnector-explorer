@@ -246,7 +246,10 @@ const filterValues = (values) => {
 const currentBasemap = ref(props.mapboxStyle);
 const handleBasemapChange = (newBasemap) => {
   changeMapStyle(map.value, newBasemap, props.planetApiKey);
+
   currentBasemap.value = newBasemap;
+
+  // Once map is idle, re-add sources, layers, and event listeners
   map.value.once("idle", () => {
     prepareMapCanvasContent();
   });

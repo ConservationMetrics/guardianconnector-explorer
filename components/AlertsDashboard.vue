@@ -504,14 +504,21 @@ const handleBufferMouseEvent = (e) => {
     [e.point.x + pixelBuffer, e.point.y + pixelBuffer],
   ];
 
-  const features = map.value.queryRenderedFeatures(bbox, {
-    layers: ["most-recent-alerts-linestring", "previous-alerts-linestring"],
-  });
+  const layersToQuery = [
+    "most-recent-alerts-linestring",
+    "previous-alerts-linestring",
+  ].filter((layerId) => map.value.getLayer(layerId));
 
-  if (features.length) {
-    map.value.getCanvas().style.cursor = "pointer";
-  } else if (featuresUnderCursor.value === 0) {
-    map.value.getCanvas().style.cursor = "";
+  if (layersToQuery.length > 0) {
+    const features = map.value.queryRenderedFeatures(bbox, {
+      layers: layersToQuery,
+    });
+
+    if (features.length) {
+      map.value.getCanvas().style.cursor = "pointer";
+    } else if (featuresUnderCursor.value === 0) {
+      map.value.getCanvas().style.cursor = "";
+    }
   }
 };
 
@@ -637,10 +644,9 @@ const handleBasemapChange = (newBasemap) => {
 const mapLegendContent = ref(null);
 const prepareMapLegendContent = () => {
   map.value.once("idle", () => {
-    let mapLegendLayerIds = "";
+    let mapLegendLayerIds = props.mapLegendLayerIds;
 
     // Add most-recent-alerts & previous-alerts layers to mapLegendContent
-    mapLegendLayerIds = props.mapLegendLayerIds;
     if (hasLineStrings.value) {
       mapLegendLayerIds =
         "most-recent-alerts-linestring," +
@@ -984,7 +990,7 @@ onBeforeUnmount(() => {
       @date-range-changed="handleDateRangeChanged"
     />
     <MapLegend
-      v-if="mapLegendContent && map"
+      v-if="mapLegendContent && alertsData"
       :map-legend-content="mapLegendContent"
       @toggle-layer-visibility="toggleLayerVisibility"
     />
