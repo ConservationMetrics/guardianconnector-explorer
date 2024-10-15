@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch } from "vue";
+import { reactive, watch } from "vue";
 import { toCamelCase } from "@/utils";
 
 import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
@@ -16,12 +16,8 @@ const props = defineProps({
 const localConfig = reactive({ ...props.config });
 
 // Set up refs for tags field
-const tagInputs = ref({
-  FILTER_OUT_VALUES_FROM_COLUMN: "",
-  UNWANTED_COLUMNS: "",
-  UNWANTED_SUBSTRINGS: "",
-});
-const tags = ref({
+
+const initialTags = {
   FILTER_OUT_VALUES_FROM_COLUMN: props.config.FILTER_OUT_VALUES_FROM_COLUMN
     ? props.config.FILTER_OUT_VALUES_FROM_COLUMN.split(",").map((tag) => ({
         text: tag,
@@ -37,7 +33,8 @@ const tags = ref({
         text: tag,
       }))
     : [],
-});
+};
+const { tags, handleTagsChanged } = updateTags(initialTags, localConfig);
 
 // Watch for changes in localConfig and emit updates
 const emit = defineEmits(["updateConfig"]);
@@ -74,9 +71,9 @@ watch(
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
 
         <VueTagsInput
-          v-model="tagInputs[key]"
+          class="tag-field"
           :tags="tags[key]"
-          @tags-changed="updateTags(key, $event)"
+          @tags-changed="handleTagsChanged(key, $event)"
         />
       </template>
     </div>

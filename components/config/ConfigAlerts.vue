@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch } from "vue";
+import { reactive, watch } from "vue";
 
 import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
 
@@ -14,18 +14,12 @@ const props = defineProps({
 });
 
 const localConfig = reactive({ ...props.config });
-
-// Set up refs for tags field
-const tagInputs = ref({
-  MAPEO_CATEGORY_IDS: "",
-});
-const tags = ref({
+const initialTags = {
   MAPEO_CATEGORY_IDS: props.config.MAPEO_CATEGORY_IDS
-    ? props.config.MAPEO_CATEGORY_IDS.split(",").map((tag) => ({
-        text: tag,
-      }))
+    ? props.config.MAPEO_CATEGORY_IDS.split(",").map((tag) => ({ text: tag }))
     : [],
-});
+};
+const { tags, handleTagsChanged } = updateTags(initialTags, localConfig);
 
 // Watch for changes in localConfig and emit updates
 const emit = defineEmits(["updateConfig"]);
@@ -55,9 +49,8 @@ watch(
       <template v-else-if="key === 'MAPEO_CATEGORY_IDS'">
         <VueTagsInput
           class="tag-field"
-          v-model="tagInputs[key]"
           :tags="tags[key]"
-          @tags-changed="updateTags(key, $event)"
+          @tags-changed="handleTagsChanged(key, $event)"
         />
       </template>
     </div>

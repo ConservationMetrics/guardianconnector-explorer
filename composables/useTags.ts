@@ -4,19 +4,26 @@ interface Tag {
   text: string;
 }
 
-export function updateTags(initialTags: Record<string, Tag[]>): {
+interface LocalConfig {
+  [key: string]: string | boolean | number;
+}
+
+export function updateTags(
+  initialTags: Record<string, Tag[]>,
+  localConfig: LocalConfig,
+): {
   tags: Ref<Record<string, Tag[]>>;
-  updateTags: (_key: string, _newTags: Tag[]) => string;
+  handleTagsChanged: (_key: string, _newTags: Tag[]) => void;
 } {
   const tags = ref(initialTags);
 
-  const updateTags = (key: string, newTags: Tag[]): string => {
+  const handleTagsChanged = (key: string, newTags: Tag[]): void => {
     tags.value[key] = newTags;
-    return newTags.map((tag) => tag.text).join(",");
+    localConfig[key] = newTags.map((tag) => tag.text).join(",");
   };
 
   return {
     tags,
-    updateTags,
+    handleTagsChanged,
   };
 }

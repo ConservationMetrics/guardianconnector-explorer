@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, watch } from "vue";
+import { reactive, watch } from "vue";
 
 import { VueTagsInput } from "@vojtechlanka/vue-tags-input";
 
@@ -15,17 +15,14 @@ const props = defineProps({
 
 const localConfig = reactive({ ...props.config });
 
-// Set up refs for tags field
-const tagInputs = ref({
-  MAP_LEGEND_LAYER_IDS: "",
-});
-const tags = ref({
+const initialTags = {
   MAP_LEGEND_LAYER_IDS: props.config.MAP_LEGEND_LAYER_IDS
     ? props.config.MAP_LEGEND_LAYER_IDS.split(",").map((tag) => ({
         text: tag,
       }))
     : [],
-});
+};
+const { tags, handleTagsChanged } = updateTags(initialTags, localConfig);
 
 // Watch for changes in localConfig and emit updates
 const emit = defineEmits(["updateConfig"]);
@@ -146,9 +143,8 @@ watch(
         <label :for="`${tableName}-${key}`">{{ $t(toCamelCase(key)) }}</label>
         <VueTagsInput
           class="tag-field"
-          v-model="tagInputs[key]"
           :tags="tags[key]"
-          @tags-changed="updateTags(key, $event)"
+          @tags-changed="handleTagsChanged(key, $event)"
         />
       </template>
       <template v-else-if="key === 'PLANET_API_KEY'">
