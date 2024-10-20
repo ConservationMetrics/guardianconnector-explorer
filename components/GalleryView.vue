@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { getFilePathsWithExtension } from "@/utils";
+import { prepareCoordinatesForSelectedFeature } from "@/utils/mapFunctions.ts";
 
 import DataFilter from "@/components/shared/DataFilter.vue";
 import DataFeature from "@/components/shared/DataFeature.vue";
@@ -48,6 +49,13 @@ const filterValues = (values) => {
   }
 };
 
+const featureWithPreparedCoordinates = (feature) => ({
+  ...feature,
+  geocoordinates: feature.geocoordinates
+    ? prepareCoordinatesForSelectedFeature(feature.geocoordinates)
+    : feature.geocoordinates,
+});
+
 // Lifecycle hooks
 </script>
 
@@ -66,7 +74,7 @@ const filterValues = (values) => {
     <DataFeature
       v-for="(feature, index) in paginatedData"
       :allowed-file-extensions="allowedFileExtensions"
-      :feature="feature"
+      :feature="featureWithPreparedCoordinates(feature)"
       :file-paths="getFilePathsWithExtension(feature, allowedFileExtensions)"
       :key="index"
       :media-base-path="mediaBasePath"

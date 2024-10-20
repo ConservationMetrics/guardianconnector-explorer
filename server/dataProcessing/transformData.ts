@@ -285,7 +285,7 @@ const prepareAlertsStatistics = (
   const typeOfAlerts = Array.from(
     new Set(
       data
-        .map((item) => item.alert_type)
+        .map((item) => item.alert_type.replace(/_/g, " "))
         .filter((alertType): alertType is string => alertType !== null),
     ),
   );
