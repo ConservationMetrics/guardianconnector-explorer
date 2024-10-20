@@ -11,9 +11,10 @@ import {
   type GeoJSONFeature,
 } from "../types";
 import {
-  capitalizeFirstLetter,
-  getRandomColor,
   calculateCentroid,
+  capitalizeFirstLetter,
+  formatDate,
+  getRandomColor,
 } from "./helpers";
 
 // Transform survey data keys and values
@@ -50,16 +51,10 @@ const transformSurveyData = (data: DataEntry[]): DataEntry[] => {
       }
       if (
         key.toLowerCase().includes("created") ||
-        key.toLowerCase().includes("modified")
+        key.toLowerCase().includes("modified") ||
+        key.toLowerCase().includes("updated")
       ) {
-        // First let's ensure the date is in the correct format
-        const dateRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).*/;
-        const dateMatch = transformedValue.match(dateRegex);
-        if (dateMatch) {
-          transformedValue = new Date(
-            `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T${dateMatch[4]}:${dateMatch[5]}:${dateMatch[6]}`,
-          ).toLocaleDateString();
-        }
+        transformedValue = formatDate(transformedValue);
       }
       transformedValue =
         transformedValue.charAt(0).toUpperCase() + transformedValue.slice(1);

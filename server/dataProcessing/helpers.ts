@@ -125,3 +125,15 @@ export const calculateCentroid = (coords: string): string => {
 
   return `${avgLat}, ${avgLng}`;
 };
+
+export const formatDate = (date: string): string => {
+  // First let's ensure the date is in the correct format
+  const dateRegex = /(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2}).*/;
+  const dateMatch = date.match(dateRegex);
+  if (dateMatch) {
+    date = new Date(
+      `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}T${dateMatch[4]}:${dateMatch[5]}:${dateMatch[6]}`,
+    ).toLocaleDateString();
+  }
+  return date;
+};
