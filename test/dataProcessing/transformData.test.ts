@@ -85,8 +85,8 @@ describe("prepareAlertsStatistics", () => {
 
     expect(result.territory).toBe("Mountain valley");
     expect(result.typeOfAlerts).toEqual([
-      "gold_mining",
-      "wildlife_trafficking",
+      "gold mining",
+      "wildlife trafficking",
     ]);
     expect(result.dataProviders).toEqual(["alerts_provider"]);
     expect(result.alertDetectionRange).toBe("01-2023 to 01-2024");
