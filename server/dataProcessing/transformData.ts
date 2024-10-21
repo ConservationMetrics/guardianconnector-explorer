@@ -77,7 +77,9 @@ const transformSurveyData = (data: DataEntry[]): DataEntry[] => {
     Object.entries(entry).forEach(([key, value]) => {
       const transformedKey = transformSurveyDataKey(key);
       const transformedValue = transformSurveyDataValue(key, value);
-      transformedEntry[transformedKey] = String(transformedValue);
+      if (transformedValue !== null) {
+        transformedEntry[transformedKey] = String(transformedValue);
+      }
     });
     return transformedEntry;
   });
