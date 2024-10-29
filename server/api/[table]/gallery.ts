@@ -1,5 +1,5 @@
 import { defineEventHandler, sendError, H3Event } from "h3";
-import { configDb, db } from "@/server/index";
+import { getDatabaseConnection } from "@/server/database/dbConnection";
 import { fetchConfig, fetchData } from "../../database/dbOperations";
 import { transformSurveyData } from "../../dataProcessing/transformData";
 import {
@@ -26,6 +26,9 @@ export default defineEventHandler(async (event: H3Event) => {
   };
 
   try {
+    const configDb = await getDatabaseConnection(true);
+    const db = await getDatabaseConnection(false);
+
     const viewsConfig = await fetchConfig(configDb, isSqlite);
     const { mainData, columnsData } = await fetchData(db, table, isSqlite);
 

@@ -1,5 +1,5 @@
 import { defineEventHandler, sendError, H3Event } from "h3";
-import { configDb } from "@/server/index";
+import { getDatabaseConnection } from "@/server/database/dbConnection";
 import { removeTableFromConfig } from "../../../database/dbOperations";
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -13,6 +13,8 @@ export default defineEventHandler(async (event: H3Event) => {
   const table = event.context?.params?.table as string;
 
   try {
+    const configDb = await getDatabaseConnection(true);
+
     await removeTableFromConfig(configDb, table, isSqlite);
     return { message: "Table removed from views configuration." };
   } catch (error) {

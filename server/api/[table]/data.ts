@@ -1,5 +1,5 @@
 import { defineEventHandler, sendError, H3Event } from "h3";
-import { db } from "@/server/index";
+import { getDatabaseConnection } from "@/server/database/dbConnection";
 import { fetchData } from "../../database/dbOperations";
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -13,6 +13,8 @@ export default defineEventHandler(async (event: H3Event) => {
   };
 
   try {
+    const db = await getDatabaseConnection(false);
+
     const { mainData, columnsData } = await fetchData(db, table, isSqlite);
     return { data: mainData, columns: columnsData };
   } catch (error) {

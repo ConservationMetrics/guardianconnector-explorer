@@ -1,5 +1,5 @@
 import { defineEventHandler, sendError, readBody, H3Event } from "h3";
-import { configDb } from "@/server/index";
+import { getDatabaseConnection } from "@/server/database/dbConnection";
 import { updateConfig } from "../../../database/dbOperations";
 
 export default defineEventHandler(async (event: H3Event) => {
@@ -14,6 +14,8 @@ export default defineEventHandler(async (event: H3Event) => {
   const config = await readBody(event);
 
   try {
+    const configDb = await getDatabaseConnection(true);
+
     await updateConfig(configDb, table, config, isSqlite);
     return { message: "Configuration updated successfully" };
   } catch (error) {
