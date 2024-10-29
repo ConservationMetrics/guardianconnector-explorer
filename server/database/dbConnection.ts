@@ -1,22 +1,30 @@
 import pg from "pg";
 import sqlite3 from "sqlite3";
 import { type DatabaseConnection } from "../types";
+import { getConfig } from "./dbConfig";
+
+let configDb: DatabaseConnection | null = null;
+let db: DatabaseConnection | null = null;
 
 export const setupDatabaseConnection = async (
   isConfigDb: boolean,
-  isSqlite: boolean,
-  sqliteDbPath: string | undefined,
-  database: string | undefined,
-  defaultDb: string | undefined,
-  host: string | undefined,
-  user: string | undefined,
-  password: string | undefined,
-  port: string,
-  ssl: boolean | string | undefined,
 ): Promise<DatabaseConnection> => {
-  console.log(`Setting up database connection to ${database}...`);
+  const {
+    configDatabase,
+    database,
+    dbHost,
+    dbUser,
+    dbPassword,
+    dbPort,
+    dbSsl,
+    isSQLite,
+    sqliteDbPath,
+  } = getConfig();
 
-  if (isSqlite) {
+  const localDatabase = isConfigDb ? configDatabase : database;
+  console.log(`Setting up database connection to ${localDatabase}...`);
+
+  if (isSQLite) {
     if (sqliteDbPath === undefined) {
       throw new Error("sqliteDbPath is undefined");
     }
@@ -35,18 +43,18 @@ export const setupDatabaseConnection = async (
     return sqliteDb;
   } else {
     const dbConnection = {
-      database: database,
-      user: user,
-      host: host,
-      password: password,
-      port: parseInt(port, 10),
-      ssl: ssl === true ? { rejectUnauthorized: false } : false,
+      database: localDatabase,
+      user: dbUser,
+      host: dbHost,
+      password: dbPassword,
+      port: parseInt(dbPort, 10),
+      ssl: dbSsl === true ? { rejectUnauthorized: false } : false,
     };
     let client = new pg.Client(dbConnection);
 
     try {
       await client.connect();
-      console.log(`Connected to the PostgreSQL database: "${database}"`);
+      console.log(`Connected to the PostgreSQL database: "${localDatabase}"`);
       return client;
     } catch (error: unknown) {
       if (
@@ -68,13 +76,13 @@ export const setupDatabaseConnection = async (
         if (isConfigDb) {
           console.log("Config database does not exist. Attemping to create...");
           const created = await createDatabaseIfNotExists(
+            localDatabase as string,
             database as string,
-            defaultDb as string,
-            host,
-            user,
-            password,
-            port,
-            ssl as string,
+            dbHost,
+            dbUser,
+            dbPassword,
+            dbPort,
+            dbSsl,
           );
           if (created) {
             // Retry connection after creating the database
@@ -102,6 +110,58 @@ export const setupDatabaseConnection = async (
     }
   }
 };
+
+export const getDatabaseConnection = async (
+  isConfigDb: boolean,
+): Promise<DatabaseConnection> => {
+  const isSQLite = getConfig().isSQLite;
+  if (!isSQLite) {
+    await ensurePostgresConnection(db, isConfigDb);
+  }
+  if (isConfigDb) {
+    if (!configDb) {
+      configDb = await setupDatabaseConnection(true);
+    }
+    return configDb;
+  } else {
+    if (!db) {
+      db = await setupDatabaseConnection(false);
+    }
+    return db;
+  }
+};
+
+export const refreshDatabaseConnection = async (
+  isConfigDb: boolean,
+): Promise<void> => {
+  if (isConfigDb && configDb instanceof pg.Client) {
+    await configDb.end();
+    configDb = await setupDatabaseConnection(true);
+  } else if (!isConfigDb && db instanceof pg.Client) {
+    await db.end();
+    db = await setupDatabaseConnection(false);
+  }
+};
+
+async function ensurePostgresConnection(
+  db: DatabaseConnection,
+  isConfigDb: boolean,
+): Promise<void> {
+  if (db instanceof pg.Client) {
+    try {
+      await db.query("SELECT 1"); // Simple query to check connection
+    } catch (error) {
+      if (error instanceof Error) {
+        console.warn(
+          "Error encountered when checking PostgreSQL connection:",
+          error.message,
+        );
+      }
+      console.log("Reconnecting to PostgreSQL...");
+      await refreshDatabaseConnection(isConfigDb);
+    }
+  }
+}
 
 const createDatabaseIfNotExists = async (
   database: string,
