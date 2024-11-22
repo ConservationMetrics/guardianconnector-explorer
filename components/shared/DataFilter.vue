@@ -62,19 +62,23 @@ function emitFilter() {
       :key="uniqueValues"
     >
       <!-- This is what shows in the listbox when selected -->
-      <!-- Pending support for tags https://github.com/TotomInc/vue3-select-component/pull/129 -->
-      <template #tag="{ option }">
-        <span
-          class="colored-dot"
-          v-if="showColoredDot"
-          :style="{ backgroundColor: option.color }"
-        ></span>
-        {{ option.label }}
+      <template #tag="{ option, removeOption }">
+        <div class="option-box">
+          <span
+            class="colored-dot"
+            v-if="showColoredDot"
+            :style="{ backgroundColor: option.color }"
+          ></span>
+          <span class="selected-label">
+            {{ option.label }}
+            <button type="button" @click="removeOption">&times;</button>
+          </span>
+        </div>
       </template>
       <!-- These are the options in the dropdown -->
       <template #option="{ option }">
         <span
-          class="colored-dot"
+          class="colored-dot dot-dropdown"
           v-if="showColoredDot"
           :style="{ backgroundColor: option.color }"
         ></span>
@@ -111,13 +115,41 @@ function emitFilter() {
 
     --vs-selected-bg: #f9f9f9;
 
+    .option-box {
+      --vs-multi-value-gap: 4px;
+
+      display: flex;
+      align-items: center;
+      gap: var(--vs-multi-value-gap);
+      border-radius: 4px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: var(--vs-multi-value-padding);
+      margin: var(--vs-multi-value-margin);
+      color: var(--vs-multi-value-text-color);
+      line-height: var(--vs-multi-value-line-height);
+      background: var(--vs-multi-value-bg);
+    }
+
+    .option-box button {
+      font-size: 1.25rem;
+      background: none;
+      transform: translateY(1px); /* Move text 3px lower */
+    }
+
     .colored-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
       display: inline-block;
+      margin: 0 5px;
+    }
+
+    .dot-dropdown {
+      margin: 5px 5px 0 0;
+    }
+
+    .selected-label {
       margin-right: 5px;
-      margin-top: 5px;
     }
   }
 
