@@ -34,7 +34,7 @@
     "vue-chartjs": "^5.3.1",
     "vue-datepicker-next": "^1.0.3",
     "vue-router": "latest",
-    "vue3-select-component": "^0.6.1"
+    "vue3-select-component": "^0.7.0"
   },
   "lint-staged": {
     "./**/*.{js,jsx,ts,tsx,json,css,vue}": [
