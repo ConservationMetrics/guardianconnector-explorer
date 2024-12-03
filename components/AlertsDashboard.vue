@@ -10,6 +10,7 @@ import bbox from "@turf/bbox";
 import { lineString } from "@turf/helpers";
 import length from "@turf/length";
 import along from "@turf/along";
+import rulerControl from "mapbox-gl-ruler-control";
 
 import {
   changeMapStyle,
@@ -45,6 +46,7 @@ const props = defineProps({
 
 const calculateHectares = ref(false);
 const dateOptions = ref([]);
+const hasRulerControl = ref(false);
 const map = ref(null);
 const showBasemapSelector = ref(false);
 const showIntroPanel = ref(true);
@@ -92,6 +94,11 @@ onMounted(() => {
     // Fullscreen Control
     const fullscreenControl = new mapboxgl.FullscreenControl();
     map.value.addControl(fullscreenControl, "top-right");
+
+    // Ruler control
+    const ruler = new rulerControl();
+    map.value.addControl(ruler, "top-right");
+    hasRulerControl.value = true;
 
     showBasemapSelector.value = true;
 
@@ -996,6 +1003,7 @@ onBeforeUnmount(() => {
     />
     <BasemapSelector
       v-if="showBasemapSelector"
+      :has-ruler-control="hasRulerControl"
       :mapbox-style="mapboxStyle"
       :planet-api-key="planetApiKey"
       @basemapSelected="handleBasemapChange"
@@ -1018,6 +1026,16 @@ body {
 
 .mapboxgl-popup-content {
   word-wrap: break-word;
+}
+
+:deep(.mapboxgl-ctrl-ruler) {
+  img {
+    margin-left: 3px;
+  }
+
+  .active {
+    background-color: #fff44f;
+  }
 }
 
 .popup-media {

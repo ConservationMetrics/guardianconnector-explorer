@@ -5,11 +5,14 @@ import Datepicker from "vue-datepicker-next";
 import "vue-datepicker-next/index.css";
 
 const props = defineProps({
+  hasRulerControl: Boolean,
   mapboxStyle: String,
   planetApiKey: String,
 });
 
 const emit = defineEmits(["basemapSelected"]);
+
+const topPosition = computed(() => (props.hasRulerControl ? "187px" : "147px"));
 
 const showBasemapWindow = ref(false);
 const selectedBasemap = ref({ id: "custom", style: props.mapboxStyle });
@@ -75,11 +78,16 @@ const emitBasemapChange = () => {
     <div
       class="basemap-toggle rounded shadow"
       :class="{ active: showBasemapWindow }"
+      :style="{ top: topPosition }"
       @click="toggleBasemapWindow"
     >
       <img src="/map.svg" alt="Map Icon" />
     </div>
-    <div v-if="showBasemapWindow" class="basemap-window rounded shadow">
+    <div
+      v-if="showBasemapWindow"
+      class="basemap-window rounded shadow"
+      :style="{ top: topPosition }"
+    >
       <div class="basemap-window-content">
         <h3 class="font-semibold mb-2">{{ $t("selectBasemap") }}</h3>
         <label>
@@ -148,7 +156,6 @@ const emitBasemapChange = () => {
 <style scoped>
 .basemap-toggle {
   position: absolute;
-  top: 147px;
   right: 10px;
   padding: 3px;
   width: 30px;
@@ -172,7 +179,6 @@ const emitBasemapChange = () => {
 .basemap-window {
   position: absolute;
   right: 50px;
-  top: 147px;
   background-color: #fff;
   border: 1px solid #ccc;
   z-index: 1001;
