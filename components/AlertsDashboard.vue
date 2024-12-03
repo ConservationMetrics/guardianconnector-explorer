@@ -416,7 +416,7 @@ const addMapeoData = () => {
       source: "mapeo-data",
       filter: ["==", "$type", "Point"],
       paint: {
-        "circle-radius": 5,
+        "circle-radius": 6,
         "circle-color": [
           // Use filter-color for fallback if selected is false
           "case",

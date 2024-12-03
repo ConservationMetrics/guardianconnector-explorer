@@ -144,9 +144,9 @@ const addDataToMap = () => {
       source: "data-source",
       filter: ["==", "$type", "Point"],
       paint: {
-        "circle-radius": 6,
+        "circle-radius": 8,
         "circle-color": ["get", "filter-color", ["get", "feature"]],
-        "circle-stroke-width": 2,
+        "circle-stroke-width": 3,
         "circle-stroke-color": "#fff",
       },
     });
