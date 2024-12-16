@@ -19,12 +19,11 @@ const selectedFilterValue = ref([]);
 const getUniqueFilterValues = computed(() => {
   const allDataFilterValues = props.data.map((item) => {
     const value = item[props.filterColumn];
+    const color = item["filter-color"] || defaultColoredDotColor;
     return {
       label: value !== null && value !== undefined ? value : t("noColumnEntry"),
       value: value,
-      color: item["filter-color"]
-        ? item["filter-color"]
-        : defaultColoredDotColor,
+      color: color,
     };
   });
 
