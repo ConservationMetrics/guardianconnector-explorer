@@ -1,5 +1,8 @@
 <script setup>
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
+const { t } = useI18n();
+
 import VueSelect from "vue3-select-component";
 
 const props = defineProps({
@@ -10,42 +13,47 @@ const props = defineProps({
 
 const emit = defineEmits(["filter"]);
 
-const defaultColor = "#ffffff";
-const selectedValue = ref([]);
+const defaultColoredDotColor = "#ffffff";
+const selectedFilterValue = ref([]);
 
-// Compute unique values
-const uniqueValues = computed(() => {
-  const values = props.data
-    .map((item) => ({
-      label: item[props.filterColumn],
-      value: item[props.filterColumn],
-      color: item["filter-color"] ? item["filter-color"] : defaultColor,
-    }))
-    .filter(
-      (item) =>
-        item.value !== null && item.value !== "" && item.value !== undefined,
-    );
+const getUniqueFilterValues = computed(() => {
+  const allDataFilterValues = props.data.map((item) => {
+    const value = item[props.filterColumn];
+    return {
+      label: value !== null && value !== undefined ? value : t("noColumnEntry"),
+      value: value,
+      color: item["filter-color"]
+        ? item["filter-color"]
+        : defaultColoredDotColor,
+    };
+  });
 
-  // Use a Map to ensure unique values based on the 'value' property
-  const uniqueMap = new Map();
-  values.forEach((item) => {
-    if (!uniqueMap.has(item.value)) {
-      uniqueMap.set(item.value, item);
+  const uniqueFilterValues = new Map();
+  let undefinedFilterValue;
+
+  allDataFilterValues.forEach((item) => {
+    if (item.value === undefined) {
+      undefinedFilterValue = item;
+    } else if (!uniqueFilterValues.has(item.value)) {
+      uniqueFilterValues.set(item.value, item);
     }
   });
 
-  return Array.from(uniqueMap.values());
+  if (undefinedFilterValue) {
+    uniqueFilterValues.set(undefined, undefinedFilterValue);
+  }
+
+  return Array.from(uniqueFilterValues.values());
 });
 
-// Emit filter selection
-function emitFilter() {
-  if (selectedValue.value.length > 0) {
-    const labels = selectedValue.value;
+const emitFilterSelection = () => {
+  if (selectedFilterValue.value.length > 0) {
+    const labels = selectedFilterValue.value;
     emit("filter", labels);
   } else {
     emit("filter", "null");
   }
-}
+};
 </script>
 
 <template>
@@ -55,11 +63,11 @@ function emitFilter() {
     </h4>
     <VueSelect
       :is-multi="true"
-      :options="uniqueValues"
-      @option-selected="emitFilter()"
-      @option-deselected="emitFilter()"
-      v-model="selectedValue"
-      :key="uniqueValues"
+      :options="getUniqueFilterValues"
+      @option-selected="emitFilterSelection()"
+      @option-deselected="emitFilterSelection()"
+      v-model="selectedFilterValue"
+      :key="getUniqueFilterValues"
     >
       <!-- This is what shows in the listbox when selected -->
       <template #tag="{ option, removeOption }">
