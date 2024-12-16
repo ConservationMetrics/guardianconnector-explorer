@@ -13,7 +13,7 @@ const props = defineProps({
 
 const emit = defineEmits(["filter"]);
 
-const defaultColoredDotColor = "#ffffff";
+const defaultColoredDotColor = "#808080";
 const selectedFilterValue = ref([]);
 
 const getUniqueFilterValues = computed(() => {
